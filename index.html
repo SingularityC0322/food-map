@@ -23,8 +23,19 @@ body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;backg
 
 /* Auth screen */
 .auth-screen{display:none;position:fixed;inset:0;background:var(--cream);z-index:500;overflow-y:auto}
-.auth-screen.open{display:flex;align-items:center;justify-content:center}
-.auth-box{width:100%;max-width:380px;padding:20px}
+.auth-screen.open{display:flex;align-items:stretch;justify-content:center}
+.auth-wrap{display:flex;width:100%;max-width:900px;min-height:100vh;margin:0 auto}
+.auth-intro{flex:1;background:var(--teal-d);padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
+.auth-intro-logo{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:white;margin-bottom:4px}
+.auth-intro-logo em{font-style:italic;font-weight:400;color:rgba(255,255,255,.7)}
+.auth-intro-tagline{font-size:13px;color:rgba(255,255,255,.55);letter-spacing:.06em;margin-bottom:36px}
+.auth-intro-item{display:flex;gap:14px;margin-bottom:22px;align-items:flex-start}
+.auth-intro-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.auth-intro-text h4{font-size:14px;font-weight:600;color:white;margin-bottom:3px}
+.auth-intro-text p{font-size:13px;color:rgba(255,255,255,.6);line-height:1.5}
+.auth-intro-footer{margin-top:auto;padding-top:32px;font-size:12px;color:rgba(255,255,255,.35)}
+.auth-box{width:100%;max-width:400px;padding:48px 36px;display:flex;flex-direction:column;justify-content:center;background:var(--cream)}
+@media(max-width:640px){.auth-intro{display:none}.auth-box{padding:32px 20px;max-width:100%}}
 .auth-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:4px}
 .auth-logo em{font-style:italic;font-weight:400;color:var(--teal)}
 .auth-sub{font-size:12px;color:var(--th);letter-spacing:.06em;margin-bottom:32px}
@@ -201,26 +212,65 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
 
 <!-- Auth screen -->
 <div class="auth-screen open" id="authScreen">
-  <div class="auth-box">
-    <div class="auth-logo">Eat as <em>a Local</em></div>
-    <div class="auth-sub">我的美食探索地图</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
-      <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+  <div class="auth-wrap">
+    <!-- Left intro panel -->
+    <div class="auth-intro">
+      <div>
+        <div class="auth-intro-logo">Eat as <em>a Local</em></div>
+        <div class="auth-intro-tagline">我的美食探索地图</div>
+        <div class="auth-intro-item">
+          <div class="auth-intro-icon">📌</div>
+          <div class="auth-intro-text">
+            <h4>收藏想去的餐厅</h4>
+            <p>朋友推荐的、刷到的、路过的，先存下来，约饭时随时翻出来</p>
+          </div>
+        </div>
+        <div class="auth-intro-item">
+          <div class="auth-intro-icon">★</div>
+          <div class="auth-intro-text">
+            <h4>记录去过的每家餐厅</h4>
+            <p>支持 0.1 步进评分，逐道菜记录，总结整体感受</p>
+          </div>
+        </div>
+        <div class="auth-intro-item">
+          <div class="auth-intro-icon">💡</div>
+          <div class="auth-intro-text">
+            <h4>记录发现与灵感</h4>
+            <p>新奇食材、有趣搭配、待尝试的吃法，都可以记下来</p>
+          </div>
+        </div>
+        <div class="auth-intro-item">
+          <div class="auth-intro-icon">🌍</div>
+          <div class="auth-intro-text">
+            <h4>菜系地图 & 广场</h4>
+            <p>看自己探索了哪些菜系，也能看到朋友们的美食发现</p>
+          </div>
+        </div>
+      </div>
+      <div class="auth-intro-footer">每个人有独立账号 · 数据云端同步 · 完全免费</div>
     </div>
-    <div id="loginForm">
-      <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="loginUser" placeholder="你的用户名" /></div>
-      <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
-      <button class="auth-btn" onclick="doLogin()">登录</button>
+    <!-- Right login panel -->
+    <div class="auth-box">
+      <div class="auth-logo">Eat as <em>a Local</em></div>
+      <div class="auth-sub">登录或注册开始使用</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+      </div>
+      <div id="loginForm">
+        <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="loginUser" placeholder="你的用户名" /></div>
+        <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+        <button class="auth-btn" onclick="doLogin()">登录</button>
+      </div>
+      <div id="registerForm" style="display:none">
+        <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="regUser" placeholder="字母、数字、下划线" /></div>
+        <div class="auth-fg"><label class="auth-label">昵称（显示用）</label><input class="auth-input" id="regDisplay" placeholder="你想让别人看到的名字" /></div>
+        <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="regPwd" placeholder="至少6位" /></div>
+        <div class="auth-fg"><label class="auth-label">确认密码</label><input class="auth-input" type="password" id="regPwd2" placeholder="再输一次" onkeydown="if(event.key==='Enter')doRegister()" /></div>
+        <button class="auth-btn" onclick="doRegister()">注册</button>
+      </div>
+      <div class="auth-err" id="authErr"></div>
     </div>
-    <div id="registerForm" style="display:none">
-      <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="regUser" placeholder="字母数字，不含空格" /></div>
-      <div class="auth-fg"><label class="auth-label">昵称（显示用）</label><input class="auth-input" id="regDisplay" placeholder="你想让别人看到的名字" /></div>
-      <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="regPwd" placeholder="至少6位" /></div>
-      <div class="auth-fg"><label class="auth-label">确认密码</label><input class="auth-input" type="password" id="regPwd2" placeholder="再输一次" onkeydown="if(event.key==='Enter')doRegister()" /></div>
-      <button class="auth-btn" onclick="doRegister()">注册</button>
-    </div>
-    <div class="auth-err" id="authErr"></div>
   </div>
 </div>
 
