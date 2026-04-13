@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的美食地图</title>
+<style>
+  :root {
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-dark: #0F6E56;
+    --purple: #7F77DD;
+    --purple-light: #EEEDFE;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --coral: #D85A30;
+    --coral-light: #FAECE7;
+    --gray-50: #F9F9F8;
+    --gray-100: #F1EFE8;
+    --gray-200: #D3D1C7;
+    --gray-500: #888780;
+    --gray-800: #2C2C2A;
+    --text: #1A1A1A;
+    --text-muted: #666;
+    --text-hint: #999;
+    --border: rgba(0,0,0,0.1);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif; background: var(--gray-50); color: var(--text); min-height: 100vh; }
+
+  /* Layout */
+  .app { max-width: 680px; margin: 0 auto; padding: 0 16px 100px; }
+  .header { padding: 32px 0 20px; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .header-sub { font-size: 13px; color: var(--text-hint); margin-top: 4px; }
+
+  /* Nav */
+  .nav { display: flex; gap: 4px; background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 4px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 10; }
+  .nav-btn { flex: 1; padding: 8px; border: none; background: transparent; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); transition: all 0.15s; font-family: inherit; }
+  .nav-btn.active { background: var(--gray-50); color: var(--text); font-weight: 600; }
+
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 28px; right: 50%; transform: translateX(50%); max-width: 680px; width: calc(100% - 32px); background: var(--text); color: white; border: none; border-radius: var(--radius); padding: 15px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; z-index: 20; }
+
+  /* Modal */
+  .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end; justify-content: center; }
+  .modal-wrap.open { display: flex; }
+  .modal { background: white; border-radius: 20px 20px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+  .modal-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 20px; }
+  .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .form-group { margin-bottom: 16px; }
+  .form-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; display: block; margin-bottom: 6px; }
+  .form-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; font-family: inherit; color: var(--text); background: var(--gray-50); outline: none; transition: border 0.15s; }
+  .form-input:focus { border-color: var(--teal); background: white; }
+  textarea.form-input { resize: none; min-height: 80px; line-height: 1.5; }
+  .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .type-btn { padding: 10px 4px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: white; font-size: 13px; cursor: pointer; font-family: inherit; text-align: center; transition: all 0.15s; }
+  .type-btn.sel-ingredient { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+  .type-btn.sel-pairing { border-color: var(--purple); background: var(--purple-light); color: #3C3489; font-weight: 600; }
+  .type-btn.sel-restaurant { border-color: var(--amber); background: var(--amber-light); color: #633806; font-weight: 600; }
+  .type-btn.sel-eating { border-color: var(--coral); background: var(--coral-light); color: #712B13; font-weight: 600; }
+  .rating-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .rating-btn { padding: 9px 4px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: white; font-size: 12px; cursor: pointer; font-family: inherit; text-align: center; transition: all 0.15s; }
+  .rating-btn.selected { border-color: var(--teal); background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-submit { width: 100%; padding: 15px; background: var(--text); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 8px; }
+  .btn-cancel { width: 100%; padding: 13px; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 8px; }
+
+  /* Feed */
+  .filter-row { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
+  .pill.active { background: var(--text); color: white; border-color: var(--text); }
+  .search-box { position: relative; margin-bottom: 16px; }
+  .search-box input { width: 100%; padding: 11px 14px 11px 38px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; font-family: inherit; background: white; outline: none; color: var(--text); }
+  .search-box input:focus { border-color: var(--teal); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-hint); font-size: 16px; pointer-events: none; }
+  .entries { display: flex; flex-direction: column; gap: 8px; }
+  .entry-card { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; gap: 12px; }
+  .entry-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+  .dot-ingredient { background: var(--teal); }
+  .dot-pairing { background: var(--purple); }
+  .dot-restaurant { background: var(--amber); }
+  .dot-eating { background: var(--coral); }
+  .entry-body { flex: 1; min-width: 0; }
+  .entry-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .entry-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+  .tag-ingredient { background: var(--teal-light); color: var(--teal-dark); }
+  .tag-pairing { background: var(--purple-light); color: #3C3489; }
+  .tag-restaurant { background: var(--amber-light); color: #633806; }
+  .tag-eating { background: var(--coral-light); color: #712B13; }
+  .entry-cuisine { font-size: 12px; color: var(--text-muted); }
+  .entry-place { font-size: 12px; color: var(--text-hint); }
+  .entry-note { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; }
+  .entry-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .entry-date { font-size: 11px; color: var(--text-hint); }
+  .entry-rating { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--gray-100); color: var(--text-muted); }
+  .entry-actions { display: flex; gap: 8px; }
+  .btn-del { background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 18px; padding: 0; line-height: 1; }
+  .btn-del:hover { color: #E24B4A; }
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-hint); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 14px; line-height: 1.6; }
+
+  /* Map */
+  .map-region { margin-bottom: 24px; }
+  .region-title { font-size: 11px; font-weight: 700; color: var(--text-hint); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .cuisine-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .cuisine-card { background: white; border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; transition: all 0.15s; display: flex; justify-content: space-between; align-items: center; }
+  .cuisine-card:hover { border-color: var(--gray-200); background: var(--gray-50); }
+  .cuisine-card.explored { border-color: #9FE1CB; }
+  .cuisine-name { font-size: 14px; color: var(--text); }
+  .cuisine-badge { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--gray-100); color: var(--text-hint); }
+  .cuisine-card.explored .cuisine-badge { background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
+
+  /* Stats */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
+  .stat-card { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; }
+  .stat-n { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
+  .stat-l { font-size: 12px; color: var(--text-muted); }
+  .chart-section { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .chart-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 14px; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bar-label { font-size: 13px; color: var(--text); width: 72px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-track { flex: 1; height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.4s; }
+  .bar-count { font-size: 12px; color: var(--text-hint); width: 20px; text-align: right; flex-shrink: 0; }
+
+  /* Loading */
+  .loading { text-align: center; padding: 40px; color: var(--text-hint); font-size: 14px; }
+  .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--gray-800); color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  /* Config screen */
+  .config-screen { display: none; position: fixed; inset: 0; background: var(--gray-50); z-index: 300; overflow-y: auto; padding: 40px 20px; }
+  .config-screen.open { display: block; }
+  .config-inner { max-width: 520px; margin: 0 auto; }
+  .config-inner h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .config-inner p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
+  .config-step { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
+  .config-step-num { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: 0.06em; margin-bottom: 6px; }
+  .config-step h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .config-step p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
+  .config-step a { color: var(--teal); text-decoration: none; font-weight: 500; }
+  .config-step code { background: var(--gray-100); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; display: block; margin: 8px 0; padding: 10px 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
+  .config-input-group { margin-top: 10px; }
+  .config-input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .config-input-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: monospace; outline: none; }
+  .config-input-group input:focus { border-color: var(--teal); }
+  .btn-config-save { width: 100%; padding: 14px; background: var(--text); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 16px; }
+  .config-link { font-size: 13px; color: var(--text-hint); text-align: center; margin-top: 12px; cursor: pointer; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="config-screen" id="configScreen">
+  <div class="config-inner">
+    <h1>初次配置</h1>
+    <p>需要连接你的 Supabase 数据库，只需设置一次，之后所有设备都能同步数据。</p>
+
+    <div class="config-step">
+      <div class="config-step-num">步骤 1</div>
+      <h3>注册 Supabase</h3>
+      <p>前往 <a href="https://supabase.com" target="_blank">supabase.com</a> 注册免费账号，创建一个新项目（Project）。名称随意，记住数据库密码。</p>
+    </div>
+
+    <div class="config-step">
+      <div class="config-step-num">步骤 2</div>
+      <h3>创建数据表</h3>
+      <p>进入你的项目 → 左侧「SQL Editor」→ 粘贴以下 SQL 并点击 Run：</p>
+      <code>create table entries (
+  id bigint generated always as identity primary key,
+  name text not null,
+  type text not null,
+  cuisine_id text not null,
+  cuisine_name text not null,
+  place text,
+  note text,
+  rating text,
+  want_again boolean default false,
+  date text,
+  created_at timestamptz default now()
+);
+
+alter table entries enable row level security;
+
+create policy "allow all" on entries
+  for all using (true) with check (true);</code>
+    </div>
+
+    <div class="config-step">
+      <div class="config-step-num">步骤 3</div>
+      <h3>填入你的 API 信息</h3>
+      <p>进入项目 → 左侧「Project Settings」→「API」，复制以下两个值：</p>
+      <div class="config-input-group">
+        <label>Project URL</label>
+        <input type="text" id="cfgUrl" placeholder="https://xxxxxxxxxxxx.supabase.co" />
+      </div>
+      <div class="config-input-group" style="margin-top:10px">
+        <label>anon public key</label>
+        <input type="text" id="cfgKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
+      </div>
+    </div>
+
+    <button class="btn-config-save" onclick="saveConfig()">保存并开始使用</button>
+    <div class="config-link" onclick="useDemoMode()">暂时用本地模式体验（数据不同步）</div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="header">
+    <div class="header-top">
+      <div>
+        <h1>我的美食地图</h1>
+        <div class="header-sub" id="headerSub">加载中...</div>
+      </div>
+      <button onclick="openConfig()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-hint);padding:4px">⚙</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="switchTab('feed')">动态</button>
+    <button class="nav-btn" onclick="switchTab('map')">菜系</button>
+    <button class="nav-btn" onclick="switchTab('stats')">统计</button>
+  </div>
+
+  <div id="feed" class="section active">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="搜索食材、餐厅、菜系..." oninput="renderFeed(this.value)" id="searchInput" />
+    </div>
+    <div class="filter-row">
+      <button class="pill active" onclick="setFilter('all',this)">全部</button>
+      <button class="pill" onclick="setFilter('ingredient',this)">食材</button>
+      <button class="pill" onclick="setFilter('pairing',this)">搭配</button>
+      <button class="pill" onclick="setFilter('restaurant',this)">餐厅</button>
+      <button class="pill" onclick="setFilter('eating',this)">吃法</button>
+    </div>
+    <div class="entries" id="feedList"></div>
+  </div>
+
+  <div id="map" class="section">
+    <div id="mapContent"></div>
+  </div>
+
+  <div id="stats" class="section">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="chart-section">
+      <div class="chart-title">探索最多的菜系</div>
+      <div id="chartBars"></div>
+    </div>
+  </div>
+</div>
+
+<button class="fab" onclick="openModal()">+ 新记录</button>
+
+<div class="modal-wrap" id="modalWrap" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="modalTitle">添加记录</h2>
+    <div class="form-group">
+      <label class="form-label">类型</label>
+      <div class="type-grid">
+        <button class="type-btn" onclick="selectType('ingredient',this)">食材</button>
+        <button class="type-btn" onclick="selectType('pairing',this)">搭配</button>
+        <button class="type-btn" onclick="selectType('restaurant',this)">餐厅</button>
+        <button class="type-btn" onclick="selectType('eating',this)">吃法</button>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">名称</label>
+      <input type="text" class="form-input" id="fName" placeholder="比如：剥皮辣椒、秋葵山药泥纳豆拌饭" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">菜系</label>
+        <select class="form-input" id="fCuisine"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">地点（可选）</label>
+        <input type="text" class="form-input" id="fPlace" placeholder="台北、东京..." />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">感受</label>
+      <textarea class="form-input" id="fNote" placeholder="一句话记录味道和感受，比如：鲜得不像话，完全不辣"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">推荐程度</label>
+      <div class="rating-grid">
+        <button class="rating-btn" onclick="selectRating('必试',this)">必试</button>
+        <button class="rating-btn" onclick="selectRating('值得一吃',this)">值得一吃</button>
+        <button class="rating-btn" onclick="selectRating('一般',this)">一般</button>
+        <button class="rating-btn" onclick="selectRating('不推荐',this)">不推荐</button>
+      </div>
+    </div>
+    <button class="btn-submit" onclick="saveEntry()">保存</button>
+    <button class="btn-cancel" onclick="closeModal()">取消</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CUISINES = [
+  {id:'sichuan',name:'川菜',region:'中餐'},
+  {id:'cantonese',name:'粤菜',region:'中餐'},
+  {id:'hunan',name:'湘菜',region:'中餐'},
+  {id:'fujian',name:'闽菜',region:'中餐'},
+  {id:'jiangzhe',name:'江浙菜',region:'中餐'},
+  {id:'yunnan',name:'云南菜',region:'中餐'},
+  {id:'taiwan',name:'台湾菜',region:'中餐'},
+  {id:'hainan',name:'海南菜',region:'中餐'},
+  {id:'beijing',name:'北京菜',region:'中餐'},
+  {id:'shanxi',name:'陕西菜',region:'中餐'},
+  {id:'japanese',name:'日料',region:'东亚'},
+  {id:'korean',name:'韩餐',region:'东亚'},
+  {id:'thai',name:'泰餐',region:'东南亚'},
+  {id:'vietnamese',name:'越南菜',region:'东南亚'},
+  {id:'indonesian',name:'印尼/马来菜',region:'东南亚'},
+  {id:'burmese',name:'缅甸菜',region:'东南亚'},
+  {id:'italian',name:'意大利菜',region:'欧洲'},
+  {id:'french',name:'法餐',region:'欧洲'},
+  {id:'spanish',name:'西班牙菜',region:'欧洲'},
+  {id:'greek',name:'希腊菜',region:'欧洲'},
+  {id:'portuguese',name:'葡萄牙菜',region:'欧洲'},
+  {id:'middleeast',name:'中东菜',region:'中东/地中海'},
+  {id:'moroccan',name:'摩洛哥菜',region:'中东/地中海'},
+  {id:'turkish',name:'土耳其菜',region:'中东/地中海'},
+  {id:'indian',name:'印度菜',region:'南亚'},
+  {id:'srilankan',name:'斯里兰卡菜',region:'南亚'},
+  {id:'mexican',name:'墨西哥菜',region:'美洲'},
+  {id:'peruvian',name:'秘鲁菜',region:'美洲'},
+  {id:'other',name:'其他',region:'其他'},
+];
+const REGIONS = [...new Set(CUISINES.map(c=>c.region))];
+const TYPE_LABELS = {ingredient:'食材',pairing:'搭配',restaurant:'餐厅',eating:'吃法'};
+
+let data = [];
+let supabaseUrl = '';
+let supabaseKey = '';
+let demoMode = false;
+let currentFilter = 'all';
+let selectedType = 'ingredient';
+let selectedRating = '';
+let saving = false;
+
+function loadConfig() {
+  supabaseUrl = localStorage.getItem('sb_url') || '';
+  supabaseKey = localStorage.getItem('sb_key') || '';
+  demoMode = localStorage.getItem('demo_mode') === '1';
+}
+
+function saveConfig() {
+  const url = document.getElementById('cfgUrl').value.trim();
+  const key = document.getElementById('cfgKey').value.trim();
+  if (!url || !key) { showToast('请填写 URL 和 Key'); return; }
+  if (!url.startsWith('https://')) { showToast('URL 格式不对，应以 https:// 开头'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  localStorage.removeItem('demo_mode');
+  supabaseUrl = url; supabaseKey = key; demoMode = false;
+  closeConfig();
+  init();
+}
+
+function useDemoMode() {
+  localStorage.setItem('demo_mode', '1');
+  demoMode = true;
+  closeConfig();
+  data = [
+    {id:1,name:'剥皮辣椒',type:'ingredient',cuisine_id:'taiwan',cuisine_name:'台湾菜',place:'台北',note:'炖进鸡汤里鲜得不像话，完全不辣',rating:'必试',want_again:true,date:'2024-01-01',created_at:'2024-01-01'},
+    {id:2,name:'糟粕醋',type:'ingredient',cuisine_id:'hainan',cuisine_name:'海南菜',place:'海口',note:'酸辣开胃，当地人每天喝',rating:'必试',want_again:true,date:'2024-01-02',created_at:'2024-01-02'},
+    {id:3,name:'白辣椒',type:'ingredient',cuisine_id:'hunan',cuisine_name:'湘菜',place:'',note:'和红辣椒完全不同的香气，更醇厚',rating:'值得一吃',want_again:false,date:'2024-01-03',created_at:'2024-01-03'},
+    {id:4,name:'秋葵山药泥纳豆拌饭',type:'pairing',cuisine_id:'japanese',cuisine_name:'日料',place:'东京',note:'黏糊糊的组合，意外地好吃',rating:'必试',want_again:true,date:'2024-01-04',created_at:'2024-01-04'},
+    {id:5,name:'布拉塔奶酪',type:'ingredient',cuisine_id:'italian',cuisine_name:'意大利菜',place:'',note:'外皮是马苏里拉，里面流出奶油，太丰腴了',rating:'必试',want_again:true,date:'2024-01-05',created_at:'2024-01-05'},
+  ];
+  render();
+  updateHeader();
+}
+
+function openConfig() { document.getElementById('configScreen').classList.add('open'); }
+function closeConfig() { document.getElementById('configScreen').classList.remove('open'); }
+
+async function sbFetch(path, opts = {}) {
+  const res = await fetch(supabaseUrl + '/rest/v1/' + path, {
+    ...opts,
+    headers: {
+      'apikey': supabaseKey,
+      'Authorization': 'Bearer ' + supabaseKey,
+      'Content-Type': 'application/json',
+      'Prefer': opts.method === 'POST' ? 'return=representation' : '',
+      ...(opts.headers || {})
+    }
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function loadData() {
+  if (demoMode) return;
+  try {
+    data = await sbFetch('entries?order=created_at.desc&limit=500') || [];
+  } catch(e) {
+    showToast('加载失败，请检查配置');
+    console.error(e);
+  }
+}
+
+async function init() {
+  loadConfig();
+  if (!supabaseUrl && !demoMode) {
+    document.getElementById('configScreen').classList.add('open');
+    return;
+  }
+  if (demoMode) {
+    useDemoMode();
+    return;
+  }
+  document.getElementById('headerSub').textContent = '加载中...';
+  await loadData();
+  populateCuisineSelect();
+  render();
+  updateHeader();
+}
+
+function updateHeader() {
+  const cuisines = new Set(data.map(e=>e.cuisine_id)).size;
+  document.getElementById('headerSub').textContent = `${data.length} 条记录 · ${cuisines} 个菜系`;
+}
+
+function populateCuisineSelect() {
+  const sel = document.getElementById('fCuisine');
+  sel.innerHTML = CUISINES.map(c=>`<option value="${c.id}|${c.name}">${c.name}</option>`).join('');
+}
+
+function selectType(type, btn) {
+  selectedType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  btn.classList.add('sel-' + type);
+}
+
+function selectRating(rating, btn) {
+  selectedRating = rating;
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function openModal() {
+  selectedType = 'ingredient';
+  selectedRating = '';
+  document.querySelectorAll('.type-btn').forEach(b => b.className = 'type-btn');
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('fName').value = '';
+  document.getElementById('fNote').value = '';
+  document.getElementById('fPlace').value = '';
+  document.getElementById('modalWrap').classList.add('open');
+  setTimeout(()=>document.getElementById('fName').focus(), 300);
+}
+
+function closeModal() { document.getElementById('modalWrap').classList.remove('open'); }
+
+async function saveEntry() {
+  if (saving) return;
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { showToast('请填写名称'); return; }
+  const [cuisineId, cuisineName] = document.getElementById('fCuisine').value.split('|');
+  const entry = {
+    name, type: selectedType, cuisine_id: cuisineId, cuisine_name: cuisineName,
+    place: document.getElementById('fPlace').value.trim(),
+    note: document.getElementById('fNote').value.trim(),
+    rating: selectedRating,
+    want_again: false,
+    date: new Date().toLocaleDateString('zh-CN'),
+    created_at: new Date().toISOString()
+  };
+  saving = true;
+  try {
+    if (demoMode) {
+      entry.id = Date.now();
+      data.unshift(entry);
+    } else {
+      const result = await sbFetch('entries', { method: 'POST', body: JSON.stringify(entry) });
+      if (result && result[0]) data.unshift(result[0]);
+      else { data.unshift({...entry, id: Date.now()}); await loadData(); }
+    }
+    closeModal();
+    render();
+    updateHeader();
+    showToast('已保存');
+  } catch(e) {
+    showToast('保存失败，请重试');
+    console.error(e);
+  }
+  saving = false;
+}
+
+async function deleteEntry(id) {
+  if (!confirm('确定删除这条记录？')) return;
+  try {
+    if (!demoMode) await sbFetch('entries?id=eq.' + id, { method: 'DELETE' });
+    data = data.filter(e=>e.id !== id);
+    render();
+    updateHeader();
+    showToast('已删除');
+  } catch(e) { showToast('删除失败'); }
+}
+
+function render() {
+  renderFeed('');
+  renderMap();
+  renderStats();
+}
+
+function setFilter(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed(document.getElementById('searchInput').value);
+}
+
+function renderFeed(search) {
+  const list = document.getElementById('feedList');
+  let entries = [...data];
+  if (currentFilter !== 'all') entries = entries.filter(e=>e.type===currentFilter);
+  if (search) {
+    const q = search.toLowerCase();
+    entries = entries.filter(e =>
+      e.name.toLowerCase().includes(q) ||
+      (e.note||'').toLowerCase().includes(q) ||
+      e.cuisine_name.toLowerCase().includes(q) ||
+      (e.place||'').toLowerCase().includes(q)
+    );
+  }
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🍽</div><p>${data.length===0?'还没有记录<br>点击下方按钮添加第一条':'没有找到相关记录'}</p></div>`;
+    return;
+  }
+  list.innerHTML = entries.map(e => `
+    <div class="entry-card">
+      <div class="entry-dot dot-${e.type}"></div>
+      <div class="entry-body">
+        <div class="entry-name">${e.name}</div>
+        <div class="entry-meta">
+          <span class="tag tag-${e.type}">${TYPE_LABELS[e.type]}</span>
+          <span class="entry-cuisine">${e.cuisine_name}</span>
+          ${e.place ? `<span class="entry-place">· ${e.place}</span>` : ''}
+        </div>
+        ${e.note ? `<div class="entry-note">${e.note}</div>` : ''}
+        <div class="entry-footer">
+          <span class="entry-date">${e.date||''}</span>
+          <div style="display:flex;gap:6px;align-items:center">
+            ${e.rating ? `<span class="entry-rating">${e.rating}</span>` : ''}
+            <button class="btn-del" onclick="deleteEntry(${e.id})">×</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderMap() {
+  const content = document.getElementById('mapContent');
+  content.innerHTML = REGIONS.map(region => {
+    const cuisines = CUISINES.filter(c=>c.region===region);
+    return `<div class="map-region">
+      <div class="region-title">${region}</div>
+      <div class="cuisine-grid">${cuisines.map(c => {
+        const count = data.filter(e=>e.cuisine_id===c.id).length;
+        return `<div class="cuisine-card ${count>0?'explored':''}" onclick="filterByCuisine('${c.id}','${c.name}')">
+          <span class="cuisine-name">${c.name}</span>
+          <span class="cuisine-badge">${count>0?count:'—'}</span>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterByCuisine(id, name) {
+  switchTab('feed');
+  currentFilter = 'all';
+  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.pill')[0].classList.add('active');
+  const input = document.getElementById('searchInput');
+  input.value = name;
+  renderFeed(name);
+}
+
+function renderStats() {
+  const total = data.length;
+  const cuisinesHit = new Set(data.map(e=>e.cuisine_id)).size;
+  const mustTry = data.filter(e=>e.rating==='必试').length;
+  const byType = {ingredient:0,pairing:0,restaurant:0,eating:0};
+  data.forEach(e=>{ if(byType[e.type]!==undefined) byType[e.type]++; });
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-n" style="color:var(--teal)">${total}</div><div class="stat-l">总记录</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--purple)">${cuisinesHit}</div><div class="stat-l">涉及菜系</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--amber)">${byType.ingredient}</div><div class="stat-l">食材发现</div></div>
+    <div class="stat-card"><div class="stat-n" style="color:var(--coral)">${mustTry}</div><div class="stat-l">必试推荐</div></div>
+  `;
+
+  const cuisineRank = CUISINES
+    .map(c=>({name:c.name, count:data.filter(e=>e.cuisine_id===c.id).length}))
+    .filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
+  const max = cuisineRank[0]?.count || 1;
+  document.getElementById('chartBars').innerHTML = cuisineRank.length === 0
+    ? '<div style="color:var(--text-hint);font-size:13px;text-align:center;padding:20px 0">暂无数据</div>'
+    : cuisineRank.map(c=>`
+      <div class="bar-row">
+        <div class="bar-label">${c.name}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div>
+        <div class="bar-count">${c.count}</div>
+      </div>`).join('');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['feed','map','stats'][i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+populateCuisineSelect();
+init();
+</script>
+</body>
+</html>
