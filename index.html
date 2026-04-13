@@ -6,7 +6,7 @@
 <title>Eat as a Local</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 <style>
-:root {
+:root{
   --teal:#2A7A5C;--teal-l:#EAF5F0;--teal-d:#1A5940;
   --purple:#6B63C4;--purple-l:#EEEDFE;
   --amber:#C88A2A;--amber-l:#FDF3DC;
@@ -21,196 +21,211 @@
 body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;background:var(--cream);color:var(--text);min-height:100vh}
 .app{max-width:700px;margin:0 auto;padding:0 18px 110px}
 
+/* Auth screen */
+.auth-screen{display:none;position:fixed;inset:0;background:var(--cream);z-index:500;overflow-y:auto}
+.auth-screen.open{display:flex;align-items:center;justify-content:center}
+.auth-box{width:100%;max-width:380px;padding:20px}
+.auth-logo{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;margin-bottom:4px}
+.auth-logo em{font-style:italic;font-weight:400;color:var(--teal)}
+.auth-sub{font-size:12px;color:var(--th);letter-spacing:.06em;margin-bottom:32px}
+.auth-tabs{display:flex;gap:0;background:var(--cream-d);border-radius:var(--rs);padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;padding:8px;border:none;background:transparent;font-size:14px;color:var(--tm);cursor:pointer;border-radius:6px;font-family:inherit;transition:all .15s}
+.auth-tab.active{background:white;color:var(--text);font-weight:600}
+.auth-fg{margin-bottom:14px}
+.auth-label{font-size:11px;color:var(--th);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.auth-input{width:100%;padding:12px 14px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
+.auth-input:focus{border-color:var(--teal)}
+.auth-btn{width:100%;padding:14px;background:var(--teal);color:white;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.2px}
+.auth-btn:hover{background:var(--teal-d)}
+.auth-err{font-size:13px;color:var(--coral);margin-top:8px;text-align:center;min-height:20px}
+
 /* Header */
-.header{padding:36px 0 20px;border-bottom:1px solid var(--wb);margin-bottom:22px}
+.header{padding:32px 0 18px;border-bottom:1px solid var(--wb);margin-bottom:20px}
 .header-row{display:flex;justify-content:space-between;align-items:flex-end}
-.h-en{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;letter-spacing:-0.5px;line-height:1}
+.h-en{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;letter-spacing:-.5px;line-height:1}
 .h-en em{font-style:italic;font-weight:400;color:var(--teal)}
-.h-zh{font-size:12px;color:var(--th);margin-top:6px;letter-spacing:0.06em}
-.h-right{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.stat-pill{font-size:12px;color:var(--tm);background:var(--cream-d);border-radius:20px;padding:4px 12px}
-.stat-pill b{color:var(--teal)}
-.lock-btn{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--th);background:var(--cream-d);border:none;border-radius:20px;padding:4px 12px;cursor:pointer;font-family:inherit;transition:all .15s}
-.lock-btn.on{color:var(--teal-d);background:var(--teal-l)}
+.h-zh{font-size:12px;color:var(--th);margin-top:5px;letter-spacing:.06em}
+.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.user-pill{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);font-weight:600}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--teal-l);color:var(--teal-d);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.logout-btn{font-size:12px;color:var(--th);background:none;border:none;cursor:pointer;font-family:inherit;padding:2px 0}
+.logout-btn:hover{color:var(--tm)}
 
 /* Nav */
-.nav{display:flex;gap:4px;background:white;border:1px solid var(--wb);border-radius:var(--r);padding:4px;margin-bottom:20px;position:sticky;top:8px;z-index:10}
-.nav-btn{flex:1;padding:9px 6px;border:none;background:transparent;font-size:13px;color:var(--tm);cursor:pointer;border-radius:var(--rs);transition:all .2s;font-family:inherit}
+.nav{display:flex;gap:4px;background:white;border:1px solid var(--wb);border-radius:var(--r);padding:4px;margin-bottom:18px;position:sticky;top:8px;z-index:10}
+.nav-btn{flex:1;padding:8px 4px;border:none;background:transparent;font-size:12px;color:var(--tm);cursor:pointer;border-radius:var(--rs);transition:all .2s;font-family:inherit;white-space:nowrap}
 .nav-btn.active{background:var(--cream);color:var(--text);font-weight:600}
 .section{display:none}.section.active{display:block}
 
 /* FAB */
-.fab{position:fixed;bottom:26px;right:50%;transform:translateX(50%);max-width:664px;width:calc(100% - 36px);background:var(--teal);color:white;border:none;border-radius:var(--r);padding:15px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;transition:background .15s}
+.fab{position:fixed;bottom:26px;right:50%;transform:translateX(50%);max-width:664px;width:calc(100% - 36px);background:var(--teal);color:white;border:none;border-radius:var(--r);padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;transition:background .15s}
 .fab:hover{background:var(--teal-d)}
-.fab.locked{background:var(--cream-d);color:var(--th);border:1px solid var(--wb2)}
 
-/* Sheets (bottom modal) */
+/* Sheets */
 .sheet-wrap{display:none;position:fixed;inset:0;background:rgba(28,26,22,.5);z-index:100;align-items:flex-end;justify-content:center}
 .sheet-wrap.open{display:flex}
 .sheet{background:white;border-radius:22px 22px 0 0;padding:8px 20px 48px;width:100%;max-width:700px;max-height:93vh;overflow-y:auto}
 .sheet-handle{width:40px;height:4px;background:var(--cream-d);border-radius:2px;margin:14px auto 18px}
-.sheet-title{font-family:'Playfair Display',serif;font-size:21px;font-weight:700;margin-bottom:20px}
-.fg{margin-bottom:16px}
+.sheet-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px}
+.fg{margin-bottom:15px}
 .fl{font-size:11px;color:var(--th);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:7px}
-.fi{width:100%;padding:11px 13px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:var(--cream);outline:none;transition:border .15s,background .15s}
+.fi{width:100%;padding:11px 13px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:var(--cream);outline:none;transition:border .15s}
 .fi:focus{border-color:var(--teal);background:white}
-textarea.fi{resize:none;min-height:80px;line-height:1.6}
+textarea.fi{resize:none;min-height:76px;line-height:1.6}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn-p{width:100%;padding:14px;background:var(--teal);color:white;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.2px}
+.btn-p{width:100%;padding:14px;background:var(--teal);color:white;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px}
 .btn-p:hover{background:var(--teal-d)}
-.btn-s{width:100%;padding:12px;background:transparent;color:var(--tm);border:1px solid var(--wb2);border-radius:var(--r);font-size:15px;cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-s{width:100%;padding:12px;background:transparent;color:var(--tm);border:1px solid var(--wb2);border-radius:var(--r);font-size:14px;cursor:pointer;font-family:inherit;margin-top:8px}
 
-/* Toggle buttons */
+/* Toggles */
 .tog-row{display:flex;gap:7px;flex-wrap:wrap}
 .tog{padding:8px 14px;border:1.5px solid var(--wb2);border-radius:var(--rs);background:white;font-size:13px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
-.tog:hover{border-color:var(--teal);color:var(--teal)}
-.tog.on{font-weight:600}
-.tog.c-teal.on{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d)}
-.tog.c-purple.on{border-color:var(--purple);background:var(--purple-l);color:#3C3489}
-.tog.c-amber.on{border-color:var(--amber);background:var(--amber-l);color:#7A5210}
-.tog.c-coral.on{border-color:var(--coral);background:var(--coral-l);color:#8C3425}
-.tog.c-blue.on{border-color:var(--blue);background:var(--blue-l);color:#0C447C}
+.tog.c-blue.on{border-color:var(--blue);background:var(--blue-l);color:#0C447C;font-weight:600}
+.tog.c-teal.on{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);font-weight:600}
 
-/* Star rating */
+/* Stars */
 .star-row{display:flex;align-items:center;gap:10px}
 .stars{display:flex;gap:3px}
 .star{font-size:22px;cursor:pointer;color:var(--cream-d);transition:color .1s;user-select:none}
 .star.on{color:#E8B84B}
-.star-val{font-size:14px;color:var(--tm);min-width:28px}
+.star-val{font-size:14px;color:var(--tm);min-width:32px}
+.star-adj{display:flex;gap:6px;align-items:center;margin-left:4px}
+.star-adj button{background:var(--cream-d);border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--tm);font-family:inherit}
 
-/* Rating label */
+/* Rating labels */
 .rl-row{display:flex;gap:6px;flex-wrap:wrap}
 .rl{padding:6px 12px;border:1.5px solid var(--wb2);border-radius:20px;background:white;font-size:12px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
 .rl.on{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);font-weight:600}
 
-/* Cards common */
-.card{background:white;border:1px solid var(--wb);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
-.card-inner{padding:15px 16px}
+/* Cards */
+.card{background:white;border:1px solid var(--wb);border-radius:var(--r);overflow:hidden;margin-bottom:9px}
+.card-inner{padding:14px 16px}
 
 /* Restaurant cards */
 .rest-card{cursor:pointer;transition:border-color .15s}
 .rest-card:hover{border-color:var(--wb2)}
-.rest-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
-.rest-name{font-size:16px;font-weight:600;color:var(--text);line-height:1.3}
-.rest-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
-.badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600}
-.b-wishlist{background:#E6F1FB;color:#0C447C}
+.rest-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:10px}
+.rest-name{font-size:16px;font-weight:600;line-height:1.3}
+.badge{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.b-wishlist{background:var(--blue-l);color:#0C447C}
 .b-visited{background:var(--teal-l);color:var(--teal-d)}
-.rest-city{font-size:12px;color:var(--th)}
-.rest-cuisine{font-size:12px;color:var(--tm)}
-.rest-summary{font-size:13px;color:var(--tm);line-height:1.6;margin-top:6px;font-style:italic;border-top:1px solid var(--wb);padding-top:8px}
-.rest-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.rest-meta{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:5px;font-size:12px;color:var(--tm)}
+.rest-notes{font-size:13px;color:var(--th);line-height:1.5;margin-top:6px;font-style:italic;border-top:1px solid var(--wb);padding-top:7px}
+.rest-footer{display:flex;justify-content:space-between;align-items:center;margin-top:7px}
 .dishes-count{font-size:12px;color:var(--th)}
-.star-disp{font-size:13px;color:#E8B84B}
-
-/* Dish rows inside restaurant detail */
-.dish-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--wb)}
-.dish-row:last-child{border-bottom:none}
-.dish-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px}
-.dish-body{flex:1}
-.dish-name{font-size:14px;font-weight:600;color:var(--text)}
-.dish-note{font-size:13px;color:var(--tm);margin-top:2px;line-height:1.5}
-.dish-rating{font-size:12px;color:var(--th);margin-top:2px}
 
 /* Discovery cards */
 .disc-card{display:flex}
 .disc-bar{width:4px;flex-shrink:0}
-.disc-bar.ingredient{background:var(--teal)}
-.disc-bar.pairing{background:var(--purple)}
-.disc-bar.method{background:var(--amber)}
+.disc-bar.discovery{background:var(--teal)}
 .disc-bar.inspo{background:var(--blue)}
-.disc-body{flex:1;padding:14px 15px}
+.disc-body{flex:1;padding:13px 15px}
 .disc-name{font-size:15px;font-weight:600;margin-bottom:5px}
-.disc-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:4px}
-.disc-note{font-size:13px;color:var(--tm);line-height:1.6;margin-top:5px;border-top:1px solid var(--wb);padding-top:5px;font-style:italic}
+.disc-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
+.disc-note{font-size:13px;color:var(--tm);line-height:1.6;margin-top:5px;font-style:italic;border-top:1px solid var(--wb);padding-top:5px}
 .disc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.status-pill{font-size:11px;padding:2px 9px;border-radius:10px}
-.sp-done{background:var(--teal-l);color:var(--teal-d);font-weight:600}
-.sp-todo{background:var(--blue-l);color:#0C447C}
-.sp-homecook{background:var(--amber-l);color:#7A5210}
+
+/* User tag */
+.user-tag{font-size:11px;color:var(--th);display:flex;align-items:center;gap:4px}
+.user-tag-dot{width:16px;height:16px;border-radius:50%;background:var(--cream-d);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--tm)}
+
+/* Square / feed */
+.sq-filter{display:flex;gap:8px;margin-bottom:14px;align-items:center}
+.sq-select{padding:7px 12px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--text);background:white;outline:none;cursor:pointer}
 
 /* Map */
-.map-prog{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:15px 18px;margin-bottom:18px}
-.mp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.map-prog{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+.mp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
 .mp-label{font-size:13px;color:var(--tm)}
 .mp-count{font-family:'Playfair Display',serif;font-size:20px;color:var(--teal)}
 .mp-track{height:6px;background:var(--cream-d);border-radius:3px;overflow:hidden}
 .mp-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .5s}
-.map-region{margin-bottom:20px}
-.region-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;padding-left:2px}
+.map-region{margin-bottom:18px}
+.region-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
 .c-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
 .c-card{background:white;border:1px solid var(--wb);border-radius:var(--rs);padding:11px 13px;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
 .c-card:hover{background:var(--cream)}
 .c-card.explored{border-color:rgba(42,122,92,.3)}
-.c-name{font-size:13px;color:var(--text)}
-.c-badge{font-size:12px;padding:2px 9px;border-radius:10px;background:var(--cream-d);color:var(--th)}
+.c-name{font-size:13px}
+.c-badge{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--cream-d);color:var(--th)}
 .c-card.explored .c-badge{background:var(--teal-l);color:var(--teal-d);font-weight:600}
 
 /* Stats */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
-.sc{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px}
-.sc-n{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;line-height:1;margin-bottom:5px}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.sc{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:16px}
+.sc-n{font-family:'Playfair Display',serif;font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
 .sc-l{font-size:12px;color:var(--tm)}
-.chart-sec{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px}
-.chart-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
-.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.bar-lbl{font-size:13px;color:var(--text);width:76px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-sec{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:16px}
+.chart-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-lbl{font-size:13px;width:76px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bar-track{flex:1;height:6px;background:var(--cream-d);border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;background:var(--teal);border-radius:3px}
 .bar-cnt{font-size:12px;color:var(--th);width:20px;text-align:right;flex-shrink:0}
 
-/* Filters / search */
-.filter-row{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+/* Filter pills */
+.filter-row{display:flex;gap:6px;margin-bottom:13px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}
 .pill{padding:6px 14px;border-radius:20px;border:1px solid var(--wb2);background:white;font-size:13px;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
 .pill.active{background:var(--text);color:white;border-color:var(--text)}
-.search-box{position:relative;margin-bottom:14px}
-.search-box input{width:100%;padding:11px 14px 11px 38px;border:1px solid var(--wb2);border-radius:var(--r);font-size:14px;font-family:inherit;background:white;outline:none;color:var(--text)}
-.search-box input:focus{border-color:var(--teal)}
-.s-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--th);font-size:15px;pointer-events:none}
 
-/* Section headers */
-.sec-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.sec-hd h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:700}
-.sec-hd-sub{font-size:12px;color:var(--th)}
-
-/* Detail view */
+/* Detail */
 .detail-wrap{display:none;position:fixed;inset:0;background:var(--cream);z-index:50;overflow-y:auto}
 .detail-wrap.open{display:block}
-.detail-header{padding:20px 18px 16px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:14px;position:sticky;top:0;background:var(--cream);z-index:5}
-.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm);padding:2px 6px;border-radius:6px;font-family:inherit}
-.detail-header h2{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;flex:1}
-.detail-body{padding:20px 18px;max-width:700px;margin:0 auto}
-.detail-section{margin-bottom:24px}
-.detail-section-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
-.add-dish-btn{width:100%;padding:11px;border:1.5px dashed var(--wb2);border-radius:var(--rs);background:none;font-size:14px;color:var(--th);cursor:pointer;font-family:inherit;transition:all .15s;margin-top:8px}
+.detail-header{padding:18px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--cream);z-index:5}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm);padding:2px 6px;border-radius:6px}
+.detail-header h2{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;flex:1}
+.detail-body{padding:18px;max-width:700px;margin:0 auto}
+.detail-sec{margin-bottom:22px}
+.detail-sec-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.dish-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--wb)}
+.dish-row:last-child{border-bottom:none}
+.dish-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px}
+.dish-body{flex:1}
+.dish-name{font-size:14px;font-weight:600}
+.dish-note{font-size:13px;color:var(--tm);margin-top:2px;line-height:1.5}
+.dish-rating{font-size:12px;color:var(--th);margin-top:2px}
+.add-dish-btn{width:100%;padding:11px;border:1.5px dashed var(--wb2);border-radius:var(--rs);background:none;font-size:14px;color:var(--th);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
 .add-dish-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--th);font-size:17px;padding:2px 4px;border-radius:4px;transition:all .15s;flex-shrink:0}
+.del-btn:hover{color:var(--coral);background:var(--coral-l)}
 
-/* Password */
-.pw-overlay{display:none;position:fixed;inset:0;background:rgba(28,26,22,.55);z-index:300;align-items:center;justify-content:center}
-.pw-overlay.open{display:flex}
-.pw-box{background:white;border-radius:20px;padding:32px 28px;width:320px;max-width:90vw;text-align:center}
-.pw-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;margin-bottom:6px}
-.pw-sub{font-size:13px;color:var(--tm);margin-bottom:22px;line-height:1.5}
-.pw-input{width:100%;padding:13px;border:1.5px solid var(--wb2);border-radius:var(--rs);font-size:18px;font-family:inherit;text-align:center;letter-spacing:6px;outline:none;margin-bottom:12px;background:var(--cream)}
-.pw-input:focus{border-color:var(--teal);background:white}
-.pw-input.err{border-color:var(--coral);animation:shake .3s}
-.pw-ok{width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
-.pw-no{width:100%;padding:10px;background:transparent;color:var(--th);border:none;font-size:14px;cursor:pointer;font-family:inherit;margin-top:6px}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
-
-.toast{position:fixed;bottom:94px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:10px 22px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1}
-.empty{text-align:center;padding:56px 20px;color:var(--th)}
+.empty{text-align:center;padding:50px 20px;color:var(--th)}
 .empty-en{font-family:'Playfair Display',serif;font-size:20px;color:var(--cream-d);margin-bottom:10px}
 .empty p{font-size:14px;line-height:1.7}
-.del-btn{background:none;border:none;cursor:pointer;color:var(--th);font-size:17px;padding:2px 4px;line-height:1;border-radius:4px;transition:all .15s;flex-shrink:0}
-.del-btn:hover{color:var(--coral);background:var(--coral-l)}
+.toast{position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:10px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
 </style>
 </head>
 <body>
 
-<div class="app">
+<!-- Auth screen -->
+<div class="auth-screen open" id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">Eat as <em>a Local</em></div>
+    <div class="auth-sub">我的美食探索地图</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">登录</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">注册</button>
+    </div>
+    <div id="loginForm">
+      <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="loginUser" placeholder="你的用户名" /></div>
+      <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="loginPwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+      <button class="auth-btn" onclick="doLogin()">登录</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="regUser" placeholder="字母数字，不含空格" /></div>
+      <div class="auth-fg"><label class="auth-label">昵称（显示用）</label><input class="auth-input" id="regDisplay" placeholder="你想让别人看到的名字" /></div>
+      <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="regPwd" placeholder="至少6位" /></div>
+      <div class="auth-fg"><label class="auth-label">确认密码</label><input class="auth-input" type="password" id="regPwd2" placeholder="再输一次" onkeydown="if(event.key==='Enter')doRegister()" /></div>
+      <button class="auth-btn" onclick="doRegister()">注册</button>
+    </div>
+    <div class="auth-err" id="authErr"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div class="app" id="mainApp" style="display:none">
   <div class="header">
     <div class="header-row">
       <div>
@@ -218,51 +233,53 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <div class="h-zh">我的美食探索地图</div>
       </div>
       <div class="h-right">
-        <div class="stat-pill" id="statPill"><b id="sc1">0</b> 家餐厅 · <b id="sc2">0</b> 条发现</div>
-        <button id="lockBtn" class="lock-btn" onclick="handleLock()">🔒 <span id="lockTxt">只读</span></button>
+        <div class="user-pill">
+          <div class="user-avatar" id="userAvatar"></div>
+          <span id="userDisplayName"></span>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">退出登录</button>
       </div>
     </div>
   </div>
 
   <div class="nav">
-    <button class="nav-btn active" onclick="switchTab('restaurants')">餐厅</button>
-    <button class="nav-btn" onclick="switchTab('discoveries')">发现</button>
+    <button class="nav-btn active" onclick="switchTab('mine')">我的</button>
+    <button class="nav-btn" onclick="switchTab('square')">广场</button>
     <button class="nav-btn" onclick="switchTab('map')">菜系地图</button>
     <button class="nav-btn" onclick="switchTab('stats')">统计</button>
   </div>
 
-  <!-- Restaurants tab -->
-  <div id="restaurants" class="section active">
+  <!-- My tab -->
+  <div id="mine" class="section active">
     <div class="filter-row">
       <button class="pill active" onclick="setRestFilter('all',this)">全部</button>
-      <button class="pill" onclick="setRestFilter('wishlist',this)">想去 📌</button>
-      <button class="pill" onclick="setRestFilter('visited',this)">去过 ✓</button>
+      <button class="pill" onclick="setRestFilter('wishlist',this)">📌 想去</button>
+      <button class="pill" onclick="setRestFilter('visited',this)">✓ 去过</button>
+      <button class="pill" onclick="setRestFilter('disc',this)">发现 & 灵感</button>
     </div>
-    <div id="restList"></div>
+    <div id="mineList"></div>
   </div>
 
-  <!-- Discoveries tab -->
-  <div id="discoveries" class="section">
-    <div class="search-box">
-      <span class="s-icon">⌕</span>
-      <input type="text" placeholder="搜索食材、灵感、搭配..." oninput="renderDisc(this.value)" id="discSearch" />
+  <!-- Square tab -->
+  <div id="square" class="section">
+    <div class="sq-filter">
+      <select class="sq-select" id="sqTypeFilter" onchange="renderSquare()">
+        <option value="all">全部内容</option>
+        <option value="restaurants">餐厅</option>
+        <option value="discoveries">发现 & 灵感</option>
+      </select>
+      <select class="sq-select" id="sqUserFilter" onchange="renderSquare()">
+        <option value="all">所有人</option>
+      </select>
     </div>
-    <div class="filter-row">
-      <button class="pill active" onclick="setDiscFilter('all',this)">全部</button>
-      <button class="pill" onclick="setDiscFilter('ingredient',this)">食材</button>
-      <button class="pill" onclick="setDiscFilter('pairing',this)">搭配</button>
-      <button class="pill" onclick="setDiscFilter('method',this)">吃法</button>
-      <button class="pill" onclick="setDiscFilter('inspo',this)">灵感</button>
-      <button class="pill" onclick="setDiscFilter('todo',this)">待尝试</button>
-    </div>
-    <div id="discList"></div>
+    <div id="squareList"></div>
   </div>
 
   <!-- Map tab -->
   <div id="map" class="section">
     <div class="map-prog">
       <div class="mp-top">
-        <span class="mp-label">菜系探索进度</span>
+        <span class="mp-label">我的菜系探索进度</span>
         <span class="mp-count" id="mpCount">0 / 0</span>
       </div>
       <div class="mp-track"><div class="mp-fill" id="mpFill" style="width:0%"></div></div>
@@ -274,19 +291,19 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div id="stats" class="section">
     <div class="stats-grid" id="statsGrid"></div>
     <div class="chart-sec">
-      <div class="chart-title">探索最多的菜系</div>
+      <div class="chart-title">我探索最多的菜系</div>
       <div id="chartBars"></div>
     </div>
   </div>
 </div>
 
-<button class="fab" id="fabBtn" onclick="handleFab()">+ 新记录</button>
+<button class="fab" id="fabBtn" onclick="handleFab()" style="display:none">+ 新记录</button>
 
 <!-- Restaurant sheet -->
 <div class="sheet-wrap" id="restSheet" onclick="if(event.target===this)closeSheet('restSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="restSheetTitle">添加餐厅</div>
+    <div class="sheet-title">添加餐厅</div>
     <div class="fg">
       <label class="fl">状态</label>
       <div class="tog-row">
@@ -296,18 +313,19 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     </div>
     <div class="fr">
       <div class="fg"><label class="fl">餐厅名称</label><input class="fi" id="rName" placeholder="餐厅名"/></div>
-      <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="如：东京、台北"/></div>
+      <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="东京、台北..."/></div>
     </div>
-    <div class="fg">
-      <label class="fl">菜系</label>
-      <select class="fi" id="rCuisine"></select>
-    </div>
-    <div id="visitedFields">
+    <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
+    <div id="visitedFields" style="display:none">
       <div class="fg">
         <label class="fl">整体评分</label>
         <div class="star-row">
           <div class="stars" id="restStars"></div>
           <span class="star-val" id="restStarVal">—</span>
+          <div class="star-adj">
+            <button onclick="adjStar('rest',-0.1)">−</button>
+            <button onclick="adjStar('rest',0.1)">+</button>
+          </div>
         </div>
       </div>
       <div class="fg">
@@ -321,10 +339,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       </div>
       <div class="fg"><label class="fl">总结（可选）</label><textarea class="fi" id="rSummary" placeholder="整体感受，特色，氛围..."></textarea></div>
     </div>
-    <div class="fg" id="sourceField">
-      <label class="fl">来源（可选）</label>
-      <input class="fi" id="rSource" placeholder="小红书、朋友推荐、自己发现..."/>
-    </div>
+    <div class="fg"><label class="fl">备注（可选）</label><textarea class="fi" id="rNotes" placeholder="必吃什么、谁推荐的、在哪里看到的..." style="min-height:64px"></textarea></div>
     <button class="btn-p" onclick="saveRest()">保存</button>
     <button class="btn-s" onclick="closeSheet('restSheet')">取消</button>
   </div>
@@ -341,6 +356,10 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <div class="star-row">
         <div class="stars" id="dishStars"></div>
         <span class="star-val" id="dishStarVal">—</span>
+        <div class="star-adj">
+          <button onclick="adjStar('dish',-0.1)">−</button>
+          <button onclick="adjStar('dish',0.1)">+</button>
+        </div>
       </div>
     </div>
     <div class="fg">
@@ -366,30 +385,14 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="fg">
       <label class="fl">类型</label>
       <div class="tog-row">
-        <button class="tog c-teal on" onclick="selTog(this,'discType','ingredient')">食材</button>
-        <button class="tog c-purple" onclick="selTog(this,'discType','pairing')">搭配</button>
-        <button class="tog c-amber" onclick="selTog(this,'discType','method')">吃法</button>
-        <button class="tog c-blue" onclick="selTog(this,'discType','inspo')">灵感</button>
+        <button class="tog c-teal on" onclick="selTog(this,'discType','discovery')">发现（已尝过 / 自己做的）</button>
+        <button class="tog c-blue" onclick="selTog(this,'discType','inspo')">灵感（待尝试）</button>
       </div>
     </div>
     <div class="fg"><label class="fl">名称</label><input class="fi" id="diName" placeholder="比如：剥皮辣椒、秋葵纳豆拌饭"/></div>
-    <div class="fg">
-      <label class="fl">状态</label>
-      <div class="tog-row">
-        <button class="tog c-teal on" onclick="selTog(this,'discStatus','done')">已尝过</button>
-        <button class="tog c-blue" onclick="selTog(this,'discStatus','todo')">待尝试</button>
-        <button class="tog c-amber" onclick="selTog(this,'discStatus','homecook')">自己做的</button>
-      </div>
-    </div>
-    <div class="fg">
-      <label class="fl">菜系</label>
-      <select class="fi" id="diCuisine"></select>
-    </div>
-    <div class="fg">
-      <label class="fl">关联餐厅（可选）</label>
-      <select class="fi" id="diRest"><option value="">— 不关联 —</option></select>
-    </div>
-    <div class="fg"><label class="fl">感受 / 灵感描述</label><textarea class="fi" id="diNote" placeholder="味道感受、搭配逻辑、在哪里发现的..."></textarea></div>
+    <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="diCuisine"></select></div>
+    <div class="fg"><label class="fl">关联餐厅（可选）</label><select class="fi" id="diRest"></select></div>
+    <div class="fg"><label class="fl">感受 / 描述</label><textarea class="fi" id="diNote" placeholder="味道感受、搭配逻辑、为什么想试..."></textarea></div>
     <button class="btn-p" onclick="saveDisc()">保存</button>
     <button class="btn-s" onclick="closeSheet('discSheet')">取消</button>
   </div>
@@ -400,39 +403,27 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div class="detail-header">
     <button class="back-btn" onclick="closeDetail()">←</button>
     <h2 id="detailName"></h2>
-    <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()" style="font-size:14px;padding:4px 8px">删除</button>
+    <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()" style="font-size:13px;padding:4px 10px;border:1px solid var(--wb2);border-radius:var(--rs)">删除</button>
   </div>
   <div class="detail-body">
-    <div class="detail-section" id="detailMeta"></div>
-    <div class="detail-section" id="detailDishes">
-      <div class="detail-section-title">菜品记录</div>
+    <div class="detail-sec" id="detailMeta"></div>
+    <div class="detail-sec">
+      <div class="detail-sec-title">菜品记录</div>
       <div id="dishRows"></div>
       <button class="add-dish-btn" id="addDishBtn" onclick="openDishSheet()">+ 添加一道菜</button>
     </div>
-    <div class="detail-section" id="detailDiscs">
-      <div class="detail-section-title">相关发现</div>
+    <div class="detail-sec">
+      <div class="detail-sec-title">相关发现</div>
       <div id="relatedDiscs"></div>
     </div>
-  </div>
-</div>
-
-<!-- Password -->
-<div class="pw-overlay" id="pwOverlay" onclick="if(event.target===this)closePw()">
-  <div class="pw-box">
-    <div class="pw-title">编辑模式</div>
-    <div class="pw-sub">输入密码后可以新增和删除记录</div>
-    <input type="password" class="pw-input" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPw()"/>
-    <button class="pw-ok" onclick="submitPw()">确认</button>
-    <button class="pw-no" onclick="closePw()">取消</button>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const SB_URL='https://xdvwdhnnhsbmwnzszzrd.supabase.co';
-const SB_KEY='sb_publishable_xK2SuD1DM_5Q8YQ_GYU1EQ_o0Dpj0BG';
-const PWD='19900322';
+const SB='https://xdvwdhnnhsbmwnzszzrd.supabase.co';
+const KEY='sb_publishable_xK2SuD1DM_5Q8YQ_GYU1EQ_o0Dpj0BG';
 
 const CUISINES=[
   {id:'dongbei',name:'东北菜',region:'中餐'},{id:'beijing',name:'北京菜',region:'中餐'},
@@ -465,79 +456,122 @@ const CUISINES=[
   {id:'nordic',name:'北欧菜',region:'欧洲'},{id:'eu_other',name:'其他欧洲',region:'欧洲'},
   {id:'mexican',name:'墨西哥菜',region:'美洲'},{id:'peruvian',name:'秘鲁菜',region:'美洲'},
   {id:'american',name:'美式菜',region:'美洲'},{id:'brazilian',name:'巴西菜',region:'美洲'},
-  {id:'am_other',name:'其他美洲',region:'美洲'},
-  {id:'other',name:'其他',region:'其他'},
+  {id:'am_other',name:'其他美洲',region:'美洲'},{id:'other',name:'其他',region:'其他'},
 ];
 const REGIONS=[...new Set(CUISINES.map(c=>c.region))];
-const TYPE_LABELS={ingredient:'食材',pairing:'搭配',method:'吃法',inspo:'灵感'};
-const TYPE_COLORS={ingredient:'teal',pairing:'purple',method:'amber',inspo:'blue'};
-const STATUS_LABELS={done:'已尝过',todo:'待尝试',homecook:'自己做的'};
-const STATUS_CLASSES={done:'sp-done',todo:'sp-todo',homecook:'sp-homecook'};
 
-let restaurants=[], dishes=[], discoveries=[];
-let restFilter='all', discFilter='all', discSearch='';
+// simple hash (not cryptographic, just obfuscation for non-sensitive use)
+async function hashPwd(pwd){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(pwd+'eatlocal_salt'));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+let currentUser=null;
+let myRests=[],myDishes=[],myDiscs=[];
+let allRests=[],allDiscs=[];
+let restFilter='all',discFilter='all';
 let currentRestId=null;
-let isUnlocked=false;
 let saving=false;
-
-// togState stores current selection per key
-const togState={restStatus:'wishlist',discType:'ingredient',discStatus:'done'};
+const togState={restStatus:'wishlist',discType:'discovery'};
 const rlState={restLabel:'',dishLabel:''};
 const starState={rest:0,dish:0};
 
 // ── Auth ──
-function checkSession(){isUnlocked=sessionStorage.getItem('fu')==='-';updateLockUI()}
-function handleLock(){isUnlocked?logout():openPw()}
-function logout(){isUnlocked=false;sessionStorage.removeItem('fu');updateLockUI();showToast('已切换只读模式')}
-function updateLockUI(){
-  document.getElementById('lockBtn').className='lock-btn'+(isUnlocked?' on':'');
-  document.getElementById('lockTxt').textContent=isUnlocked?'编辑中':'只读';
-  document.getElementById('fabBtn').className='fab'+(isUnlocked?'':' locked');
-  document.getElementById('fabBtn').textContent=isUnlocked?'+ 新记录':'🔒 输入密码后可编辑';
-  renderAll();
-}
-function openPw(){document.getElementById('pwInput').value='';document.getElementById('pwInput').className='pw-input';document.getElementById('pwOverlay').classList.add('open');setTimeout(()=>document.getElementById('pwInput').focus(),100)}
-function closePw(){document.getElementById('pwOverlay').classList.remove('open')}
-function submitPw(){
-  if(document.getElementById('pwInput').value===PWD){isUnlocked=true;sessionStorage.setItem('fu','-');closePw();updateLockUI();showToast('已解锁编辑模式')}
-  else{const i=document.getElementById('pwInput');i.className='pw-input err';i.value='';setTimeout(()=>i.className='pw-input',600);showToast('密码错误')}
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((b,i)=>b.classList.toggle('active',['login','register'][i]===tab));
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+  document.getElementById('authErr').textContent='';
 }
 
-// ── Supabase ──
-async function sb(path,opts={}){
-  const r=await fetch(SB_URL+'/rest/v1/'+path,{...opts,headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':opts.method==='POST'?'return=representation':'',...(opts.headers||{})}});
-  if(!r.ok)throw new Error(await r.text());
-  const t=await r.text();return t?JSON.parse(t):null;
+async function doLogin(){
+  const username=document.getElementById('loginUser').value.trim().toLowerCase();
+  const pwd=document.getElementById('loginPwd').value;
+  if(!username||!pwd){setAuthErr('请填写用户名和密码');return}
+  const hash=await hashPwd(pwd);
+  try{
+    const res=await sb_get(`users?username=eq.${encodeURIComponent(username)}&password_hash=eq.${hash}&select=*`);
+    if(!res||!res.length){setAuthErr('用户名或密码错误');return}
+    setUser(res[0]);
+  }catch(e){setAuthErr('登录失败，请重试')}
 }
+
+async function doRegister(){
+  const username=document.getElementById('regUser').value.trim().toLowerCase();
+  const display=document.getElementById('regDisplay').value.trim();
+  const pwd=document.getElementById('regPwd').value;
+  const pwd2=document.getElementById('regPwd2').value;
+  if(!username||!display||!pwd){setAuthErr('请填写所有字段');return}
+  if(!/^[a-z0-9_]+$/.test(username)){setAuthErr('用户名只能包含字母、数字和下划线');return}
+  if(pwd.length<6){setAuthErr('密码至少6位');return}
+  if(pwd!==pwd2){setAuthErr('两次密码不一致');return}
+  const hash=await hashPwd(pwd);
+  try{
+    const exist=await sb_get(`users?username=eq.${encodeURIComponent(username)}&select=id`);
+    if(exist&&exist.length){setAuthErr('用户名已被使用');return}
+    const res=await sb_post('users',{username,display_name:display,password_hash:hash});
+    if(res&&res[0])setUser(res[0]);else setAuthErr('注册失败，请重试');
+  }catch(e){setAuthErr('注册失败，请重试')}
+}
+
+function setAuthErr(msg){document.getElementById('authErr').textContent=msg}
+
+function setUser(user){
+  currentUser=user;
+  sessionStorage.setItem('fu_user',JSON.stringify(user));
+  document.getElementById('authScreen').classList.remove('open');
+  document.getElementById('mainApp').style.display='block';
+  document.getElementById('fabBtn').style.display='block';
+  document.getElementById('userAvatar').textContent=(user.display_name||user.username).charAt(0).toUpperCase();
+  document.getElementById('userDisplayName').textContent=user.display_name||user.username;
+  loadAll();
+}
+
+function doLogout(){
+  currentUser=null;
+  sessionStorage.removeItem('fu_user');
+  myRests=[];myDishes=[];myDiscs=[];allRests=[];allDiscs=[];
+  document.getElementById('mainApp').style.display='none';
+  document.getElementById('fabBtn').style.display='none';
+  document.getElementById('authScreen').classList.add('open');
+  switchAuthTab('login');
+}
+
+// ── Supabase helpers ──
+async function sb_get(path){
+  const r=await fetch(`${SB}/rest/v1/${path}`,{headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
+}
+async function sb_post(table,body){
+  const r=await fetch(`${SB}/rest/v1/${table}`,{method:'POST',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await r.text());
+  return r.json();
+}
+async function sb_del(table,id){
+  const r=await fetch(`${SB}/rest/v1/${table}?id=eq.${id}`,{method:'DELETE',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});
+  if(!r.ok)throw new Error(await r.text());
+}
+
 async function loadAll(){
   try{
-    [restaurants,dishes,discoveries]=await Promise.all([
-      sb('restaurants?order=created_at.desc'),
-      sb('dishes?order=created_at.asc'),
-      sb('discoveries?order=created_at.desc'),
+    [myRests,myDishes,myDiscs,allRests,allDiscs]=await Promise.all([
+      sb_get(`restaurants?user_id=eq.${currentUser.id}&order=created_at.desc`),
+      sb_get(`dishes?user_id=eq.${currentUser.id}&order=created_at.asc`),
+      sb_get(`discoveries?user_id=eq.${currentUser.id}&order=created_at.desc`),
+      sb_get('restaurants?order=created_at.desc&limit=200'),
+      sb_get('discoveries?order=created_at.desc&limit=200'),
     ]);
-    restaurants=restaurants||[];dishes=dishes||[];discoveries=discoveries||[];
+    myRests=myRests||[];myDishes=myDishes||[];myDiscs=myDiscs||[];
+    allRests=allRests||[];allDiscs=allDiscs||[];
+    buildUserFilter();
+    renderAll();
+    updateHeader();
   }catch(e){showToast('加载失败，请刷新')}
 }
 
-// ── Tab ──
-let currentTab='restaurants';
-function switchTab(tab){
-  currentTab=tab;
-  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['restaurants','discoveries','map','stats'][i]===tab));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById(tab).classList.add('active');
-  updateFabLabel();
-}
-function updateFabLabel(){
-  if(!isUnlocked)return;
-  const labels={restaurants:'+ 添加餐厅',discoveries:'+ 记录发现',map:'+ 记录发现',stats:'+ 新记录'};
-  document.getElementById('fabBtn').textContent=labels[currentTab]||'+ 新记录';
-}
-function handleFab(){
-  if(!isUnlocked){openPw();return}
-  if(currentTab==='restaurants')openRestSheet();
-  else openDiscSheet();
+function updateHeader(){
+  // no separate stat pill needed, just render
 }
 
 // ── Cuisine selects ──
@@ -552,51 +586,63 @@ function buildCuisineSelect(id){
 }
 function buildRestSelect(){
   let h='<option value="">— 不关联 —</option>';
-  restaurants.filter(r=>r.status==='visited').forEach(r=>{h+=`<option value="${r.id}|${r.name}">${r.name}${r.city?' ('+r.city+')':''}</option>`});
+  myRests.forEach(r=>{h+=`<option value="${r.id}|${r.name}">${r.name}${r.city?' ('+r.city+')':''} ${r.status==='wishlist'?'📌':''}</option>`});
   document.getElementById('diRest').innerHTML=h;
 }
+function buildUserFilter(){
+  const users=[...new Map(allRests.concat(allDiscs).map(x=>[x.username,{username:x.username,display:x.display_name||x.username}])).values()];
+  const sel=document.getElementById('sqUserFilter');
+  sel.innerHTML='<option value="all">所有人</option>'+users.map(u=>`<option value="${u.username}">${u.display}</option>`).join('');
+}
 
-// ── Toggle / rating helpers ──
+// ── Toggle / star helpers ──
 function selTog(btn,key,val){
   togState[key]=val;
-  const row=btn.closest('.tog-row');
-  row.querySelectorAll('.tog').forEach(b=>b.classList.remove('on'));
+  btn.closest('.tog-row').querySelectorAll('.tog').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   if(key==='restStatus'){document.getElementById('visitedFields').style.display=val==='visited'?'block':'none'}
 }
 function selRl(btn,key,val){
   rlState[key]=val;
-  const row=btn.closest('.rl-row');
-  row.querySelectorAll('.rl').forEach(b=>b.classList.remove('on'));
+  btn.closest('.rl-row').querySelectorAll('.rl').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-function buildStars(containerId,valId,key){
-  const c=document.getElementById(containerId);
-  c.innerHTML='';
+function buildStars(cid,vid,key){
+  const c=document.getElementById(cid);c.innerHTML='';
   for(let i=1;i<=5;i++){
-    const s=document.createElement('span');
-    s.className='star'+(starState[key]>=i?' on':'');
-    s.textContent='★';
-    s.onclick=(()=>{
-      const v=i;
-      return()=>{starState[key]=v;buildStars(containerId,valId,key);document.getElementById(valId).textContent=v+'.0'}
-    })();
-    // half star on right half click - simplified to 0.5 steps via dblclick
+    const s=document.createElement('span');s.className='star'+(starState[key]>=i?' on':'');s.textContent='★';
+    s.onclick=(v=>()=>{starState[key]=v;buildStars(cid,vid,key);document.getElementById(vid).textContent=v.toFixed(1)})(i);
     c.appendChild(s);
   }
 }
+function adjStar(key,delta){
+  starState[key]=Math.max(0,Math.min(5,Math.round((starState[key]+delta)*10)/10));
+  const cid=key==='rest'?'restStars':'dishStars';
+  const vid=key==='rest'?'restStarVal':'dishStarVal';
+  buildStars(cid,vid,key);
+  document.getElementById(vid).textContent=starState[key]?starState[key].toFixed(1):'—';
+}
+
+// ── Tab ──
+let currentTab='mine';
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['mine','square','map','stats'][i]===tab));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(tab).classList.add('active');
+  document.getElementById('fabBtn').textContent=tab==='mine'?'+ 新记录':'+ 新记录';
+}
+function handleFab(){
+  if(currentTab==='square'||currentTab==='stats'){openRestSheet();return}
+  // show choice
+  openRestSheet();
+}
 
 // ── Restaurant sheet ──
-function openRestSheet(rest=null){
-  document.getElementById('restSheetTitle').textContent=rest?'编辑餐厅':'添加餐厅';
+function openRestSheet(){
   buildCuisineSelect('rCuisine');
-  // reset
-  togState.restStatus='wishlist';
-  rlState.restLabel='';starState.rest=0;
-  document.getElementById('rName').value='';
-  document.getElementById('rCity').value='';
-  document.getElementById('rSummary').value='';
-  document.getElementById('rSource').value='';
+  togState.restStatus='wishlist';rlState.restLabel='';starState.rest=0;
+  ['rName','rCity','rSummary','rNotes'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('restStarVal').textContent='—';
   document.getElementById('visitedFields').style.display='none';
   document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
@@ -606,278 +652,276 @@ function openRestSheet(rest=null){
   document.getElementById('restSheet').classList.add('open');
 }
 function closeSheet(id){document.getElementById(id).classList.remove('open')}
+
 async function saveRest(){
-  if(saving||!isUnlocked)return;
+  if(saving)return;
   const name=document.getElementById('rName').value.trim();
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
-  const [cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim(),cuisine_id:cid,cuisine_name:cname||'',status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:document.getElementById('rSummary').value.trim()||null,source:document.getElementById('rSource').value.trim()||null};
+  const[cid,cname]=cv?cv.split('|'):['',''];
+  const entry={user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name,name,city:document.getElementById('rCity').value.trim()||null,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:document.getElementById('rSummary').value.trim()||null,notes:document.getElementById('rNotes').value.trim()||null};
   saving=true;
-  try{
-    const res=await sb('restaurants',{method:'POST',body:JSON.stringify(entry)});
-    if(res&&res[0])restaurants.unshift(res[0]);else await loadAll();
-    closeSheet('restSheet');renderAll();updateHeader();showToast('已保存');
-  }catch(e){showToast('保存失败')}
+  try{const res=await sb_post('restaurants',entry);if(res&&res[0])myRests.unshift(res[0]);allRests.unshift(res[0]);closeSheet('restSheet');renderAll();showToast('已保存')}
+  catch(e){showToast('保存失败')}
   saving=false;
 }
 
 // ── Dish sheet ──
 function openDishSheet(){
-  if(!isUnlocked){showToast('请先解锁编辑模式');return}
   rlState.dishLabel='';starState.dish=0;
-  document.getElementById('dName').value='';document.getElementById('dNote').value='';
+  ['dName','dNote'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('dishStarVal').textContent='—';
   document.querySelectorAll('#dishSheet .rl').forEach(b=>b.classList.remove('on'));
   buildStars('dishStars','dishStarVal','dish');
   document.getElementById('dishSheet').classList.add('open');
 }
 async function saveDish(){
-  if(saving||!isUnlocked||!currentRestId)return;
+  if(saving||!currentRestId)return;
   const name=document.getElementById('dName').value.trim();
   if(!name){showToast('请填写菜名');return}
-  const entry={restaurant_id:currentRestId,name,rating:starState.dish||null,rating_label:rlState.dishLabel||null,note:document.getElementById('dNote').value.trim()||null};
+  const entry={restaurant_id:currentRestId,user_id:currentUser.id,name,rating:starState.dish||null,rating_label:rlState.dishLabel||null,note:document.getElementById('dNote').value.trim()||null};
   saving=true;
-  try{
-    const res=await sb('dishes',{method:'POST',body:JSON.stringify(entry)});
-    if(res&&res[0])dishes.push(res[0]);else await loadAll();
-    closeSheet('dishSheet');renderDetail(currentRestId);showToast('已添加');
-  }catch(e){showToast('保存失败')}
+  try{const res=await sb_post('dishes',entry);if(res&&res[0])myDishes.push(res[0]);closeSheet('dishSheet');renderDetail(currentRestId);showToast('已添加')}
+  catch(e){showToast('保存失败')}
   saving=false;
 }
 
 // ── Discovery sheet ──
 function openDiscSheet(){
   buildCuisineSelect('diCuisine');buildRestSelect();
-  togState.discType='ingredient';togState.discStatus='done';
-  document.getElementById('diName').value='';document.getElementById('diNote').value='';
+  togState.discType='discovery';
+  ['diName','diNote'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('#discSheet .tog').forEach(b=>b.classList.remove('on'));
   document.querySelector('#discSheet .tog.c-teal').classList.add('on');
-  document.querySelectorAll('#discSheet .tog.c-teal')[1]?.classList.remove('on');
-  // reset status togs
-  const stogs=document.querySelectorAll('#discSheet .tog');
-  stogs.forEach(b=>{if(b.textContent.includes('已尝过'))b.classList.add('on');else b.classList.remove('on')});
-  // re-set type
-  stogs[0].classList.add('on');
   document.getElementById('discSheet').classList.add('open');
   setTimeout(()=>document.getElementById('diName').focus(),300);
 }
 async function saveDisc(){
-  if(saving||!isUnlocked)return;
+  if(saving)return;
   const name=document.getElementById('diName').value.trim();
   if(!name){showToast('请填写名称');return}
   const cv=document.getElementById('diCuisine').value;
-  const [cid,cname]=cv?cv.split('|'):['',''];
+  const[cid,cname]=cv?cv.split('|'):['',''];
   const rv=document.getElementById('diRest').value;
-  const [rid,rname]=rv?rv.split('|'):['',''];
-  const entry={name,type:togState.discType,status:togState.discStatus,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:document.getElementById('diNote').value.trim()||null};
+  const[rid,rname]=rv?rv.split('|'):['',''];
+  const entry={user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name,name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:document.getElementById('diNote').value.trim()||null};
   saving=true;
-  try{
-    const res=await sb('discoveries',{method:'POST',body:JSON.stringify(entry)});
-    if(res&&res[0])discoveries.unshift(res[0]);else await loadAll();
-    closeSheet('discSheet');renderAll();updateHeader();showToast('已保存');
-  }catch(e){showToast('保存失败')}
+  try{const res=await sb_post('discoveries',entry);if(res&&res[0]){myDiscs.unshift(res[0]);allDiscs.unshift(res[0]);}closeSheet('discSheet');renderAll();showToast('已保存')}
+  catch(e){showToast('保存失败')}
   saving=false;
 }
 
 // ── Delete ──
 async function deleteRest(id){
-  if(!isUnlocked||!confirm('确定删除这家餐厅？相关菜品记录也会一起删除。'))return;
-  try{await sb('restaurants?id=eq.'+id,{method:'DELETE'});restaurants=restaurants.filter(r=>r.id!==id);dishes=dishes.filter(d=>d.restaurant_id!==id);renderAll();updateHeader();showToast('已删除')}
+  if(!confirm('确定删除这家餐厅？相关菜品也会一起删除。'))return;
+  try{await sb_del('restaurants',id);myRests=myRests.filter(r=>r.id!==id);allRests=allRests.filter(r=>r.id!==id);myDishes=myDishes.filter(d=>d.restaurant_id!==id);renderAll();showToast('已删除')}
   catch(e){showToast('删除失败')}
 }
 function deleteCurrentRest(){if(currentRestId){deleteRest(currentRestId);closeDetail()}}
 async function deleteDisc(id){
-  if(!isUnlocked||!confirm('确定删除？'))return;
-  try{await sb('discoveries?id=eq.'+id,{method:'DELETE'});discoveries=discoveries.filter(d=>d.id!==id);renderDisc(discSearch);updateHeader();showToast('已删除')}
+  if(!confirm('确定删除？'))return;
+  try{await sb_del('discoveries',id);myDiscs=myDiscs.filter(d=>d.id!==id);allDiscs=allDiscs.filter(d=>d.id!==id);renderAll();showToast('已删除')}
   catch(e){showToast('删除失败')}
 }
 async function deleteDish(id){
-  if(!isUnlocked||!confirm('确定删除？'))return;
-  try{await sb('dishes?id=eq.'+id,{method:'DELETE'});dishes=dishes.filter(d=>d.id!==id);renderDetail(currentRestId);showToast('已删除')}
+  if(!confirm('确定删除？'))return;
+  try{await sb_del('dishes',id);myDishes=myDishes.filter(d=>d.id!==id);renderDetail(currentRestId);showToast('已删除')}
   catch(e){showToast('删除失败')}
 }
 
-// ── Render restaurants ──
-function setRestFilter(f,btn){restFilter=f;document.querySelectorAll('#restaurants .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderRests()}
-function renderRests(){
-  const list=document.getElementById('restList');
-  let items=restaurants;
-  if(restFilter!=='all')items=items.filter(r=>r.status===restFilter);
-  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">No restaurants yet</div><p>还没有餐厅记录<br>${isUnlocked?'点击下方按钮添加':'解锁编辑模式后可添加'}</p></div>`;return}
-  list.innerHTML=items.map(r=>{
-    const dcount=dishes.filter(d=>d.restaurant_id===r.id).length;
-    const stars=r.rating?'★'.repeat(Math.floor(r.rating))+(r.rating%1>=0.5?'½':''):'' ;
-    return`<div class="card rest-card" onclick="openDetail(${r.id})">
-      <div class="card-inner">
-        <div class="rest-top">
-          <div class="rest-name">${r.name}</div>
-          <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
-        </div>
-        <div class="rest-meta">
-          ${r.cuisine_name?`<span class="rest-cuisine">${r.cuisine_name}</span>`:''}
-          ${r.city?`<span class="rest-city">· ${r.city}</span>`:''}
-        </div>
-        ${r.summary?`<div class="rest-summary">${r.summary}</div>`:''}
-        <div class="rest-footer">
-          <span class="dishes-count">${dcount?dcount+'道菜':'暂无菜品记录'}</span>
-          <span>${r.rating_label?`<span class="badge b-visited" style="margin-right:6px">${r.rating_label}</span>`:''}${r.rating?`<span style="color:#E8B84B;font-size:13px">${r.rating} ★</span>`:''}</span>
-        </div>
+// ── Render mine ──
+function setRestFilter(f,btn){restFilter=f;document.querySelectorAll('#mine .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMine()}
+
+function restCardHTML(r,showDel=false){
+  const dcount=myDishes.filter(d=>d.restaurant_id===r.id).length;
+  return`<div class="card rest-card" onclick="openDetail(${r.id})">
+    <div class="card-inner">
+      <div class="rest-top">
+        <div class="rest-name">${r.name}</div>
+        <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
       </div>
-    </div>`;
+      <div class="rest-meta">
+        ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}
+        ${r.city?`<span>· ${r.city}</span>`:''}
+      </div>
+      ${r.summary?`<div class="rest-notes">${r.summary}</div>`:''}
+      ${r.notes&&r.status==='wishlist'?`<div class="rest-notes" style="color:var(--th)">${r.notes}</div>`:''}
+      <div class="rest-footer">
+        <span class="dishes-count">${dcount?dcount+'道菜':'暂无菜品'}</span>
+        <span>${r.rating_label?`<span class="badge b-visited" style="margin-right:5px">${r.rating_label}</span>`:''} ${r.rating?`<span style="color:#E8B84B;font-size:13px">${r.rating.toFixed(1)} ★</span>`:''}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function discCardHTML(d,showUser=false,showDel=false){
+  return`<div class="card disc-card">
+    <div class="disc-bar ${d.type}"></div>
+    <div class="disc-body">
+      <div class="disc-name">${d.name}</div>
+      <div class="disc-meta">
+        <span class="badge" style="${d.type==='inspo'?'background:var(--blue-l);color:#0C447C':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+        ${d.cuisine_name?`<span style="font-size:12px;color:var(--tm)">${d.cuisine_name}</span>`:''}
+        ${d.restaurant_name?`<span style="font-size:12px;color:var(--th)">· ${d.restaurant_name}</span>`:''}
+      </div>
+      ${d.note?`<div class="disc-note">${d.note}</div>`:''}
+      <div class="disc-footer">
+        ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>`:'<span></span>'}
+        ${showDel?`<button class="del-btn" onclick="event.stopPropagation();deleteDisc(${d.id})">×</button>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMine(){
+  const list=document.getElementById('mineList');
+  if(restFilter==='disc'){
+    if(!myDiscs.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>还没有发现记录</p></div>`;return}
+    list.innerHTML=myDiscs.map(d=>discCardHTML(d,false,true)).join('');
+    return;
+  }
+  let items=[...myRests];
+  if(restFilter!=='all')items=items.filter(r=>r.status===restFilter);
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>还没有${restFilter==='wishlist'?'想去的':'去过的'}餐厅</p></div>`;return}
+  list.innerHTML=items.map(r=>restCardHTML(r,true)).join('');
+}
+
+// ── Square ──
+function renderSquare(){
+  const typeF=document.getElementById('sqTypeFilter').value;
+  const userF=document.getElementById('sqUserFilter').value;
+  const list=document.getElementById('squareList');
+  let items=[];
+  if(typeF!=='discoveries'){
+    let rests=[...allRests];
+    if(userF!=='all')rests=rests.filter(r=>r.username===userF);
+    items=items.concat(rests.map(r=>({...r,_kind:'rest',_ts:r.created_at})));
+  }
+  if(typeF!=='restaurants'){
+    let discs=[...allDiscs];
+    if(userF!=='all')discs=discs.filter(d=>d.username===userF);
+    items=items.concat(discs.map(d=>({...d,_kind:'disc',_ts:d.created_at})));
+  }
+  items.sort((a,b)=>b._ts.localeCompare(a._ts));
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>还没有公开内容</p></div>`;return}
+  list.innerHTML=items.map(item=>{
+    if(item._kind==='rest'){
+      const isOwn=item.user_id===currentUser.id;
+      return`<div class="card rest-card" ${isOwn?`onclick="openDetail(${item.id})"`:'style="cursor:default"'}>
+        <div class="card-inner">
+          <div class="rest-top"><div class="rest-name">${item.name}</div><span class="badge ${item.status==='wishlist'?'b-wishlist':'b-visited'}">${item.status==='wishlist'?'📌 想去':'✓ 去过'}</span></div>
+          <div class="rest-meta">${item.cuisine_name?`<span>${item.cuisine_name}</span>`:''} ${item.city?`<span>· ${item.city}</span>`:''}</div>
+          ${item.summary?`<div class="rest-notes">${item.summary}</div>`:''}
+          <div class="rest-footer">
+            <div class="user-tag"><div class="user-tag-dot">${(item.display_name||item.username).charAt(0).toUpperCase()}</div>${item.display_name||item.username}</div>
+            ${item.rating?`<span style="color:#E8B84B;font-size:13px">${item.rating.toFixed(1)} ★</span>`:''}
+          </div>
+        </div>
+      </div>`;
+    }else{
+      return discCardHTML(item,true,false);
+    }
   }).join('');
 }
 
-// ── Restaurant detail ──
+// ── Detail ──
 function openDetail(id){
   currentRestId=id;
+  const isOwn=myRests.some(r=>r.id===id);
   document.getElementById('restDetail').classList.add('open');
+  document.getElementById('detailDelBtn').style.display=isOwn?'inline-block':'none';
+  document.getElementById('addDishBtn').style.display=isOwn?'block':'none';
   renderDetail(id);
-  document.getElementById('addDishBtn').style.display=isUnlocked?'block':'none';
-  document.getElementById('detailDelBtn').style.display=isUnlocked?'block':'none';
 }
 function closeDetail(){document.getElementById('restDetail').classList.remove('open');currentRestId=null}
 function renderDetail(id){
-  const r=restaurants.find(x=>x.id===id);
-  if(!r)return;
+  const r=[...myRests,...allRests].find(x=>x.id===id);if(!r)return;
   document.getElementById('detailName').textContent=r.name;
+  const isOwn=r.user_id===currentUser.id;
   document.getElementById('detailMeta').innerHTML=`
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
       <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
       ${r.cuisine_name?`<span class="badge" style="background:var(--cream-d);color:var(--tm)">${r.cuisine_name}</span>`:''}
       ${r.city?`<span style="font-size:13px;color:var(--th)">${r.city}</span>`:''}
-      ${r.rating?`<span style="font-size:14px;color:#E8B84B">${r.rating} ★</span>`:''}
+      ${r.rating?`<span style="font-size:14px;color:#E8B84B">${r.rating.toFixed(1)} ★</span>`:''}
       ${r.rating_label?`<span class="badge b-visited">${r.rating_label}</span>`:''}
     </div>
-    ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;font-style:italic;padding:12px 14px;background:var(--cream);border-radius:var(--rs);border:1px solid var(--wb)">${r.summary}</div>`:''}
-    ${r.source?`<div style="font-size:12px;color:var(--th);margin-top:8px">来源：${r.source}</div>`:''}
+    ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;font-style:italic;padding:12px 14px;background:var(--cream);border-radius:var(--rs);margin-bottom:8px">${r.summary}</div>`:''}
+    ${r.notes?`<div style="font-size:13px;color:var(--th);line-height:1.6;padding:10px 14px;background:var(--cream);border-radius:var(--rs)">${r.notes}</div>`:''}
   `;
-  const myDishes=dishes.filter(d=>d.restaurant_id===id);
-  document.getElementById('dishRows').innerHTML=myDishes.length?myDishes.map(d=>`
+  const dishList=isOwn?myDishes.filter(d=>d.restaurant_id===id):[];
+  document.getElementById('dishRows').innerHTML=dishList.length?dishList.map(d=>`
     <div class="dish-row">
       <div class="dish-dot"></div>
       <div class="dish-body">
         <div class="dish-name">${d.name}</div>
         ${d.note?`<div class="dish-note">${d.note}</div>`:''}
-        <div class="dish-rating">${d.rating?d.rating+' ★ ':''}${d.rating_label||''}</div>
+        <div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div>
       </div>
-      ${isUnlocked?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
+      ${isOwn?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
     </div>`).join(''):'<div style="color:var(--th);font-size:13px;padding:8px 0">还没有菜品记录</div>';
-  const relDiscs=discoveries.filter(d=>d.restaurant_id===id);
+  const relDiscs=myDiscs.filter(d=>d.restaurant_id===id);
   document.getElementById('relatedDiscs').innerHTML=relDiscs.length?relDiscs.map(d=>`
     <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--wb)">
-      <div style="width:4px;height:4px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
       <span style="font-size:14px;font-weight:600">${d.name}</span>
-      <span class="badge" style="background:var(--teal-l);color:var(--teal-d)">${TYPE_LABELS[d.type]||d.type}</span>
+      <span class="badge" style="${d.type==='inspo'?'background:var(--blue-l);color:#0C447C':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
     </div>`).join(''):'<div style="color:var(--th);font-size:13px;padding:8px 0">暂无相关发现</div>';
-  document.getElementById('addDishBtn').style.display=isUnlocked?'block':'none';
-  document.getElementById('detailDelBtn').style.display=isUnlocked?'block':'none';
 }
 
-// ── Render discoveries ──
-function setDiscFilter(f,btn){discFilter=f;document.querySelectorAll('#discoveries .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderDisc(discSearch)}
-function renderDisc(search){
-  discSearch=search||'';
-  const list=document.getElementById('discList');
-  let items=[...discoveries];
-  if(discFilter==='todo')items=items.filter(d=>d.status==='todo');
-  else if(discFilter!=='all')items=items.filter(d=>d.type===discFilter);
-  if(discSearch){const q=discSearch.toLowerCase();items=items.filter(d=>d.name.toLowerCase().includes(q)||(d.note||'').toLowerCase().includes(q)||(d.cuisine_name||'').toLowerCase().includes(q))}
-  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>${discoveries.length===0?'还没有发现记录':'没有找到相关记录'}</p></div>`;return}
-  list.innerHTML=items.map(d=>`
-    <div class="card disc-card">
-      <div class="disc-bar ${d.type}"></div>
-      <div class="disc-body">
-        <div class="disc-name">${d.name}</div>
-        <div class="disc-meta">
-          <span class="badge" style="background:var(--${TYPE_COLORS[d.type]||'teal'}-l,var(--teal-l));color:var(--${TYPE_COLORS[d.type]||'teal'}-d,var(--teal-d))">${TYPE_LABELS[d.type]||d.type}</span>
-          ${d.cuisine_name?`<span style="font-size:12px;color:var(--tm)">${d.cuisine_name}</span>`:''}
-          ${d.restaurant_name?`<span style="font-size:12px;color:var(--th)">· ${d.restaurant_name}</span>`:''}
-        </div>
-        ${d.note?`<div class="disc-note">${d.note}</div>`:''}
-        <div class="disc-footer">
-          <span class="status-pill ${STATUS_CLASSES[d.status]||'sp-done'}">${STATUS_LABELS[d.status]||d.status}</span>
-          ${isUnlocked?`<button class="del-btn" onclick="deleteDisc(${d.id})">×</button>`:''}
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-// ── Map ──
+// ── Map & Stats (my data only) ──
 function renderMap(){
-  const visited=new Set(restaurants.filter(r=>r.status==='visited').map(r=>r.cuisine_id));
-  const total=CUISINES.length;
-  const exp=visited.size;
+  const visited=new Set(myRests.filter(r=>r.status==='visited').map(r=>r.cuisine_id));
+  const total=CUISINES.length,exp=visited.size;
   document.getElementById('mpCount').textContent=`${exp} / ${total}`;
   document.getElementById('mpFill').style.width=Math.round(exp/total*100)+'%';
   document.getElementById('mapContent').innerHTML=REGIONS.map(region=>{
-    const cuisines=CUISINES.filter(c=>c.region===region);
     return`<div class="map-region"><div class="region-title">${region}</div>
-    <div class="c-grid">${cuisines.map(c=>{
-      const rests=restaurants.filter(r=>r.cuisine_id===c.id&&r.status==='visited');
-      return`<div class="c-card ${rests.length?'explored':''}" onclick="filterMapCuisine('${c.id}','${c.name}')">
-        <span class="c-name">${c.name}</span>
-        <span class="c-badge">${rests.length||'—'}</span>
+    <div class="c-grid">${CUISINES.filter(c=>c.region===region).map(c=>{
+      const cnt=myRests.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length;
+      return`<div class="c-card ${cnt?'explored':''}" onclick="filterMapCuisine('${c.id}','${c.name}')">
+        <span class="c-name">${c.name}</span><span class="c-badge">${cnt||'—'}</span>
       </div>`;
     }).join('')}</div></div>`;
   }).join('');
 }
 function filterMapCuisine(id,name){
-  switchTab('restaurants');
-  restFilter='all';
-  document.querySelectorAll('#restaurants .pill').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#restaurants .pill')[0].classList.add('active');
-  // filter inline
-  const list=document.getElementById('restList');
-  const items=restaurants.filter(r=>r.cuisine_id===id);
-  if(!items.length){list.innerHTML=`<div class="empty"><p>该菜系暂无餐厅记录</p></div>`;return}
-  restFilter='__custom__';
-  document.getElementById('restList').innerHTML=items.map(r=>{
-    const dcount=dishes.filter(d=>d.restaurant_id===r.id).length;
-    return`<div class="card rest-card" onclick="openDetail(${r.id})">
-      <div class="card-inner">
-        <div class="rest-top"><div class="rest-name">${r.name}</div><span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span></div>
-        <div class="rest-meta">${r.cuisine_name?`<span class="rest-cuisine">${r.cuisine_name}</span>`:''} ${r.city?`<span class="rest-city">· ${r.city}</span>`:''}</div>
-        <div class="rest-footer"><span class="dishes-count">${dcount?dcount+'道菜':'暂无菜品记录'}</span><span>${r.rating?`<span style="color:#E8B84B;font-size:13px">${r.rating} ★</span>`:''}</span></div>
-      </div></div>`;
-  }).join('');
+  switchTab('mine');restFilter='all';
+  document.querySelectorAll('#mine .pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#mine .pill')[0].classList.add('active');
+  const items=myRests.filter(r=>r.cuisine_id===id);
+  document.getElementById('mineList').innerHTML=items.length?items.map(r=>restCardHTML(r,true)).join(''):`<div class="empty"><p>该菜系暂无餐厅记录</p></div>`;
 }
 
-// ── Stats ──
 function renderStats(){
-  const total=restaurants.length;
-  const wishlist=restaurants.filter(r=>r.status==='wishlist').length;
-  const visited=restaurants.filter(r=>r.status==='visited').length;
-  const discTotal=discoveries.length;
+  const visited=myRests.filter(r=>r.status==='visited').length;
+  const wishlist=myRests.filter(r=>r.status==='wishlist').length;
   document.getElementById('statsGrid').innerHTML=`
     <div class="sc"><div class="sc-n" style="color:var(--teal)">${visited}</div><div class="sc-l">去过的餐厅</div></div>
     <div class="sc"><div class="sc-n" style="color:var(--blue)">${wishlist}</div><div class="sc-l">想去的餐厅</div></div>
-    <div class="sc"><div class="sc-n" style="color:var(--purple)">${dishes.length}</div><div class="sc-l">菜品记录</div></div>
-    <div class="sc"><div class="sc-n" style="color:var(--amber)">${discTotal}</div><div class="sc-l">发现记录</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--purple)">${myDishes.length}</div><div class="sc-l">菜品记录</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--amber)">${myDiscs.length}</div><div class="sc-l">发现记录</div></div>
   `;
-  const cuisineRank=CUISINES.map(c=>({name:c.name,count:restaurants.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
+  const cuisineRank=CUISINES.map(c=>({name:c.name,count:myRests.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
   const max=cuisineRank[0]?.count||1;
   document.getElementById('chartBars').innerHTML=cuisineRank.length?cuisineRank.map(c=>`
     <div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join('')
-    :'<div style="color:var(--th);font-size:13px;text-align:center;padding:20px 0">暂无数据</div>';
+    :'<div style="color:var(--th);font-size:13px;text-align:center;padding:16px 0">暂无数据</div>';
 }
 
-// ── Header ──
-function updateHeader(){
-  document.getElementById('sc1').textContent=restaurants.length;
-  document.getElementById('sc2').textContent=discoveries.length;
+// FAB: show choice between restaurant and discovery
+function handleFab(){
+  // Simple approach: alternate sheets based on current filter
+  if(restFilter==='disc')openDiscSheet();
+  else openRestSheet();
 }
 
-function renderAll(){renderRests();renderDisc(discSearch);renderMap();renderStats()}
+function renderAll(){renderMine();renderSquare();renderMap();renderStats()}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 
-async function init(){
-  checkSession();
-  buildCuisineSelect('rCuisine');
-  buildCuisineSelect('diCuisine');
-  await loadAll();
-  renderAll();
-  updateHeader();
+// ── Init ──
+function init(){
+  const saved=sessionStorage.getItem('fu_user');
+  if(saved){try{setUser(JSON.parse(saved))}catch(e){sessionStorage.removeItem('fu_user')}}
 }
 init();
 </script>
