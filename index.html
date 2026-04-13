@@ -30,26 +30,22 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, 'PingFang SC', 'Hiragino Sans GB', sans-serif; background: var(--gray-50); color: var(--text); min-height: 100vh; }
 
-  /* Layout */
   .app { max-width: 680px; margin: 0 auto; padding: 0 16px 100px; }
   .header { padding: 32px 0 20px; }
   .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
   .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
   .header-sub { font-size: 13px; color: var(--text-hint); margin-top: 4px; }
 
-  /* Nav */
   .nav { display: flex; gap: 4px; background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 4px; margin-bottom: 20px; position: sticky; top: 10px; z-index: 10; }
   .nav-btn { flex: 1; padding: 8px; border: none; background: transparent; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); transition: all 0.15s; font-family: inherit; }
   .nav-btn.active { background: var(--gray-50); color: var(--text); font-weight: 600; }
 
-  /* Sections */
   .section { display: none; }
   .section.active { display: block; }
 
-  /* FAB */
   .fab { position: fixed; bottom: 28px; right: 50%; transform: translateX(50%); max-width: 680px; width: calc(100% - 32px); background: var(--text); color: white; border: none; border-radius: var(--radius); padding: 15px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; letter-spacing: 0.2px; z-index: 20; }
+  .fab.locked { background: var(--gray-200); color: var(--text-muted); }
 
-  /* Modal */
   .modal-wrap { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: flex-end; justify-content: center; }
   .modal-wrap.open { display: flex; }
   .modal { background: white; border-radius: 20px 20px 0 0; padding: 24px 20px 40px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
@@ -73,7 +69,6 @@
   .btn-submit { width: 100%; padding: 15px; background: var(--text); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 8px; }
   .btn-cancel { width: 100%; padding: 13px; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: 15px; cursor: pointer; font-family: inherit; margin-top: 8px; }
 
-  /* Feed */
   .filter-row { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
   .filter-row::-webkit-scrollbar { display: none; }
   .pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: white; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.15s; flex-shrink: 0; }
@@ -103,14 +98,12 @@
   .entry-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
   .entry-date { font-size: 11px; color: var(--text-hint); }
   .entry-rating { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: var(--gray-100); color: var(--text-muted); }
-  .entry-actions { display: flex; gap: 8px; }
   .btn-del { background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 18px; padding: 0; line-height: 1; }
   .btn-del:hover { color: #E24B4A; }
   .empty { text-align: center; padding: 60px 20px; color: var(--text-hint); }
   .empty-icon { font-size: 40px; margin-bottom: 12px; }
   .empty p { font-size: 14px; line-height: 1.6; }
 
-  /* Map */
   .map-region { margin-bottom: 24px; }
   .region-title { font-size: 11px; font-weight: 700; color: var(--text-hint); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
   .cuisine-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -121,7 +114,6 @@
   .cuisine-badge { font-size: 12px; padding: 2px 8px; border-radius: 10px; background: var(--gray-100); color: var(--text-hint); }
   .cuisine-card.explored .cuisine-badge { background: var(--teal-light); color: var(--teal-dark); font-weight: 600; }
 
-  /* Stats */
   .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
   .stat-card { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; }
   .stat-n { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 4px; }
@@ -129,91 +121,31 @@
   .chart-section { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
   .chart-title { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 14px; }
   .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .bar-label { font-size: 13px; color: var(--text); width: 72px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar-label { font-size: 13px; color: var(--text); width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .bar-track { flex: 1; height: 6px; background: var(--gray-100); border-radius: 3px; overflow: hidden; }
-  .bar-fill { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.4s; }
+  .bar-fill { height: 100%; background: var(--teal); border-radius: 3px; }
   .bar-count { font-size: 12px; color: var(--text-hint); width: 20px; text-align: right; flex-shrink: 0; }
 
-  /* Loading */
-  .loading { text-align: center; padding: 40px; color: var(--text-hint); font-size: 14px; }
   .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--gray-800); color: white; padding: 10px 20px; border-radius: 20px; font-size: 13px; z-index: 200; opacity: 0; transition: opacity 0.2s; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
 
-  /* Config screen */
-  .config-screen { display: none; position: fixed; inset: 0; background: var(--gray-50); z-index: 300; overflow-y: auto; padding: 40px 20px; }
-  .config-screen.open { display: block; }
-  .config-inner { max-width: 520px; margin: 0 auto; }
-  .config-inner h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
-  .config-inner p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; }
-  .config-step { background: white; border: 0.5px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; }
-  .config-step-num { font-size: 11px; font-weight: 700; color: var(--teal); letter-spacing: 0.06em; margin-bottom: 6px; }
-  .config-step h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-  .config-step p { font-size: 13px; color: var(--text-muted); margin-bottom: 10px; line-height: 1.5; }
-  .config-step a { color: var(--teal); text-decoration: none; font-weight: 500; }
-  .config-step code { background: var(--gray-100); padding: 2px 6px; border-radius: 4px; font-size: 12px; font-family: monospace; display: block; margin: 8px 0; padding: 10px 12px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
-  .config-input-group { margin-top: 10px; }
-  .config-input-group label { font-size: 12px; font-weight: 600; color: var(--text-muted); display: block; margin-bottom: 4px; }
-  .config-input-group input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: monospace; outline: none; }
-  .config-input-group input:focus { border-color: var(--teal); }
-  .btn-config-save { width: 100%; padding: 14px; background: var(--text); color: white; border: none; border-radius: var(--radius); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; margin-top: 16px; }
-  .config-link { font-size: 13px; color: var(--text-hint); text-align: center; margin-top: 12px; cursor: pointer; text-decoration: underline; }
+  /* 密码弹窗 */
+  .pw-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; align-items: center; justify-content: center; }
+  .pw-overlay.open { display: flex; }
+  .pw-box { background: white; border-radius: var(--radius); padding: 28px 24px; width: 320px; max-width: 90vw; text-align: center; }
+  .pw-box h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+  .pw-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .pw-input { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 16px; font-family: inherit; text-align: center; letter-spacing: 4px; outline: none; margin-bottom: 12px; }
+  .pw-input:focus { border-color: var(--teal); }
+  .pw-input.error { border-color: #E24B4A; animation: shake 0.3s; }
+  .pw-submit { width: 100%; padding: 13px; background: var(--text); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .pw-cancel { width: 100%; padding: 10px; background: transparent; color: var(--text-muted); border: none; font-size: 14px; cursor: pointer; font-family: inherit; margin-top: 6px; }
+  .lock-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--text-hint); background: var(--gray-100); padding: 4px 10px; border-radius: 20px; cursor: pointer; }
+  .lock-badge.unlocked { color: var(--teal-dark); background: var(--teal-light); }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
 </style>
 </head>
 <body>
-
-<div class="config-screen" id="configScreen">
-  <div class="config-inner">
-    <h1>初次配置</h1>
-    <p>需要连接你的 Supabase 数据库，只需设置一次，之后所有设备都能同步数据。</p>
-
-    <div class="config-step">
-      <div class="config-step-num">步骤 1</div>
-      <h3>注册 Supabase</h3>
-      <p>前往 <a href="https://supabase.com" target="_blank">supabase.com</a> 注册免费账号，创建一个新项目（Project）。名称随意，记住数据库密码。</p>
-    </div>
-
-    <div class="config-step">
-      <div class="config-step-num">步骤 2</div>
-      <h3>创建数据表</h3>
-      <p>进入你的项目 → 左侧「SQL Editor」→ 粘贴以下 SQL 并点击 Run：</p>
-      <code>create table entries (
-  id bigint generated always as identity primary key,
-  name text not null,
-  type text not null,
-  cuisine_id text not null,
-  cuisine_name text not null,
-  place text,
-  note text,
-  rating text,
-  want_again boolean default false,
-  date text,
-  created_at timestamptz default now()
-);
-
-alter table entries enable row level security;
-
-create policy "allow all" on entries
-  for all using (true) with check (true);</code>
-    </div>
-
-    <div class="config-step">
-      <div class="config-step-num">步骤 3</div>
-      <h3>填入你的 API 信息</h3>
-      <p>进入项目 → 左侧「Project Settings」→「API」，复制以下两个值：</p>
-      <div class="config-input-group">
-        <label>Project URL</label>
-        <input type="text" id="cfgUrl" placeholder="https://xxxxxxxxxxxx.supabase.co" />
-      </div>
-      <div class="config-input-group" style="margin-top:10px">
-        <label>anon public key</label>
-        <input type="text" id="cfgKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." />
-      </div>
-    </div>
-
-    <button class="btn-config-save" onclick="saveConfig()">保存并开始使用</button>
-    <div class="config-link" onclick="useDemoMode()">暂时用本地模式体验（数据不同步）</div>
-  </div>
-</div>
 
 <div class="app">
   <div class="header">
@@ -222,7 +154,10 @@ create policy "allow all" on entries
         <h1>我的美食地图</h1>
         <div class="header-sub" id="headerSub">加载中...</div>
       </div>
-      <button onclick="openConfig()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-hint);padding:4px">⚙</button>
+      <div id="lockBadge" class="lock-badge" onclick="handleLockClick()">
+        <span id="lockIcon">🔒</span>
+        <span id="lockText">只读模式</span>
+      </div>
     </div>
   </div>
 
@@ -260,12 +195,13 @@ create policy "allow all" on entries
   </div>
 </div>
 
-<button class="fab" onclick="openModal()">+ 新记录</button>
+<button class="fab" id="fabBtn" onclick="handleFabClick()">+ 新记录</button>
 
+<!-- 新记录弹窗 -->
 <div class="modal-wrap" id="modalWrap" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-handle"></div>
-    <h2 id="modalTitle">添加记录</h2>
+    <h2>添加记录</h2>
     <div class="form-group">
       <label class="form-label">类型</label>
       <div class="type-grid">
@@ -291,7 +227,7 @@ create policy "allow all" on entries
     </div>
     <div class="form-group">
       <label class="form-label">感受</label>
-      <textarea class="form-input" id="fNote" placeholder="一句话记录味道和感受，比如：鲜得不像话，完全不辣"></textarea>
+      <textarea class="form-input" id="fNote" placeholder="一句话记录味道和感受"></textarea>
     </div>
     <div class="form-group">
       <label class="form-label">推荐程度</label>
@@ -307,95 +243,181 @@ create policy "allow all" on entries
   </div>
 </div>
 
+<!-- 密码弹窗 -->
+<div class="pw-overlay" id="pwOverlay" onclick="if(event.target===this)closePw()">
+  <div class="pw-box">
+    <h3>编辑模式</h3>
+    <p>输入密码后可以新增和删除记录</p>
+    <input type="password" class="pw-input" id="pwInput" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitPw()" />
+    <button class="pw-submit" onclick="submitPw()">确认</button>
+    <button class="pw-cancel" onclick="closePw()">取消</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+const SUPABASE_URL = 'https://xdvwdhnnhsbmwnzszzrd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xK2SuD1DM_5Q8YQ_GYU1EQ_o0Dpj0BG';
+const EDIT_PASSWORD = '19900322';
+const PW_SESSION_KEY = 'foodmap_unlocked';
+
 const CUISINES = [
-  {id:'sichuan',name:'川菜',region:'中餐'},
-  {id:'cantonese',name:'粤菜',region:'中餐'},
-  {id:'hunan',name:'湘菜',region:'中餐'},
-  {id:'fujian',name:'闽菜',region:'中餐'},
-  {id:'jiangzhe',name:'江浙菜',region:'中餐'},
-  {id:'yunnan',name:'云南菜',region:'中餐'},
-  {id:'taiwan',name:'台湾菜',region:'中餐'},
-  {id:'hainan',name:'海南菜',region:'中餐'},
-  {id:'beijing',name:'北京菜',region:'中餐'},
-  {id:'shanxi',name:'陕西菜',region:'中餐'},
-  {id:'japanese',name:'日料',region:'东亚'},
-  {id:'korean',name:'韩餐',region:'东亚'},
-  {id:'thai',name:'泰餐',region:'东南亚'},
-  {id:'vietnamese',name:'越南菜',region:'东南亚'},
-  {id:'indonesian',name:'印尼/马来菜',region:'东南亚'},
-  {id:'burmese',name:'缅甸菜',region:'东南亚'},
-  {id:'italian',name:'意大利菜',region:'欧洲'},
-  {id:'french',name:'法餐',region:'欧洲'},
-  {id:'spanish',name:'西班牙菜',region:'欧洲'},
-  {id:'greek',name:'希腊菜',region:'欧洲'},
-  {id:'portuguese',name:'葡萄牙菜',region:'欧洲'},
-  {id:'middleeast',name:'中东菜',region:'中东/地中海'},
-  {id:'moroccan',name:'摩洛哥菜',region:'中东/地中海'},
-  {id:'turkish',name:'土耳其菜',region:'中东/地中海'},
-  {id:'indian',name:'印度菜',region:'南亚'},
-  {id:'srilankan',name:'斯里兰卡菜',region:'南亚'},
-  {id:'mexican',name:'墨西哥菜',region:'美洲'},
-  {id:'peruvian',name:'秘鲁菜',region:'美洲'},
-  {id:'other',name:'其他',region:'其他'},
+  // 中餐
+  {id:'dongbei',   name:'东北菜',   region:'中餐'},
+  {id:'beijing',   name:'北京菜',   region:'中餐'},
+  {id:'shandong',  name:'鲁菜',     region:'中餐'},
+  {id:'shanxi',    name:'晋菜',     region:'中餐'},
+  {id:'shaanxi',   name:'陕西菜',   region:'中餐'},
+  {id:'sichuan',   name:'川菜',     region:'中餐'},
+  {id:'hunan',     name:'湘菜',     region:'中餐'},
+  {id:'cantonese', name:'粤菜',     region:'中餐'},
+  {id:'chaoshan',  name:'潮汕菜',   region:'中餐'},
+  {id:'fujian',    name:'闽菜',     region:'中餐'},
+  {id:'jiangzhe',  name:'江浙菜',   region:'中餐'},
+  {id:'huaiyang',  name:'淮扬菜',   region:'中餐'},
+  {id:'anhui',     name:'徽菜',     region:'中餐'},
+  {id:'yunnan',    name:'云南菜',   region:'中餐'},
+  {id:'guizhou',   name:'贵州菜',   region:'中餐'},
+  {id:'guangxi',   name:'广西菜',   region:'中餐'},
+  {id:'xinjiang',  name:'新疆菜',   region:'中餐'},
+  {id:'taiwan',    name:'台湾菜',   region:'中餐'},
+  {id:'hainan',    name:'海南菜',   region:'中餐'},
+  {id:'hakka',     name:'客家菜',   region:'中餐'},
+  {id:'cn_other',  name:'其他中餐', region:'中餐'},
+  // 东亚
+  {id:'japanese',  name:'日料',     region:'东亚'},
+  {id:'korean',    name:'韩餐',     region:'东亚'},
+  // 东南亚
+  {id:'thai',      name:'泰餐',     region:'东南亚'},
+  {id:'vietnamese',name:'越南菜',   region:'东南亚'},
+  {id:'singaporean',name:'新加坡菜',region:'东南亚'},
+  {id:'malaysian', name:'马来菜',   region:'东南亚'},
+  {id:'indonesian',name:'印尼菜',   region:'东南亚'},
+  {id:'filipino',  name:'菲律宾菜', region:'东南亚'},
+  {id:'burmese',   name:'缅甸菜',   region:'东南亚'},
+  {id:'cambodian', name:'柬埔寨菜', region:'东南亚'},
+  {id:'sea_other', name:'其他东南亚',region:'东南亚'},
+  // 南亚
+  {id:'indian',    name:'印度菜',   region:'南亚'},
+  {id:'srilankan', name:'斯里兰卡菜',region:'南亚'},
+  {id:'nepali',    name:'尼泊尔菜', region:'南亚'},
+  {id:'pakistani', name:'巴基斯坦菜',region:'南亚'},
+  // 中东
+  {id:'turkish',   name:'土耳其菜', region:'中东'},
+  {id:'lebanese',  name:'黎巴嫩菜', region:'中东'},
+  {id:'iranian',   name:'伊朗菜',   region:'中东'},
+  {id:'israeli',   name:'以色列菜', region:'中东'},
+  {id:'me_other',  name:'其他中东', region:'中东'},
+  // 地中海/北非
+  {id:'greek',     name:'希腊菜',   region:'地中海/北非'},
+  {id:'moroccan',  name:'摩洛哥菜', region:'地中海/北非'},
+  {id:'egyptian',  name:'埃及菜',   region:'地中海/北非'},
+  {id:'ethiopian', name:'埃塞俄比亚菜',region:'地中海/北非'},
+  // 欧洲
+  {id:'italian',   name:'意大利菜', region:'欧洲'},
+  {id:'french',    name:'法餐',     region:'欧洲'},
+  {id:'spanish',   name:'西班牙菜', region:'欧洲'},
+  {id:'portuguese',name:'葡萄牙菜', region:'欧洲'},
+  {id:'british',   name:'英国菜',   region:'欧洲'},
+  {id:'german',    name:'德国菜',   region:'欧洲'},
+  {id:'nordic',    name:'北欧菜',   region:'欧洲'},
+  {id:'eu_other',  name:'其他欧洲', region:'欧洲'},
+  // 美洲
+  {id:'mexican',   name:'墨西哥菜', region:'美洲'},
+  {id:'peruvian',  name:'秘鲁菜',   region:'美洲'},
+  {id:'american',  name:'美式菜',   region:'美洲'},
+  {id:'brazilian', name:'巴西菜',   region:'美洲'},
+  {id:'am_other',  name:'其他美洲', region:'美洲'},
+  // 其他
+  {id:'other',     name:'其他',     region:'其他'},
 ];
-const REGIONS = [...new Set(CUISINES.map(c=>c.region))];
-const TYPE_LABELS = {ingredient:'食材',pairing:'搭配',restaurant:'餐厅',eating:'吃法'};
+
+const REGIONS = [...new Set(CUISINES.map(c => c.region))];
+const TYPE_LABELS = {ingredient:'食材', pairing:'搭配', restaurant:'餐厅', eating:'吃法'};
 
 let data = [];
-let supabaseUrl = '';
-let supabaseKey = '';
-let demoMode = false;
 let currentFilter = 'all';
 let selectedType = 'ingredient';
 let selectedRating = '';
 let saving = false;
+let isUnlocked = false;
 
-function loadConfig() {
-  supabaseUrl = localStorage.getItem('sb_url') || '';
-  supabaseKey = localStorage.getItem('sb_key') || '';
-  demoMode = localStorage.getItem('demo_mode') === '1';
+function checkSession() {
+  isUnlocked = sessionStorage.getItem(PW_SESSION_KEY) === '1';
+  updateLockUI();
 }
 
-function saveConfig() {
-  const url = document.getElementById('cfgUrl').value.trim();
-  const key = document.getElementById('cfgKey').value.trim();
-  if (!url || !key) { showToast('请填写 URL 和 Key'); return; }
-  if (!url.startsWith('https://')) { showToast('URL 格式不对，应以 https:// 开头'); return; }
-  localStorage.setItem('sb_url', url);
-  localStorage.setItem('sb_key', key);
-  localStorage.removeItem('demo_mode');
-  supabaseUrl = url; supabaseKey = key; demoMode = false;
-  closeConfig();
-  init();
+function updateLockUI() {
+  const badge = document.getElementById('lockBadge');
+  const icon = document.getElementById('lockIcon');
+  const text = document.getElementById('lockText');
+  const fab = document.getElementById('fabBtn');
+  if (isUnlocked) {
+    badge.className = 'lock-badge unlocked';
+    icon.textContent = '🔓';
+    text.textContent = '编辑中';
+    fab.className = 'fab';
+    fab.textContent = '+ 新记录';
+  } else {
+    badge.className = 'lock-badge';
+    icon.textContent = '🔒';
+    text.textContent = '只读模式';
+    fab.className = 'fab locked';
+    fab.textContent = '🔒 需要密码才能编辑';
+  }
 }
 
-function useDemoMode() {
-  localStorage.setItem('demo_mode', '1');
-  demoMode = true;
-  closeConfig();
-  data = [
-    {id:1,name:'剥皮辣椒',type:'ingredient',cuisine_id:'taiwan',cuisine_name:'台湾菜',place:'台北',note:'炖进鸡汤里鲜得不像话，完全不辣',rating:'必试',want_again:true,date:'2024-01-01',created_at:'2024-01-01'},
-    {id:2,name:'糟粕醋',type:'ingredient',cuisine_id:'hainan',cuisine_name:'海南菜',place:'海口',note:'酸辣开胃，当地人每天喝',rating:'必试',want_again:true,date:'2024-01-02',created_at:'2024-01-02'},
-    {id:3,name:'白辣椒',type:'ingredient',cuisine_id:'hunan',cuisine_name:'湘菜',place:'',note:'和红辣椒完全不同的香气，更醇厚',rating:'值得一吃',want_again:false,date:'2024-01-03',created_at:'2024-01-03'},
-    {id:4,name:'秋葵山药泥纳豆拌饭',type:'pairing',cuisine_id:'japanese',cuisine_name:'日料',place:'东京',note:'黏糊糊的组合，意外地好吃',rating:'必试',want_again:true,date:'2024-01-04',created_at:'2024-01-04'},
-    {id:5,name:'布拉塔奶酪',type:'ingredient',cuisine_id:'italian',cuisine_name:'意大利菜',place:'',note:'外皮是马苏里拉，里面流出奶油，太丰腴了',rating:'必试',want_again:true,date:'2024-01-05',created_at:'2024-01-05'},
-  ];
-  render();
-  updateHeader();
+function handleLockClick() {
+  if (isUnlocked) {
+    isUnlocked = false;
+    sessionStorage.removeItem(PW_SESSION_KEY);
+    updateLockUI();
+    showToast('已切换为只读模式');
+  } else {
+    openPw();
+  }
 }
 
-function openConfig() { document.getElementById('configScreen').classList.add('open'); }
-function closeConfig() { document.getElementById('configScreen').classList.remove('open'); }
+function handleFabClick() {
+  if (!isUnlocked) { openPw(); return; }
+  openModal();
+}
+
+function openPw() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwInput').className = 'pw-input';
+  document.getElementById('pwOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('pwInput').focus(), 100);
+}
+
+function closePw() {
+  document.getElementById('pwOverlay').classList.remove('open');
+}
+
+function submitPw() {
+  const val = document.getElementById('pwInput').value;
+  if (val === EDIT_PASSWORD) {
+    isUnlocked = true;
+    sessionStorage.setItem(PW_SESSION_KEY, '1');
+    closePw();
+    updateLockUI();
+    showToast('已解锁编辑模式');
+  } else {
+    const input = document.getElementById('pwInput');
+    input.className = 'pw-input error';
+    input.value = '';
+    setTimeout(() => input.className = 'pw-input', 600);
+    showToast('密码错误');
+  }
+}
 
 async function sbFetch(path, opts = {}) {
-  const res = await fetch(supabaseUrl + '/rest/v1/' + path, {
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, {
     ...opts,
     headers: {
-      'apikey': supabaseKey,
-      'Authorization': 'Bearer ' + supabaseKey,
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
       'Content-Type': 'application/json',
       'Prefer': opts.method === 'POST' ? 'return=representation' : '',
       ...(opts.headers || {})
@@ -407,40 +429,28 @@ async function sbFetch(path, opts = {}) {
 }
 
 async function loadData() {
-  if (demoMode) return;
   try {
     data = await sbFetch('entries?order=created_at.desc&limit=500') || [];
   } catch(e) {
-    showToast('加载失败，请检查配置');
-    console.error(e);
+    showToast('加载失败，请刷新重试');
   }
-}
-
-async function init() {
-  loadConfig();
-  if (!supabaseUrl && !demoMode) {
-    document.getElementById('configScreen').classList.add('open');
-    return;
-  }
-  if (demoMode) {
-    useDemoMode();
-    return;
-  }
-  document.getElementById('headerSub').textContent = '加载中...';
-  await loadData();
-  populateCuisineSelect();
-  render();
-  updateHeader();
 }
 
 function updateHeader() {
-  const cuisines = new Set(data.map(e=>e.cuisine_id)).size;
+  const cuisines = new Set(data.map(e => e.cuisine_id)).size;
   document.getElementById('headerSub').textContent = `${data.length} 条记录 · ${cuisines} 个菜系`;
 }
 
 function populateCuisineSelect() {
   const sel = document.getElementById('fCuisine');
-  sel.innerHTML = CUISINES.map(c=>`<option value="${c.id}|${c.name}">${c.name}</option>`).join('');
+  let html = '';
+  REGIONS.forEach(region => {
+    const items = CUISINES.filter(c => c.region === region);
+    html += `<optgroup label="${region}">`;
+    items.forEach(c => { html += `<option value="${c.id}|${c.name}">${c.name}</option>`; });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
 }
 
 function selectType(type, btn) {
@@ -464,18 +474,21 @@ function openModal() {
   document.getElementById('fNote').value = '';
   document.getElementById('fPlace').value = '';
   document.getElementById('modalWrap').classList.add('open');
-  setTimeout(()=>document.getElementById('fName').focus(), 300);
+  setTimeout(() => document.getElementById('fName').focus(), 300);
 }
 
-function closeModal() { document.getElementById('modalWrap').classList.remove('open'); }
+function closeModal() {
+  document.getElementById('modalWrap').classList.remove('open');
+}
 
 async function saveEntry() {
-  if (saving) return;
+  if (saving || !isUnlocked) return;
   const name = document.getElementById('fName').value.trim();
   if (!name) { showToast('请填写名称'); return; }
   const [cuisineId, cuisineName] = document.getElementById('fCuisine').value.split('|');
   const entry = {
-    name, type: selectedType, cuisine_id: cuisineId, cuisine_name: cuisineName,
+    name, type: selectedType,
+    cuisine_id: cuisineId, cuisine_name: cuisineName,
     place: document.getElementById('fPlace').value.trim(),
     note: document.getElementById('fNote').value.trim(),
     rating: selectedRating,
@@ -485,30 +498,25 @@ async function saveEntry() {
   };
   saving = true;
   try {
-    if (demoMode) {
-      entry.id = Date.now();
-      data.unshift(entry);
-    } else {
-      const result = await sbFetch('entries', { method: 'POST', body: JSON.stringify(entry) });
-      if (result && result[0]) data.unshift(result[0]);
-      else { data.unshift({...entry, id: Date.now()}); await loadData(); }
-    }
+    const result = await sbFetch('entries', { method: 'POST', body: JSON.stringify(entry) });
+    if (result && result[0]) data.unshift(result[0]);
+    else { await loadData(); }
     closeModal();
     render();
     updateHeader();
     showToast('已保存');
   } catch(e) {
     showToast('保存失败，请重试');
-    console.error(e);
   }
   saving = false;
 }
 
 async function deleteEntry(id) {
+  if (!isUnlocked) { showToast('请先解锁编辑模式'); return; }
   if (!confirm('确定删除这条记录？')) return;
   try {
-    if (!demoMode) await sbFetch('entries?id=eq.' + id, { method: 'DELETE' });
-    data = data.filter(e=>e.id !== id);
+    await sbFetch('entries?id=eq.' + id, { method: 'DELETE' });
+    data = data.filter(e => e.id !== id);
     render();
     updateHeader();
     showToast('已删除');
@@ -516,33 +524,33 @@ async function deleteEntry(id) {
 }
 
 function render() {
-  renderFeed('');
+  renderFeed(document.getElementById('searchInput').value || '');
   renderMap();
   renderStats();
 }
 
 function setFilter(type, btn) {
   currentFilter = type;
-  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  renderFeed(document.getElementById('searchInput').value);
+  renderFeed(document.getElementById('searchInput').value || '');
 }
 
 function renderFeed(search) {
   const list = document.getElementById('feedList');
   let entries = [...data];
-  if (currentFilter !== 'all') entries = entries.filter(e=>e.type===currentFilter);
+  if (currentFilter !== 'all') entries = entries.filter(e => e.type === currentFilter);
   if (search) {
     const q = search.toLowerCase();
     entries = entries.filter(e =>
       e.name.toLowerCase().includes(q) ||
-      (e.note||'').toLowerCase().includes(q) ||
+      (e.note || '').toLowerCase().includes(q) ||
       e.cuisine_name.toLowerCase().includes(q) ||
-      (e.place||'').toLowerCase().includes(q)
+      (e.place || '').toLowerCase().includes(q)
     );
   }
   if (entries.length === 0) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">🍽</div><p>${data.length===0?'还没有记录<br>点击下方按钮添加第一条':'没有找到相关记录'}</p></div>`;
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🍽</div><p>${data.length === 0 ? '还没有记录<br>解锁编辑模式后点击下方按钮添加' : '没有找到相关记录'}</p></div>`;
     return;
   }
   list.innerHTML = entries.map(e => `
@@ -557,10 +565,10 @@ function renderFeed(search) {
         </div>
         ${e.note ? `<div class="entry-note">${e.note}</div>` : ''}
         <div class="entry-footer">
-          <span class="entry-date">${e.date||''}</span>
+          <span class="entry-date">${e.date || ''}</span>
           <div style="display:flex;gap:6px;align-items:center">
             ${e.rating ? `<span class="entry-rating">${e.rating}</span>` : ''}
-            <button class="btn-del" onclick="deleteEntry(${e.id})">×</button>
+            ${isUnlocked ? `<button class="btn-del" onclick="deleteEntry(${e.id})">×</button>` : ''}
           </div>
         </div>
       </div>
@@ -570,14 +578,14 @@ function renderFeed(search) {
 function renderMap() {
   const content = document.getElementById('mapContent');
   content.innerHTML = REGIONS.map(region => {
-    const cuisines = CUISINES.filter(c=>c.region===region);
+    const cuisines = CUISINES.filter(c => c.region === region);
     return `<div class="map-region">
       <div class="region-title">${region}</div>
       <div class="cuisine-grid">${cuisines.map(c => {
-        const count = data.filter(e=>e.cuisine_id===c.id).length;
-        return `<div class="cuisine-card ${count>0?'explored':''}" onclick="filterByCuisine('${c.id}','${c.name}')">
+        const count = data.filter(e => e.cuisine_id === c.id).length;
+        return `<div class="cuisine-card ${count > 0 ? 'explored' : ''}" onclick="filterByCuisine('${c.id}','${c.name}')">
           <span class="cuisine-name">${c.name}</span>
-          <span class="cuisine-badge">${count>0?count:'—'}</span>
+          <span class="cuisine-badge">${count > 0 ? count : '—'}</span>
         </div>`;
       }).join('')}</div>
     </div>`;
@@ -587,7 +595,7 @@ function renderMap() {
 function filterByCuisine(id, name) {
   switchTab('feed');
   currentFilter = 'all';
-  document.querySelectorAll('.pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.pill')[0].classList.add('active');
   const input = document.getElementById('searchInput');
   input.value = name;
@@ -596,10 +604,10 @@ function filterByCuisine(id, name) {
 
 function renderStats() {
   const total = data.length;
-  const cuisinesHit = new Set(data.map(e=>e.cuisine_id)).size;
-  const mustTry = data.filter(e=>e.rating==='必试').length;
-  const byType = {ingredient:0,pairing:0,restaurant:0,eating:0};
-  data.forEach(e=>{ if(byType[e.type]!==undefined) byType[e.type]++; });
+  const cuisinesHit = new Set(data.map(e => e.cuisine_id)).size;
+  const mustTry = data.filter(e => e.rating === '必试').length;
+  const byType = {ingredient: 0, pairing: 0, restaurant: 0, eating: 0};
+  data.forEach(e => { if (byType[e.type] !== undefined) byType[e.type]++; });
 
   document.getElementById('statsGrid').innerHTML = `
     <div class="stat-card"><div class="stat-n" style="color:var(--teal)">${total}</div><div class="stat-l">总记录</div></div>
@@ -609,33 +617,41 @@ function renderStats() {
   `;
 
   const cuisineRank = CUISINES
-    .map(c=>({name:c.name, count:data.filter(e=>e.cuisine_id===c.id).length}))
-    .filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
+    .map(c => ({name: c.name, count: data.filter(e => e.cuisine_id === c.id).length}))
+    .filter(c => c.count > 0).sort((a, b) => b.count - a.count).slice(0, 8);
   const max = cuisineRank[0]?.count || 1;
   document.getElementById('chartBars').innerHTML = cuisineRank.length === 0
     ? '<div style="color:var(--text-hint);font-size:13px;text-align:center;padding:20px 0">暂无数据</div>'
-    : cuisineRank.map(c=>`
+    : cuisineRank.map(c => `
       <div class="bar-row">
         <div class="bar-label">${c.name}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count / max * 100)}%"></div></div>
         <div class="bar-count">${c.count}</div>
       </div>`).join('');
 }
 
 function switchTab(tab) {
-  document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['feed','map','stats'][i]===tab));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach((b, i) => b.classList.toggle('active', ['feed', 'map', 'stats'][i] === tab));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
+  if (tab === 'feed') renderFeed(document.getElementById('searchInput').value || '');
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2000);
+  setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-populateCuisineSelect();
+async function init() {
+  checkSession();
+  populateCuisineSelect();
+  await loadData();
+  render();
+  updateHeader();
+}
+
 init();
 </script>
 </body>
