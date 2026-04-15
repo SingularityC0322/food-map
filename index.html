@@ -7,274 +7,286 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
-  --indigo:#5B5BD6;--indigo-l:#EFEFFD;--indigo-d:#4242B4;
-  --violet:#7C3AED;--violet-l:#F4EFFE;--violet-d:#5B21B6;
-  --blue:#3B82F6;--blue-l:#EFF6FF;--blue-d:#1D4ED8;
-  --slate:#64748B;--slate-l:#F1F5F9;
-  --rose:#E11D48;--rose-l:#FFF1F2;
-  --amber:#D97706;--amber-l:#FFFBEB;
-  --gold:#B45309;--gold-l:#FEF3C7;
-  --bg:#F8F7FF;--bg-d:#EFEDFC;--bg-dd:#E2DFF7;
-  --wb:rgba(80,60,200,0.08);--wb2:rgba(80,60,200,0.14);
-  --text:#1E1B3A;--tm:#4B4880;--th:#8B88B0;
-  --r:14px;--rs:10px;
+  --teal:#2A7A5C;--teal-l:#E1F5EE;--teal-d:#1A5940;
+  --purple:#7F77DD;--purple-l:#EEEDFE;
+  --amber:#C88A2A;--amber-l:#FDF3DC;
+  --coral:#C4523A;--coral-l:#FAECE7;
+  --blue:#3A7FBF;--blue-l:#E6F1FB;
+  --gold:#B8982A;--gold-l:#FBF6E5;
+  --cream:#FAF8F3;--cream-d:#F2EFE7;--cream-dd:#E8E3D8;
+  --wb:rgba(60,40,20,0.1);--wb2:rgba(60,40,20,0.16);
+  --text:#1C1A16;--tm:#6B6459;--th:#A8A099;
+  --r:14px;--rs:9px;
   --serif:'Playfair Display',Georgia,serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
-.app{max-width:720px;margin:0 auto;padding:0 20px 120px}
+body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px}
+.app{max-width:700px;margin:0 auto;padding:0 18px 110px}
 
-/* ── Auth ── */
-.auth-screen{display:none;position:fixed;inset:0;background:var(--bg);z-index:500;overflow-y:auto}
+/* Auth */
+.auth-screen{display:none;position:fixed;inset:0;background:var(--cream);z-index:500;overflow-y:auto}
 .auth-screen.open{display:flex;align-items:stretch;justify-content:center}
 .auth-wrap{display:flex;width:100%;max-width:900px;min-height:100vh;margin:0 auto}
-.auth-intro{flex:1;background:linear-gradient(145deg,#EEF0FF,#F4EFFE);padding:60px 52px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid rgba(91,91,214,0.1)}
-.auth-intro-logo{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--text);margin-bottom:5px}
-.auth-intro-logo em{font-style:italic;font-weight:400;color:var(--indigo)}
-.auth-intro-tagline{font-size:12px;color:var(--th);letter-spacing:.14em;text-transform:uppercase;margin-bottom:52px}
-.auth-intro-item{display:flex;gap:16px;margin-bottom:26px;align-items:flex-start}
-.auth-intro-icon{width:32px;height:32px;border-radius:8px;background:white;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;margin-top:2px;border:1px solid rgba(91,91,214,0.1)}
+.auth-intro{flex:1;background:var(--cream-d);padding:56px 48px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--wb)}
+.auth-intro-logo{font-family:var(--serif);font-size:30px;font-weight:700;color:var(--text);margin-bottom:4px}
+.auth-intro-logo em{font-style:italic;font-weight:400;color:var(--teal)}
+.auth-intro-tagline{font-size:11px;color:var(--th);letter-spacing:.12em;text-transform:uppercase;margin-bottom:44px}
+.auth-intro-item{display:flex;gap:14px;margin-bottom:24px;align-items:flex-start}
+.auth-intro-icon{width:34px;height:34px;border-radius:9px;background:white;border:1px solid var(--wb);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;margin-top:1px}
 .auth-intro-text h4{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px}
 .auth-intro-text p{font-size:12px;color:var(--th);line-height:1.6}
 .auth-intro-footer{margin-top:auto;padding-top:40px;font-size:11px;color:var(--th);letter-spacing:.04em}
-.auth-box{width:100%;max-width:400px;padding:56px 44px;display:flex;flex-direction:column;justify-content:center;background:var(--bg)}
+.auth-box{width:100%;max-width:400px;padding:56px 44px;display:flex;flex-direction:column;justify-content:center;background:var(--cream)}
 @media(max-width:640px){.auth-intro{display:none}.auth-box{padding:40px 24px;max-width:100%}}
-.auth-logo{font-family:var(--serif);font-size:24px;font-weight:700;margin-bottom:4px;color:var(--text)}
-.auth-logo em{font-style:italic;font-weight:400;color:var(--indigo)}
-.auth-sub{font-size:10px;color:var(--th);letter-spacing:.12em;text-transform:uppercase;margin-bottom:36px}
-.auth-tabs{display:flex;border-bottom:1px solid rgba(91,91,214,0.15);margin-bottom:28px}
-.auth-tab{flex:1;padding:10px;border:none;background:transparent;font-size:13px;color:var(--th);cursor:pointer;font-family:inherit;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-1px;letter-spacing:.02em}
-.auth-tab.active{color:var(--indigo);font-weight:600;border-bottom-color:var(--indigo)}
+.auth-logo{font-family:var(--serif);font-size:26px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.auth-logo em{font-style:italic;font-weight:400;color:var(--teal)}
+.auth-sub{font-size:11px;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:32px}
+.auth-tabs{display:flex;border-bottom:1px solid var(--wb2);margin-bottom:26px}
+.auth-tab{flex:1;padding:10px;border:none;background:transparent;font-size:14px;color:var(--th);cursor:pointer;font-family:inherit;transition:all .15s;border-bottom:2px solid transparent;margin-bottom:-1px}
+.auth-tab.active{color:var(--text);font-weight:600;border-bottom-color:var(--teal)}
 .auth-fg{margin-bottom:14px}
-.auth-label{font-size:10px;color:var(--th);font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:6px}
-.auth-input{width:100%;padding:11px 13px;border:1px solid rgba(91,91,214,0.15);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
-.auth-input:focus{border-color:var(--indigo)}
-.auth-btn{width:100%;padding:14px;background:var(--indigo);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.04em}
-.auth-btn:hover{background:var(--indigo-d);transition:background .15s}
-.auth-err{font-size:12px;color:var(--rose);margin-top:10px;text-align:center;min-height:18px}
+.auth-label{font-size:11px;color:var(--th);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.auth-input{width:100%;padding:11px 13px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
+.auth-input:focus{border-color:var(--teal)}
+.auth-btn{width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.04em;transition:background .15s}
+.auth-btn:hover{background:var(--teal-d)}
+.auth-err{font-size:13px;color:var(--coral);margin-top:8px;text-align:center;min-height:18px}
 
-/* ── Header ── */
-.header{padding:22px 0 14px;border-bottom:1px solid rgba(91,91,214,0.1);margin-bottom:16px}
+/* Header */
+.header{padding:24px 0 16px;border-bottom:1px solid var(--wb);margin-bottom:18px}
 .header-row{display:flex;justify-content:space-between;align-items:center}
-.h-en{font-family:var(--serif);font-size:21px;font-weight:700;line-height:1}
-.h-en em{font-style:italic;font-weight:400;color:var(--indigo)}
-.h-zh{font-size:10px;color:var(--th);margin-top:4px;letter-spacing:.12em;text-transform:uppercase}
-.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.user-pill{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text);font-weight:500}
-.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--indigo-l);color:var(--indigo-d);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-.logout-btn{font-size:11px;color:var(--th);background:none;border:none;cursor:pointer;font-family:inherit;letter-spacing:.02em}
+.h-en{font-family:var(--serif);font-size:22px;font-weight:700;line-height:1}
+.h-en em{font-style:italic;font-weight:400;color:var(--teal)}
+.h-zh{font-size:11px;color:var(--th);margin-top:4px;letter-spacing:.1em;text-transform:uppercase}
+.h-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.user-pill{display:flex;align-items:center;gap:7px;font-size:14px;color:var(--text);font-weight:500}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--teal-l);color:var(--teal-d);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.logout-btn{font-size:12px;color:var(--th);background:none;border:none;cursor:pointer;font-family:inherit}
 .logout-btn:hover{color:var(--tm)}
 
-/* ── Nav ── */
-.nav{display:flex;border-bottom:1px solid rgba(91,91,214,0.1);margin-bottom:18px}
-.nav-btn{flex:1;padding:11px 4px;border:none;background:transparent;font-size:13px;color:var(--th);cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap;letter-spacing:.03em;border-bottom:2px solid transparent;margin-bottom:-1px}
-.nav-btn.active{color:var(--indigo);font-weight:600;border-bottom-color:var(--indigo)}
+/* Nav */
+.nav{display:flex;border-bottom:1px solid var(--wb);margin-bottom:18px}
+.nav-btn{flex:1;padding:10px 4px;border:none;background:transparent;font-size:13px;color:var(--th);cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.nav-btn.active{color:var(--text);font-weight:600;border-bottom-color:var(--teal)}
 .section{display:none}.section.active{display:block}
 
-/* ── FAB ── */
-.fab{position:fixed;bottom:24px;right:50%;transform:translateX(50%);max-width:680px;width:calc(100% - 40px);background:var(--indigo);color:white;border:none;border-radius:var(--rs);padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;letter-spacing:.04em}
-.fab:hover{background:var(--indigo-d)} .fab{box-shadow:0 4px 20px rgba(91,91,214,.3)}
+/* FAB */
+.fab{position:fixed;bottom:24px;right:50%;transform:translateX(50%);max-width:664px;width:calc(100% - 36px);background:var(--teal);color:white;border:none;border-radius:var(--rs);padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;letter-spacing:.04em;transition:background .15s}
+.fab:hover{background:var(--teal-d)}
 
-/* ── Sheets ── */
-.sheet-wrap{display:none;position:fixed;inset:0;background:rgba(26,24,20,.4);z-index:100;align-items:flex-end;justify-content:center}
+/* Sheets */
+.sheet-wrap{display:none;position:fixed;inset:0;background:rgba(28,26,22,.45);z-index:100;align-items:flex-end;justify-content:center}
 .sheet-wrap.open{display:flex}
-.sheet{background:var(--bg);border-radius:16px 16px 0 0;padding:6px 20px 48px;width:100%;max-width:700px;max-height:93vh;overflow-y:auto}
-.sheet-handle{width:32px;height:3px;background:var(--bg-dd);border-radius:2px;margin:12px auto 18px}
-.sheet-title{font-family:var(--serif);font-size:18px;font-weight:700;margin-bottom:18px;color:var(--text)}
-.fg{margin-bottom:14px}
-.fl{font-size:10px;color:var(--th);font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:6px}
-.fi{width:100%;padding:10px 12px;border:1px solid rgba(91,91,214,0.15);border-radius:var(--rs);font-size:14px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
-.fi:focus{border-color:var(--indigo)}
-textarea.fi{resize:none;min-height:76px;line-height:1.6}
+.sheet{background:var(--cream);border-radius:18px 18px 0 0;padding:6px 20px 50px;width:100%;max-width:700px;max-height:93vh;overflow-y:auto}
+.sheet-handle{width:36px;height:4px;background:var(--cream-dd);border-radius:2px;margin:13px auto 18px}
+.sheet-title{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:18px;color:var(--text)}
+.fg{margin-bottom:15px}
+.fl{font-size:11px;color:var(--th);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+.fi{width:100%;padding:11px 13px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
+.fi:focus{border-color:var(--teal);background:white}
+textarea.fi{resize:none;min-height:80px;line-height:1.6}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.btn-p{width:100%;padding:13px;background:var(--indigo);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.04em}
-.btn-p:hover{background:var(--indigo-d)}
-.btn-s{width:100%;padding:11px;background:transparent;color:var(--tm);border:1px solid rgba(91,91,214,0.15);border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px}
+.btn-p{width:100%;padding:13px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:8px;letter-spacing:.04em;transition:background .15s}
+.btn-p:hover{background:var(--teal-d)}
+.btn-s{width:100%;padding:11px;background:transparent;color:var(--tm);border:1px solid var(--wb2);border-radius:var(--rs);font-size:14px;cursor:pointer;font-family:inherit;margin-top:8px}
 
-/* ── Form components ── */
-.tog-row{display:flex;gap:6px;flex-wrap:wrap}
-.tog{padding:7px 13px;border:1px solid rgba(91,91,214,0.15);border-radius:20px;background:white;font-size:12px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
-.tog.c-blue.on{border-color:var(--blue);background:var(--blue-l);color:var(--indigo-d);font-weight:600}
-.tog.c-teal.on{border-color:var(--indigo);background:var(--indigo-l);color:var(--indigo-d);font-weight:600}
+/* Form */
+.tog-row{display:flex;gap:7px;flex-wrap:wrap}
+.tog{padding:8px 14px;border:1.5px solid var(--wb2);border-radius:20px;background:white;font-size:13px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
+.tog.c-blue.on{border-color:var(--blue);background:var(--blue-l);color:#1A4A6A;font-weight:600}
+.tog.c-teal.on{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);font-weight:600}
 .star-row{display:flex;align-items:center;gap:10px}
 .stars{display:flex;gap:2px}
-.star{font-size:20px;cursor:pointer;color:var(--bg-dd);transition:color .1s;user-select:none}
-.star.on{color:#C8A832}
-.star-val{font-size:13px;color:var(--tm);min-width:32px}
+.star{font-size:22px;cursor:pointer;color:var(--cream-dd);transition:color .1s;user-select:none}
+.star.on{color:#E8B84B}
+.star-val{font-size:14px;color:var(--tm);min-width:32px}
 .star-adj{display:flex;gap:5px;align-items:center;margin-left:2px}
-.star-adj button{background:var(--bg-d);border:none;border-radius:5px;width:24px;height:24px;cursor:pointer;font-size:13px;color:var(--tm);font-family:inherit}
-.rl-row{display:flex;gap:6px;flex-wrap:wrap}
-.rl{padding:5px 12px;border:1px solid rgba(91,91,214,0.15);border-radius:20px;background:white;font-size:12px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
-.rl.on{border-color:var(--indigo);background:var(--indigo-l);color:var(--indigo-d);font-weight:600} .tog-switch.on{background:var(--indigo);border-color:var(--indigo)}
-.award-row{display:flex;gap:6px;flex-wrap:wrap}
-.award-chip{padding:5px 12px;border:1px solid rgba(91,91,214,0.15);border-radius:20px;background:white;font-size:12px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
+.star-adj button{background:var(--cream-d);border:none;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:14px;color:var(--tm);font-family:inherit}
+.rl-row{display:flex;gap:7px;flex-wrap:wrap}
+.rl{padding:6px 13px;border:1.5px solid var(--wb2);border-radius:20px;background:white;font-size:13px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
+.rl.on{border-color:var(--teal);background:var(--teal-l);color:var(--teal-d);font-weight:600}
+.award-row{display:flex;gap:7px;flex-wrap:wrap}
+.award-chip{padding:6px 13px;border:1.5px solid var(--wb2);border-radius:20px;background:white;font-size:13px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
 .award-chip.on{border-color:var(--gold);background:var(--gold-l);color:#7A6010;font-weight:600}
-.priv-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid rgba(91,91,214,0.1);margin-top:4px}
-.priv-row-label{font-size:13px;color:var(--tm)}
-.priv-row-sub{font-size:11px;color:var(--th);margin-top:2px}
-.tog-switch{width:38px;height:21px;border-radius:11px;background:var(--bg-d);border:1px solid rgba(91,91,214,0.15);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
-.tog-switch.on{background:var(--indigo);border-color:var(--indigo)}
-.tog-switch-thumb{width:15px;height:15px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:left .2s}
-.tog-switch.on .tog-switch-thumb{left:19px}
+.priv-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--wb);margin-top:4px}
+.priv-row-label{font-size:14px;color:var(--tm)}
+.priv-row-sub{font-size:12px;color:var(--th);margin-top:2px}
+.tog-switch{width:40px;height:22px;border-radius:11px;background:var(--cream-d);border:1px solid var(--wb2);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.tog-switch.on{background:var(--teal);border-color:var(--teal)}
+.tog-switch-thumb{width:16px;height:16px;border-radius:50%;background:white;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tog-switch.on .tog-switch-thumb{left:20px}
 
-/* ── Cards ── */
-.card{background:white;border:1px solid rgba(91,91,214,0.1);border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+/* Cards */
+.card{background:white;border:1px solid var(--wb);border-radius:var(--r);overflow:hidden;margin-bottom:8px;transition:all .15s}
+.card:hover{border-color:var(--wb2);box-shadow:0 2px 10px rgba(60,40,20,.06)}
 .card-inner{padding:13px 15px}
-.badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;white-space:nowrap;flex-shrink:0;letter-spacing:.03em}
-.b-wishlist{background:var(--blue-l);color:var(--indigo-d)}
-.b-visited{background:var(--indigo-l);color:var(--indigo-d)}
-.priv-badge{font-size:10px;padding:2px 7px;border-radius:8px;background:var(--bg-d);color:var(--th);font-weight:600}
+.badge{font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600;white-space:nowrap;flex-shrink:0;letter-spacing:.02em}
+.b-wishlist{background:var(--blue-l);color:#1A4A6A}
+.b-visited{background:var(--teal-l);color:var(--teal-d)}
+.priv-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--cream-d);color:var(--th);font-weight:600}
 .priv-badge.on{background:#EDE8E0;color:#7A6A55}
 .award-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--gold-l);color:#7A6010;font-weight:600}
 
-/* ── Restaurant cards ── */
-.rest-card{cursor:pointer;transition:all .15s}
-.rest-card:hover{border-color:rgba(91,91,214,0.15);box-shadow:0 2px 10px rgba(40,35,20,.05)}
-.rest-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px;gap:8px}
+/* Rest cards */
+.rest-card{cursor:pointer}
 .rest-name{font-size:15px;font-weight:600;line-height:1.3;color:var(--text)}
-.rest-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px;font-size:12px;color:var(--tm)}
-.rest-notes{font-size:12px;color:var(--th);line-height:1.5;margin-top:6px;font-style:italic;border-top:1px solid rgba(91,91,214,0.1);padding-top:6px}
-.rest-footer{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.dishes-count{font-size:11px;color:var(--th)}
 
-/* ── Discovery cards ── */
+/* Disc cards */
 .disc-card{display:flex}
-.disc-bar{width:3px;flex-shrink:0}
-.disc-bar{width:4px}.disc-bar.discovery{background:var(--indigo)}
-.disc-bar.inspo{background:var(--blue)}
+.disc-bar{width:4px;flex-shrink:0}
+.disc-bar.discovery{background:var(--teal)}
+.disc-bar.inspo{background:var(--purple)}
 .disc-body{flex:1;padding:12px 14px}
-.disc-name{font-size:15px;font-weight:600;margin-bottom:4px;color:var(--text)}
-.disc-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
-.disc-note{font-size:12px;color:var(--tm);line-height:1.6;margin-top:5px;font-style:italic;border-top:1px solid rgba(91,91,214,0.1);padding-top:5px}
-.disc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
-.user-tag{font-size:11px;color:var(--th);display:flex;align-items:center;gap:4px}
-.user-tag-dot{width:20px;height:20px;border-radius:50%;background:var(--indigo-l);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--tm)}
+.user-tag{font-size:12px;color:var(--th);display:flex;align-items:center;gap:5px}
+.user-tag-dot{width:18px;height:18px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--teal-d)}
 
-/* ── Buttons ── */
-.del-btn{background:none;border:none;cursor:pointer;color:var(--th);font-size:15px;padding:2px 5px;border-radius:4px;transition:all .15s;flex-shrink:0}
-.del-btn:hover{color:var(--rose);background:var(--rose-l)}
-.edit-btn{background:none;border:1px solid rgba(91,91,214,0.15);cursor:pointer;color:var(--tm);font-size:11px;padding:3px 10px;border-radius:20px;font-family:inherit;transition:all .15s;flex-shrink:0}
-.edit-btn:hover{background:var(--indigo-l);color:var(--indigo-d);border-color:var(--indigo)}
+/* Buttons */
+.del-btn{background:none;border:none;cursor:pointer;color:var(--th);font-size:16px;padding:2px 5px;border-radius:4px;transition:all .15s;flex-shrink:0}
+.del-btn:hover{color:var(--coral);background:var(--coral-l)}
+.edit-btn{background:none;border:1px solid var(--wb2);cursor:pointer;color:var(--tm);font-size:12px;padding:3px 10px;border-radius:20px;font-family:inherit;transition:all .15s;flex-shrink:0}
+.edit-btn:hover{background:var(--teal-l);color:var(--teal-d);border-color:var(--teal)}
 
-/* ── Filters & Pills ── */
-.filter-row{display:flex;gap:5px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+/* Search bar */
+.search-bar{position:relative;margin-bottom:14px}
+.search-bar input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:14px;font-family:inherit;background:white;outline:none;color:var(--text);transition:border .15s}
+.search-bar input:focus{border-color:var(--teal)}
+.search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--th);font-size:16px;pointer-events:none}
+.search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--th);font-size:16px;padding:4px;display:none}
+
+/* Filters */
+.filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}
-.pill{padding:5px 13px;border-radius:20px;border:1px solid rgba(91,91,214,0.15);background:white;font-size:12px;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-.pill.active{background:var(--indigo);color:white;border-color:var(--indigo)}
-.sq-filter{display:flex;gap:8px;margin-bottom:14px}
-.sq-select{padding:6px 12px;border:1px solid rgba(91,91,214,0.15);border-radius:var(--rs);font-size:12px;font-family:inherit;color:var(--text);background:white;outline:none;cursor:pointer}
+.pill{padding:6px 14px;border-radius:20px;border:1px solid var(--wb2);background:white;font-size:13px;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
+.pill.active{background:var(--teal);color:white;border-color:var(--teal)}
+.sq-filter{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.sq-select{padding:7px 12px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--text);background:white;outline:none;cursor:pointer}
 
-/* ── Map ── */
-.map-prog{background:white;border:1px solid rgba(91,91,214,0.1);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
+/* City group headers */
+.city-group{margin-bottom:4px}
+.city-group-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;padding:8px 2px 6px;display:flex;align-items:center;gap:8px}
+.city-group-title::after{content:'';flex:1;height:1px;background:var(--wb)}
+
+/* Map */
+.map-prog{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:14px 16px;margin-bottom:16px}
 .mp-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.mp-label{font-size:12px;color:var(--tm)}
-.mp-count{font-family:var(--serif);font-size:20px;color:var(--indigo)}
-.mp-track{height:3px;background:var(--bg-d);border-radius:2px;overflow:hidden}
-.mp-fill{height:100%;background:linear-gradient(90deg,var(--indigo),var(--violet));border-radius:3px;transition:width .5s}
+.mp-label{font-size:13px;color:var(--tm)}
+.mp-count{font-family:var(--serif);font-size:20px;color:var(--teal)}
+.mp-track{height:5px;background:var(--cream-d);border-radius:3px;overflow:hidden}
+.mp-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .5s}
 .map-region{margin-bottom:18px}
-.region-title{font-size:10px;font-weight:700;color:var(--th);letter-spacing:.12em;text-transform:uppercase;margin-bottom:7px}
-.c-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
-.c-card{background:white;border:1px solid rgba(91,91,214,0.1);border-radius:var(--rs);padding:10px 12px;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
-.c-card:hover{background:var(--bg)}
-.c-card.explored{border-color:rgba(61,122,107,.25)}
-.c-name{font-size:13px;color:var(--text)}
-.c-badge{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--bg-d);color:var(--th)}
-.c-card.explored .c-badge{background:var(--indigo-l);color:var(--indigo-d);font-weight:600} .c-card.explored{border-color:rgba(91,91,214,.3)}
+.region-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.c-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+.c-card{background:white;border:1px solid var(--wb);border-radius:var(--rs);padding:11px 13px;cursor:pointer;transition:all .15s;display:flex;justify-content:space-between;align-items:center}
+.c-card:hover{background:var(--teal-l);border-color:rgba(42,122,92,.2)}
+.c-card.explored{border-color:rgba(42,122,92,.3)}
+.c-name{font-size:14px;color:var(--text)}
+.c-badge{font-size:12px;padding:2px 9px;border-radius:10px;background:var(--cream-d);color:var(--th)}
+.c-card.explored .c-badge{background:var(--teal-l);color:var(--teal-d);font-weight:600}
 
-/* ── Stats ── */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
-.sc{background:white;border:1px solid rgba(91,91,214,0.1);border-radius:var(--r);padding:16px}
-.sc-n{font-family:var(--serif);font-size:30px;font-weight:700;line-height:1;margin-bottom:4px}
-.sc-l{font-size:11px;color:var(--tm)}
-.chart-sec{background:white;border:1px solid rgba(91,91,214,0.1);border-radius:var(--r);padding:16px}
-.chart-title{font-size:10px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
+/* Stats */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.sc{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px}
+.sc-n{font-family:var(--serif);font-size:32px;font-weight:700;line-height:1;margin-bottom:4px}
+.sc-l{font-size:12px;color:var(--tm)}
+.chart-sec{background:white;border:1px solid var(--wb);border-radius:var(--r);padding:16px}
+.chart-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
 .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.bar-lbl{font-size:13px;width:76px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bar-track{flex:1;height:3px;background:var(--bg-d);border-radius:2px;overflow:hidden}
-.bar-fill{height:100%;background:linear-gradient(90deg,var(--indigo),var(--violet));border-radius:3px}
-.bar-cnt{font-size:11px;color:var(--th);width:20px;text-align:right;flex-shrink:0}
+.bar-lbl{font-size:13px;width:76px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)}
+.bar-track{flex:1;height:5px;background:var(--cream-d);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;background:var(--teal);border-radius:3px}
+.bar-cnt{font-size:12px;color:var(--th);width:22px;text-align:right;flex-shrink:0}
 
-/* ── Detail ── */
-.detail-wrap{display:none;position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto}
+/* Detail */
+.detail-wrap{display:none;position:fixed;inset:0;background:var(--cream);z-index:50;overflow-y:auto}
 .detail-wrap.open{display:block}
-.detail-header{padding:14px 18px;border-bottom:1px solid rgba(91,91,214,0.1);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--bg);z-index:5}
-.back-btn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--tm);padding:2px 6px}
-.detail-header h2{font-family:var(--serif);font-size:17px;font-weight:700;flex:1}
+.detail-header{padding:14px 18px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--cream);z-index:5}
+.back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm);padding:2px 6px}
+.detail-header h2{font-family:var(--serif);font-size:18px;font-weight:700;flex:1;color:var(--text)}
 .detail-body{padding:16px 18px;max-width:700px;margin:0 auto}
 .detail-sec{margin-bottom:20px}
-.detail-sec-title{font-size:10px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
-.dish-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid rgba(91,91,214,0.1)}
+.detail-sec-title{font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.dish-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--wb)}
 .dish-row:last-child{border-bottom:none}
-.dish-dot{width:5px;height:5px;border-radius:50%;background:var(--indigo);flex-shrink:0;margin-top:7px}
+.dish-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px}
 .dish-body{flex:1}
-.dish-name{font-size:14px;font-weight:600}
-.dish-note{font-size:12px;color:var(--tm);margin-top:2px;line-height:1.5}
-.dish-rating{font-size:11px;color:var(--th);margin-top:2px}
-.add-dish-btn{width:100%;padding:10px;border:1px dashed rgba(91,91,214,0.15);border-radius:var(--rs);background:none;font-size:13px;color:var(--th);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
-.add-dish-btn:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-l)}
+.dish-name{font-size:14px;font-weight:600;color:var(--text)}
+.dish-note{font-size:13px;color:var(--tm);margin-top:2px;line-height:1.5}
+.dish-rating{font-size:12px;color:var(--th);margin-top:2px}
+.add-dish-btn{width:100%;padding:11px;border:1.5px dashed var(--wb2);border-radius:var(--rs);background:none;font-size:14px;color:var(--th);cursor:pointer;font-family:inherit;margin-top:8px;transition:all .15s}
+.add-dish-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
 
-/* ── Friends ── */
-.friend-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(91,91,214,0.1)}
+/* Friends */
+.friend-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--wb)}
 .friend-item:last-child{border-bottom:none}
-.friend-avatar{width:38px;height:38px;border-radius:50%;background:var(--indigo-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--tm);flex-shrink:0}
+.friend-avatar{width:36px;height:36px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--teal-d);flex-shrink:0}
 .friend-info{flex:1}
-.friend-name{font-size:14px;font-weight:600}
-.friend-username{font-size:11px;color:var(--th);margin-top:1px}
-.friend-action{padding:5px 13px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:all .15s;border:1px solid rgba(91,91,214,0.15);background:white;color:var(--tm)}
-.friend-action.primary{background:var(--text);color:white;border-color:var(--text)}
-.friend-action.accept{background:var(--indigo-l);color:var(--indigo-d);border-color:var(--indigo)}
+.friend-name{font-size:14px;font-weight:600;color:var(--text)}
+.friend-username{font-size:12px;color:var(--th);margin-top:1px}
+.friend-action{padding:6px 14px;border-radius:20px;font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s;border:1px solid var(--wb2);background:white;color:var(--tm)}
+.friend-action.primary{background:var(--teal);color:white;border-color:var(--teal)}
+.friend-action.accept{background:var(--teal-l);color:var(--teal-d);border-color:var(--teal)}
 
-/* ── Share ── */
-.share-link-box{background:var(--bg-d);border-radius:var(--rs);padding:12px 14px;margin-top:12px;display:flex;align-items:center;gap:8px}
-.share-link-url{flex:1;font-size:11px;color:var(--tm);word-break:break-all;font-family:monospace}
-.share-copy-btn{padding:5px 12px;border:1px solid rgba(91,91,214,0.15);border-radius:20px;background:white;font-size:11px;cursor:pointer;font-family:inherit;color:var(--tm);white-space:nowrap;flex-shrink:0}
-.share-copy-btn:hover{background:var(--indigo-l);color:var(--indigo-d)}
+/* Share */
+.share-link-box{background:var(--cream-d);border-radius:var(--rs);padding:12px 14px;margin-top:12px;display:flex;align-items:center;gap:8px}
+.share-link-url{flex:1;font-size:12px;color:var(--tm);word-break:break-all;font-family:monospace}
+.share-copy-btn{padding:6px 13px;border:1px solid var(--wb2);border-radius:20px;background:white;font-size:12px;cursor:pointer;font-family:inherit;color:var(--tm);white-space:nowrap;flex-shrink:0;transition:all .15s}
+.share-copy-btn:hover{background:var(--teal-l);color:var(--teal-d)}
 .share-page{max-width:580px;margin:0 auto;padding:36px 20px}
-.share-page-header{text-align:center;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(91,91,214,0.1)}
+.share-page-header{text-align:center;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--wb)}
 .share-page-logo{font-family:var(--serif);font-size:20px;color:var(--text);margin-bottom:4px}
-.share-page-logo em{font-style:italic;color:var(--indigo)}
-.share-page-sub{font-size:10px;color:var(--th);letter-spacing:.1em;text-transform:uppercase}
+.share-page-logo em{font-style:italic;color:var(--teal)}
+.share-page-sub{font-size:11px;color:var(--th);letter-spacing:.08em;text-transform:uppercase}
 
-/* ── Import ── */
-.import-btn{width:100%;padding:10px;border:1px dashed rgba(91,91,214,0.15);border-radius:var(--rs);background:transparent;font-size:12px;color:var(--tm);cursor:pointer;font-family:inherit;margin-bottom:13px;letter-spacing:.02em;transition:all .15s}
-.import-btn:hover{border-color:var(--indigo);color:var(--indigo);background:var(--indigo-l)}
-.btn-fetch{padding:10px 14px;background:var(--bg-d);border:1px solid rgba(91,91,214,0.15);border-radius:var(--rs);font-size:13px;color:var(--tm);cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:all .15s}
-.btn-fetch:hover{background:var(--indigo-l);color:var(--indigo-d);border-color:var(--indigo)}
+/* Import */
+.import-btn{width:100%;padding:11px;border:1px dashed var(--wb2);border-radius:var(--rs);background:transparent;font-size:13px;color:var(--tm);cursor:pointer;font-family:inherit;margin-bottom:13px;transition:all .15s}
+.import-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-l)}
+.btn-fetch{padding:11px 15px;background:var(--cream-d);border:1px solid var(--wb2);border-radius:var(--rs);font-size:14px;color:var(--tm);cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.btn-fetch:hover{background:var(--teal-l);color:var(--teal-d);border-color:var(--teal)}
 .import-loading{display:flex;flex-direction:column;align-items:center;padding:48px 0}
-.import-spinner{width:28px;height:28px;border:2px solid var(--bg-d);border-top-color:var(--indigo);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+.import-spinner{width:30px;height:30px;border:2.5px solid var(--cream-d);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.import-loading-text{font-size:13px;color:var(--tm)}
-.import-rest-item{background:var(--bg);border:1px solid rgba(91,91,214,0.1);border-radius:var(--rs);padding:12px 13px;margin-bottom:7px;cursor:pointer;transition:all .15s}
-.import-rest-item.checked{background:var(--indigo-l);border-color:rgba(61,122,107,.3)}
+.import-loading-text{font-size:14px;color:var(--tm)}
+.import-rest-item{background:var(--cream);border:1px solid var(--wb);border-radius:var(--rs);padding:12px 13px;margin-bottom:7px;cursor:pointer;transition:all .15s}
+.import-rest-item.checked{background:var(--teal-l);border-color:rgba(42,122,92,.3)}
 .import-rest-top{display:flex;align-items:flex-start;gap:10px}
-.import-check{width:18px;height:18px;border-radius:5px;border:1px solid rgba(91,91,214,0.15);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:11px;transition:all .15s}
-.import-rest-item.checked .import-check{background:var(--indigo);border-color:var(--indigo);color:white}
+.import-check{width:19px;height:19px;border-radius:5px;border:1px solid var(--wb2);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-size:11px;transition:all .15s}
+.import-rest-item.checked .import-check{background:var(--teal);border-color:var(--teal);color:white}
 .import-rest-info{flex:1}
-.import-rest-name{font-size:14px;font-weight:600;margin-bottom:3px}
-.import-rest-meta{font-size:11px;color:var(--th);margin-bottom:4px}
-.import-rest-note{font-size:12px;color:var(--tm);line-height:1.5;font-style:italic}
+.import-rest-name{font-size:14px;font-weight:600;margin-bottom:3px;color:var(--text)}
+.import-rest-meta{font-size:12px;color:var(--th);margin-bottom:3px}
+.import-rest-note{font-size:13px;color:var(--tm);line-height:1.5;font-style:italic}
 
-/* ── Misc ── */
+/* Misc */
 .empty{text-align:center;padding:48px 20px;color:var(--th)}
-.empty-en{font-family:var(--serif);font-size:18px;color:var(--bg-dd);margin-bottom:10px;font-style:italic}
-.empty p{font-size:13px;line-height:1.7}
-.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:8px 18px;border-radius:20px;font-size:12px;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.empty-en{font-family:var(--serif);font-size:19px;color:var(--cream-dd);margin-bottom:10px;font-style:italic}
+.empty p{font-size:14px;line-height:1.7}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:9px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
+/* Rich text editor */
+.rte-wrap{border:1px solid var(--wb2);border-radius:var(--rs);overflow:hidden;background:white}
+.rte-toolbar{display:flex;gap:2px;padding:5px 7px;background:var(--cream-d);border-bottom:1px solid var(--wb);flex-wrap:wrap;align-items:center}
+.rte-toolbar button{background:none;border:none;cursor:pointer;padding:3px 7px;border-radius:5px;font-size:13px;color:var(--tm);font-family:inherit;line-height:1.3;min-width:26px}
+.rte-toolbar button:hover{background:var(--wb);color:var(--text)}
+.rte-sep{width:1px;height:16px;background:var(--wb2);margin:0 3px;flex-shrink:0}
+.rte-color-btn{text-decoration:underline;text-decoration-color:var(--teal);text-decoration-thickness:2px}
+.rte-body{border:none;border-radius:0;min-height:90px;outline:none;line-height:1.7;white-space:pre-wrap;padding:10px 13px}
+.rte-body:empty::before{content:attr(data-placeholder);color:var(--th);pointer-events:none}
+.rte-body:focus{border-color:transparent;background:white}
 </style>
 </head>
 <body>
 
-<!-- ── Auth Screen ── -->
+<!-- Auth -->
 <div class="auth-screen open" id="authScreen">
   <div class="auth-wrap">
     <div class="auth-intro">
       <div>
         <div class="auth-intro-logo">Eat as <em>a Local</em></div>
-        <div class="auth-intro-tagline">美食探索地图</div>
-        <div class="auth-intro-item"><div class="auth-intro-icon">📌</div><div class="auth-intro-text"><h4>收藏想去的餐厅</h4><p>朋友推荐、刷到的，先存下来，约饭时随时翻出</p></div></div>
-        <div class="auth-intro-item"><div class="auth-intro-icon">★</div><div class="auth-intro-text"><h4>记录每家餐厅每道菜</h4><p>0.1步进评分，菜品逐一记录，支持荣誉认证标注</p></div></div>
-        <div class="auth-intro-item"><div class="auth-intro-icon">💡</div><div class="auth-intro-text"><h4>发现与灵感</h4><p>新奇食材、有趣搭配、待尝试的吃法，随时记下</p></div></div>
-        <div class="auth-intro-item"><div class="auth-intro-icon">🌍</div><div class="auth-intro-text"><h4>广场 & 好友</h4><p>看朋友的美食发现，生成专属分享链接</p></div></div>
+        <div class="auth-intro-tagline">我的美食探索地图</div>
+        <div class="auth-intro-item"><div class="auth-intro-icon">📌</div><div class="auth-intro-text"><h4>收藏想去的餐厅</h4><p>朋友推荐、刷到感兴趣的，先存起来</p></div></div>
+        <div class="auth-intro-item"><div class="auth-intro-icon">★</div><div class="auth-intro-text"><h4>记录每家餐厅每道菜</h4><p>0.1步进评分，逐道菜记录，支持荣誉认证</p></div></div>
+        <div class="auth-intro-item"><div class="auth-intro-icon">💡</div><div class="auth-intro-text"><h4>发现与灵感</h4><p>食材、搭配、吃法，随时记下来</p></div></div>
+        <div class="auth-intro-item"><div class="auth-intro-icon">🌍</div><div class="auth-intro-text"><h4>广场 & 好友</h4><p>看朋友发现，生成专属分享链接</p></div></div>
       </div>
       <div class="auth-intro-footer">独立账号 · 云端同步 · 完全免费</div>
     </div>
@@ -302,7 +314,7 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
   </div>
 </div>
 
-<!-- ── Main App ── -->
+<!-- Main -->
 <div class="app" id="mainApp" style="display:none">
   <div class="header">
     <div class="header-row">
@@ -323,11 +335,23 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
 
   <!-- Mine -->
   <div id="mine" class="section active">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="mineSearch" placeholder="搜索餐厅名、城市、菜系、食材..." oninput="renderMine()"/>
+      <button class="search-clear" id="mineSearchClear" onclick="clearSearch('mine')">×</button>
+    </div>
     <div class="filter-row">
       <button class="pill active" onclick="setRestFilter('all',this)">全部</button>
       <button class="pill" onclick="setRestFilter('wishlist',this)">📌 想去</button>
       <button class="pill" onclick="setRestFilter('visited',this)">✓ 去过</button>
       <button class="pill" onclick="setRestFilter('disc',this)">发现 & 灵感</button>
+    </div>
+    <!-- City sub-filter (shown when browsing restaurants) -->
+    <div id="cityFilterRow" class="filter-row" style="margin-top:-4px"></div>
+    <!-- Group by toggle -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center" id="groupToggleRow">
+      <span style="font-size:12px;color:var(--th)">分组</span>
+      <button class="pill" id="groupByCity" onclick="toggleGroupBy()" style="font-size:12px;padding:4px 12px">按城市</button>
     </div>
     <button class="import-btn" onclick="openImport()">✦ 从文章智能导入餐厅</button>
     <div id="mineList"></div>
@@ -335,6 +359,11 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
 
   <!-- Square -->
   <div id="square" class="section">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="sqSearch" placeholder="搜索餐厅、食材、用户..." oninput="renderSquare()"/>
+      <button class="search-clear" id="sqSearchClear" onclick="clearSearch('sq')">×</button>
+    </div>
     <div class="sq-filter">
       <select class="sq-select" id="sqTypeFilter" onchange="renderSquare()">
         <option value="all">全部内容</option>
@@ -350,16 +379,10 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
   <div id="friends" class="section">
     <div class="fg">
       <label class="fl">搜索用户</label>
-      <div style="display:flex;gap:8px">
-        <input class="fi" id="friendSearch" placeholder="输入用户名..." style="flex:1"/>
-        <button onclick="searchUser()" class="btn-fetch">搜索</button>
-      </div>
+      <div style="display:flex;gap:8px"><input class="fi" id="friendSearch" placeholder="输入用户名..." style="flex:1"/><button onclick="searchUser()" class="btn-fetch">搜索</button></div>
       <div id="friendSearchResult" style="margin-top:10px"></div>
     </div>
-    <div id="pendingInSection" style="display:none">
-      <div class="detail-sec-title" style="margin-bottom:10px">待处理申请</div>
-      <div id="pendingInList"></div>
-    </div>
+    <div id="pendingInSection" style="display:none"><div class="detail-sec-title" style="margin-bottom:10px">待处理申请</div><div id="pendingInList"></div></div>
     <div class="detail-sec-title" style="margin-bottom:10px;margin-top:4px">我的好友</div>
     <div id="friendList"></div>
   </div>
@@ -382,18 +405,14 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
 
 <button class="fab" id="fabBtn" onclick="handleFab()" style="display:none">+ 新记录</button>
 
-<!-- ── Import Sheet ── -->
+<!-- Import Sheet -->
 <div class="sheet-wrap" id="importSheet" onclick="if(event.target===this)closeSheet('importSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">从文章导入餐厅</div>
     <div id="importStep1">
-      <div class="fg">
-        <label class="fl">文章链接</label>
-        <div style="display:flex;gap:8px"><input class="fi" id="importUrl" placeholder="粘贴文章链接..." style="flex:1"/><button onclick="fetchUrl()" class="btn-fetch">抓取</button></div>
-        <div style="font-size:12px;color:var(--th);margin-top:5px">或直接粘贴文字到下方</div>
-      </div>
-      <div class="fg"><label class="fl">文章内容</label><textarea class="fi" id="importText" placeholder="把文章文字粘贴到这里..." style="min-height:130px;line-height:1.6"></textarea></div>
+      <div class="fg"><label class="fl">文章链接</label><div style="display:flex;gap:8px"><input class="fi" id="importUrl" placeholder="粘贴文章链接..." style="flex:1"/><button onclick="fetchUrl()" class="btn-fetch">抓取</button></div><div style="font-size:12px;color:var(--th);margin-top:5px">或直接粘贴文字到下方</div></div>
+      <div class="fg"><label class="fl">文章内容</label><textarea class="fi" id="importText" placeholder="把文章文字粘贴到这里..." style="min-height:130px"></textarea></div>
       <button class="btn-p" onclick="analyzeArticle()">✦ AI 分析提取餐厅</button>
       <button class="btn-s" onclick="closeSheet('importSheet')">取消</button>
     </div>
@@ -402,112 +421,68 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
       <div id="importResults" style="display:none">
         <div style="font-size:13px;color:var(--tm);margin-bottom:12px">找到以下餐厅，勾选后加入「想去」列表：</div>
         <div id="importRestList"></div>
-        <div style="display:flex;gap:8px;margin-top:14px">
-          <button class="btn-s" style="flex:1" onclick="backToImportStep1()">重新输入</button>
-          <button class="btn-p" style="flex:2" id="importSaveBtn" onclick="saveImported()">加入想去列表</button>
-        </div>
+        <div style="display:flex;gap:8px;margin-top:14px"><button class="btn-s" style="flex:1" onclick="backToStep1()">重新输入</button><button class="btn-p" style="flex:2" id="importSaveBtn" onclick="saveImported()">加入想去列表</button></div>
       </div>
-      <div id="importError" style="display:none;text-align:center;padding:28px 0">
-        <div style="font-size:13px;color:var(--tm);margin-bottom:14px" id="importErrorMsg">分析失败，请重试</div>
-        <button class="btn-s" onclick="backToImportStep1()">返回重试</button>
-      </div>
+      <div id="importError" style="display:none;text-align:center;padding:28px 0"><div style="font-size:13px;color:var(--tm);margin-bottom:14px">分析失败，请重试</div><button class="btn-s" onclick="backToStep1()">返回重试</button></div>
     </div>
   </div>
 </div>
 
-<!-- ── Restaurant Sheet ── -->
+<!-- Restaurant Sheet -->
 <div class="sheet-wrap" id="restSheet" onclick="if(event.target===this)closeSheet('restSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="restSheetTitle">添加餐厅</div>
-    <div class="fg"><label class="fl">状态</label>
-      <div class="tog-row">
-        <button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button>
-        <button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button>
-      </div>
-    </div>
+    <div class="fg"><label class="fl">状态</label><div class="tog-row"><button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button><button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button></div></div>
     <div class="fr">
       <div class="fg"><label class="fl">餐厅名称</label><input class="fi" id="rName" placeholder="餐厅名"/></div>
-      <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="东京、台北..."/></div>
+      <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="东京、台北、上海..."/></div>
     </div>
     <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
     <div id="visitedFields" style="display:none">
-      <div class="fg"><label class="fl">整体评分</label>
-        <div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span>
-          <div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div>
-        </div>
-      </div>
-      <div class="fg"><label class="fl">评价标签</label>
-        <div class="rl-row">
-          <button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button>
-          <button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button>
-          <button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button>
-          <button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button>
-        </div>
-      </div>
-      <div class="fg"><label class="fl">总结（可选）</label><textarea class="fi" id="rSummary" placeholder="整体感受、特色、氛围..."></textarea></div>
+      <div class="fg"><label class="fl">整体评分</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
+      <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
+      <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
       <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
     </div>
-    <div class="fg"><label class="fl">备注（可选）</label><textarea class="fi" id="rNotes" placeholder="必吃什么、谁推荐的..." style="min-height:60px"></textarea></div>
-    <div class="priv-row">
-      <div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div>
-      <div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div>
-    </div>
+    <div class="fg"><label class="fl">备注（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rNotes')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rNotes" contenteditable="true" data-placeholder="必吃什么、谁推荐的..."></div></div></div>
+    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
     <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
     <button class="btn-s" onclick="closeSheet('restSheet')">取消</button>
   </div>
 </div>
 
-<!-- ── Dish Sheet ── -->
+<!-- Dish Sheet -->
 <div class="sheet-wrap" id="dishSheet" onclick="if(event.target===this)closeSheet('dishSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">添加一道菜</div>
     <div class="fg"><label class="fl">菜名</label><input class="fi" id="dName" placeholder="比如：黑松露炒饭"/></div>
-    <div class="fg"><label class="fl">评分</label>
-      <div class="star-row"><div class="stars" id="dishStars"></div><span class="star-val" id="dishStarVal">—</span>
-        <div class="star-adj"><button onclick="adjStar('dish',-0.1)">−</button><button onclick="adjStar('dish',0.1)">+</button></div>
-      </div>
-    </div>
-    <div class="fg"><label class="fl">评价标签</label>
-      <div class="rl-row">
-        <button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button>
-        <button class="rl" onclick="selRl(this,'dishLabel','值得一吃')">值得一吃</button>
-        <button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button>
-        <button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button>
-      </div>
-    </div>
+    <div class="fg"><label class="fl">评分</label><div class="star-row"><div class="stars" id="dishStars"></div><span class="star-val" id="dishStarVal">—</span><div class="star-adj"><button onclick="adjStar('dish',-0.1)">−</button><button onclick="adjStar('dish',0.1)">+</button></div></div></div>
+    <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'dishLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button></div></div>
     <div class="fg"><label class="fl">感受（可选）</label><textarea class="fi" id="dNote" placeholder="一句话描述味道..."></textarea></div>
     <button class="btn-p" onclick="saveDish()">保存</button>
     <button class="btn-s" onclick="closeSheet('dishSheet')">取消</button>
   </div>
 </div>
 
-<!-- ── Discovery Sheet ── -->
+<!-- Discovery Sheet -->
 <div class="sheet-wrap" id="discSheet" onclick="if(event.target===this)closeSheet('discSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title" id="discSheetTitle">记录发现</div>
-    <div class="fg"><label class="fl">类型</label>
-      <div class="tog-row">
-        <button class="tog c-teal on" onclick="selTog(this,'discType','discovery')">发现（已尝过 / 自己做的）</button>
-        <button class="tog c-blue" onclick="selTog(this,'discType','inspo')">灵感（待尝试）</button>
-      </div>
-    </div>
+    <div class="fg"><label class="fl">类型</label><div class="tog-row"><button class="tog c-teal on" onclick="selTog(this,'discType','discovery')">发现（已尝过 / 自己做的）</button><button class="tog c-blue" onclick="selTog(this,'discType','inspo')">灵感（待尝试）</button></div></div>
     <div class="fg"><label class="fl">名称</label><input class="fi" id="diName" placeholder="比如：剥皮辣椒、秋葵纳豆拌饭"/></div>
     <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="diCuisine"></select></div>
     <div class="fg"><label class="fl">关联餐厅（可选）</label><select class="fi" id="diRest"></select></div>
-    <div class="fg"><label class="fl">感受 / 描述</label><textarea class="fi" id="diNote" placeholder="味道感受、搭配逻辑、为什么想试..."></textarea></div>
-    <div class="priv-row">
-      <div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div>
-      <div class="tog-switch" id="discPrivSwitch" onclick="togglePriv('disc')"><div class="tog-switch-thumb"></div></div>
-    </div>
+    <div class="fg"><label class="fl">感受 / 描述</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'diNote')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="diNote" contenteditable="true" data-placeholder="味道感受、搭配逻辑、为什么想试..."></div></div></div>
+    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="discPrivSwitch" onclick="togglePriv('disc')"><div class="tog-switch-thumb"></div></div></div>
     <button class="btn-p" id="discSaveBtn" onclick="saveDisc()">保存</button>
     <button class="btn-s" onclick="closeSheet('discSheet')">取消</button>
   </div>
 </div>
 
-<!-- ── Restaurant Detail ── -->
+<!-- Restaurant Detail -->
 <div class="detail-wrap" id="restDetail">
   <div class="detail-header">
     <button class="back-btn" onclick="closeDetail()">←</button>
@@ -518,47 +493,34 @@ textarea.fi{resize:none;min-height:76px;line-height:1.6}
   </div>
   <div class="detail-body">
     <div class="detail-sec" id="detailMeta"></div>
-    <div class="detail-sec">
-      <div class="detail-sec-title">菜品记录</div>
-      <div id="dishRows"></div>
-      <button class="add-dish-btn" id="addDishBtn" onclick="openDishSheet()">+ 添加一道菜</button>
-    </div>
-    <div class="detail-sec">
-      <div class="detail-sec-title">相关发现</div>
-      <div id="relatedDiscs"></div>
-    </div>
+    <div class="detail-sec"><div class="detail-sec-title">菜品记录</div><div id="dishRows"></div><button class="add-dish-btn" id="addDishBtn" onclick="openDishSheet()">+ 添加一道菜</button></div>
+    <div class="detail-sec"><div class="detail-sec-title">相关发现</div><div id="relatedDiscs"></div></div>
   </div>
 </div>
 
-<!-- ── Share Sheet ── -->
+<!-- Share Sheet -->
 <div class="sheet-wrap" id="shareSheet" onclick="if(event.target===this)closeSheet('shareSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">生成分享链接</div>
-    <p style="font-size:13px;color:var(--tm);line-height:1.6;margin-bottom:16px">任何拿到链接的人都能查看，无需登录。</p>
-    <div id="shareLoading" style="text-align:center;padding:20px;color:var(--th);font-size:13px">生成中...</div>
+    <p style="font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:16px">任何拿到链接的人都能查看，无需登录。</p>
+    <div id="shareLoading" style="text-align:center;padding:20px;color:var(--th);font-size:14px">生成中...</div>
     <div id="shareLinkArea" style="display:none">
-      <div class="share-link-box">
-        <div class="share-link-url" id="shareLinkUrl"></div>
-        <button class="share-copy-btn" onclick="copyShareLink()">复制</button>
-      </div>
-      <p style="font-size:11px;color:var(--th);margin-top:10px;line-height:1.5">把链接发给朋友，打开即可查看。</p>
+      <div class="share-link-box"><div class="share-link-url" id="shareLinkUrl"></div><button class="share-copy-btn" onclick="copyShareLink()">复制</button></div>
+      <p style="font-size:12px;color:var(--th);margin-top:10px">把链接发给朋友，打开即可查看。</p>
     </div>
     <button class="btn-s" onclick="closeSheet('shareSheet')" style="margin-top:16px">关闭</button>
   </div>
 </div>
 
-<!-- ── Share View Page ── -->
-<div id="sharePage" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:600;overflow-y:auto">
+<!-- Share Page -->
+<div id="sharePage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:600;overflow-y:auto">
   <div class="share-page">
-    <div class="share-page-header">
-      <div class="share-page-logo">Eat as <em>a Local</em></div>
-      <div class="share-page-sub">美食探索分享</div>
-    </div>
+    <div class="share-page-header"><div class="share-page-logo">Eat as <em>a Local</em></div><div class="share-page-sub">美食探索分享</div></div>
     <div id="sharePageContent"></div>
-    <div style="text-align:center;margin-top:32px;padding-top:20px;border-top:1px solid rgba(91,91,214,0.1)">
-      <p style="font-size:12px;color:var(--th);margin-bottom:10px">想记录自己的美食探索？</p>
-      <button onclick="document.getElementById('sharePage').style.display='none';document.getElementById('authScreen').classList.add('open')" class="btn-p" style="width:auto;padding:9px 24px;display:inline-block">注册使用</button>
+    <div style="text-align:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--wb)">
+      <p style="font-size:13px;color:var(--th);margin-bottom:10px">想记录自己的美食探索？</p>
+      <button onclick="document.getElementById('sharePage').style.display='none';document.getElementById('authScreen').classList.add('open')" class="btn-p" style="width:auto;padding:10px 26px;display:inline-block">注册使用</button>
     </div>
   </div>
 </div>
@@ -619,10 +581,25 @@ let myFriends=[],pendingIn=[],pendingOut=[];
 let restFilter='all',currentTab='mine',currentRestId=null,saving=false;
 let editingRestId=null,editingDiscId=null;
 let selectedAwards=[];
+let groupByCity=false;
+let cityFilter='all';
 const togState={restStatus:'wishlist',discType:'discovery'};
 const rlState={restLabel:'',dishLabel:''};
 const starState={rest:0,dish:0};
 const privState={rest:false,disc:false};
+
+function fmtDate(s){if(!s)return'';const d=new Date(s);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`}
+
+// ── Rich text editor ──
+function rf(cmd,val){document.execCommand(cmd,false,val||null)}
+function rfColor(btn,editorId){
+  const input=document.createElement('input');input.type='color';input.value='#C4523A';
+  input.onchange=()=>{document.getElementById(editorId).focus();document.execCommand('foreColor',false,input.value)};
+  input.click();
+}
+function rteGet(id){return document.getElementById(id).innerHTML.trim()}
+function rteSet(id,html){document.getElementById(id).innerHTML=html||''}
+function rtePlain(html){const tmp=document.createElement('div');tmp.innerHTML=html||'';return tmp.textContent||''}
 
 // ── Helpers ──
 async function hashPwd(p){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p+'eatlocal_salt'));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
@@ -701,7 +678,7 @@ async function loadAll(){
     myFriends=fs.filter(f=>f.status==='accepted');
     pendingIn=fs.filter(f=>f.friend_id===currentUser.id&&f.status==='pending');
     pendingOut=fs.filter(f=>f.user_id===currentUser.id&&f.status==='pending');
-    buildUserFilter();renderAll();
+    buildUserFilter();buildCityFilter();renderAll();
   }catch(e){showToast('加载失败，请刷新')}
 }
 
@@ -714,6 +691,41 @@ function switchTab(tab){
   if(tab==='friends')renderFriends();
 }
 function handleFab(){if(restFilter==='disc')openDiscSheet();else openRestSheet();}
+
+// ── City filter ──
+function buildCityFilter(){
+  const cities=[...new Set(myRests.filter(r=>r.city&&r.city.trim()).map(r=>r.city.trim()))].sort();
+  const row=document.getElementById('cityFilterRow');
+  if(!cities.length){row.style.display='none';return}
+  row.style.display='flex';
+  row.innerHTML='<button class="pill active" onclick="setCityFilter(\'all\',this)">全部城市</button>'+
+    cities.map(c=>`<button class="pill" onclick="setCityFilter('${c}',this)">${c}</button>`).join('');
+}
+function setCityFilter(city,btn){
+  cityFilter=city;
+  document.querySelectorAll('#cityFilterRow .pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMine();
+}
+function toggleGroupBy(){
+  groupByCity=!groupByCity;
+  const btn=document.getElementById('groupByCity');
+  btn.classList.toggle('active',groupByCity);
+  btn.textContent=groupByCity?'✓ 按城市':'按城市';
+  renderMine();
+}
+
+// ── Search ──
+function clearSearch(prefix){
+  document.getElementById(prefix+'Search').value='';
+  document.getElementById(prefix+'SearchClear').style.display='none';
+  if(prefix==='mine')renderMine();else renderSquare();
+}
+function getSearch(prefix){
+  const val=document.getElementById(prefix+'Search').value;
+  document.getElementById(prefix+'SearchClear').style.display=val?'block':'none';
+  return val.toLowerCase();
+}
 
 // ── Selects ──
 function buildCuisineSelect(id){
@@ -731,7 +743,7 @@ function buildUserFilter(){
   document.getElementById('sqUserFilter').innerHTML='<option value="all">所有人</option>'+users.map(u=>`<option value="${u.u}">${u.d}</option>`).join('');
 }
 
-// ── Toggle/Star helpers ──
+// ── Toggle/Star ──
 function selTog(btn,key,val){
   togState[key]=val;
   btn.closest('.tog-row').querySelectorAll('.tog').forEach(b=>b.classList.remove('on'));
@@ -760,8 +772,8 @@ function openRestSheet(rest=null){
   starState.rest=rest?rest.rating||0:0;
   document.getElementById('rName').value=rest?rest.name:'';
   document.getElementById('rCity').value=rest?rest.city||'':'';
-  document.getElementById('rSummary').value=rest?rest.summary||'':'';
-  document.getElementById('rNotes').value=rest?rest.notes||'':'';
+  rteSet('rSummary',rest?rest.summary||'':'');
+  rteSet('rNotes',rest?rest.notes||'':'');
   document.getElementById('restStarVal').textContent=rest&&rest.rating?rest.rating.toFixed(1):'—';
   document.getElementById('visitedFields').style.display=(rest?rest.status:'wishlist')==='visited'?'block':'none';
   document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
@@ -783,7 +795,7 @@ async function saveRest(){
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim()||null,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:document.getElementById('rSummary').value.trim()||null,notes:document.getElementById('rNotes').value.trim()||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
+  const entry={name,city:document.getElementById('rCity').value.trim()||null,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
   saving=true;
   try{
     if(editingRestId){
@@ -798,7 +810,7 @@ async function saveRest(){
       if(res&&res[0]){myRests.unshift(res[0]);allRests.unshift(res[0]);}
       showToast('已保存');
     }
-    closeSheet('restSheet');renderAll();
+    closeSheet('restSheet');buildCityFilter();renderAll();
   }catch(e){showToast('保存失败')}
   saving=false;
 }
@@ -830,7 +842,7 @@ function openDiscSheet(disc=null){
   buildCuisineSelect('diCuisine');buildRestSelect();
   togState.discType=disc?disc.type:'discovery';
   document.getElementById('diName').value=disc?disc.name:'';
-  document.getElementById('diNote').value=disc?disc.note||'':'';
+  rteSet('diNote',disc?disc.note||'':'');
   document.querySelectorAll('#discSheet .tog').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#discSheet .tog').forEach(b=>{if((togState.discType==='discovery'&&b.textContent.includes('发现'))||(togState.discType==='inspo'&&b.textContent.includes('灵感')))b.classList.add('on')});
   if(disc&&disc.cuisine_id){const sel=document.getElementById('diCuisine');[...sel.options].forEach(o=>{if(o.value===`${disc.cuisine_id}|${disc.cuisine_name}`)o.selected=true})}
@@ -850,7 +862,7 @@ async function saveDisc(){
   const[cid,cname]=cv?cv.split('|'):['',''];
   const rv=document.getElementById('diRest').value;
   const[rid,rname]=rv?rv.split('|'):['',''];
-  const entry={name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:document.getElementById('diNote').value.trim()||null,is_private:privState.disc};
+  const entry={name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:rteGet('diNote')||null,is_private:privState.disc};
   saving=true;
   try{
     if(editingDiscId){
@@ -874,7 +886,7 @@ function editDisc(id){const d=myDiscs.find(x=>x.id===id);if(d)openDiscSheet(d)}
 // ── Delete ──
 async function deleteRest(id){
   if(!confirm('确定删除这家餐厅？'))return;
-  try{await sbDel('restaurants',id);myRests=myRests.filter(r=>r.id!==id);allRests=allRests.filter(r=>r.id!==id);myDishes=myDishes.filter(d=>d.restaurant_id!==id);renderAll();showToast('已删除')}
+  try{await sbDel('restaurants',id);myRests=myRests.filter(r=>r.id!==id);allRests=allRests.filter(r=>r.id!==id);myDishes=myDishes.filter(d=>d.restaurant_id!==id);buildCityFilter();renderAll();showToast('已删除')}
   catch(e){showToast('删除失败')}
 }
 function deleteCurrentRest(){if(currentRestId){deleteRest(currentRestId);closeDetail()}}
@@ -889,34 +901,31 @@ async function deleteDish(id){
   catch(e){showToast('删除失败')}
 }
 
-// ── Render ──
-function setRestFilter(f,btn){restFilter=f;document.querySelectorAll('#mine .pill').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderMine()}
-
-function fmtDate(s){if(!s)return'';const d=new Date(s);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`}
-
-function restCardHTML(r){
-  return`<div class="card rest-card" onclick="openDetail(${r.id})" style="margin-bottom:6px">
-    <div class="card-inner" style="padding:11px 14px">
+// ── Render cards ──
+function restCardHTML(r,showUser=false){
+  const dc=myDishes.filter(d=>d.restaurant_id===r.id).length;
+  return`<div class="card rest-card" onclick="openDetail(${r.id})" style="margin-bottom:7px">
+    <div class="card-inner" style="padding:12px 14px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-            <span class="rest-name" style="font-size:14px">${r.name}</span>
-            ${r.rating_label?`<span class="badge b-visited" style="font-size:9px;padding:1px 7px">${r.rating_label}</span>`:''}
-            ${r.is_private?'<span class="priv-badge on" style="font-size:9px">私密</span>':''}
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+            <span class="rest-name">${r.name}</span>
+            <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+            ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+            ${r.is_private?'<span class="priv-badge on">私密</span>':''}
           </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:9px;padding:1px 7px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
-            ${r.cuisine_name?`<span style="font-size:11px;color:var(--tm)">${r.cuisine_name}</span>`:''}
-            ${r.city?`<span style="font-size:11px;color:var(--th)">· ${r.city}</span>`:''}
-            ${r.awards&&r.awards.length?`<span class="award-badge" style="font-size:9px">${r.awards[0]}${r.awards.length>1?' +'+( r.awards.length-1):''}</span>`:''}
+          <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tm)">
+            ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}
+            ${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
+            ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+( r.awards.length-1):''}</span>`:''}
           </div>
-          ${r.summary?`<div style="font-size:12px;color:var(--th);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${r.summary}</div>`:''}
-          ${r.notes&&r.status==='wishlist'&&!r.summary?`<div style="font-size:12px;color:var(--th);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${r.notes}</div>`:''}
+          ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+          ${!r.summary&&r.notes&&r.status==='wishlist'?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.notes)}</div>`:''}
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          ${r.rating?`<span style="color:#C8A832;font-size:14px;font-weight:600">${r.rating.toFixed(1)}<span style="font-size:10px;color:var(--th);font-weight:400"> ★</span></span>`:''}
-          <span style="font-size:10px;color:var(--th)">${fmtDate(r.created_at)}</span>
-          <button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:10px;padding:2px 8px">编辑</button>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+          ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
+          <span style="font-size:11px;color:var(--th)">${fmtDate(r.created_at)}</span>
+          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button>`}
         </div>
       </div>
     </div>
@@ -924,28 +933,28 @@ function restCardHTML(r){
 }
 
 function discCardHTML(d,showUser=false,showDel=false){
-  return`<div class="card disc-card" style="margin-bottom:6px">
+  return`<div class="card disc-card" style="margin-bottom:7px">
     <div class="disc-bar ${d.type}"></div>
     <div class="disc-body" style="padding:11px 14px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
-            <span class="disc-name" style="font-size:14px;margin-bottom:0">${d.name}</span>
-            ${d.is_private?'<span class="priv-badge on" style="font-size:9px">私密</span>':''}
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:600;color:var(--text)">${d.name}</span>
+            <span class="badge" style="font-size:10px;${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+            ${d.is_private?'<span class="priv-badge on">私密</span>':''}
           </div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span class="badge" style="font-size:9px;padding:1px 7px;${d.type==='inspo'?'background:var(--blue-l);color:var(--indigo-d)':'background:var(--indigo-l);color:var(--indigo-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
-            ${d.cuisine_name?`<span style="font-size:11px;color:var(--tm)">${d.cuisine_name}</span>`:''}
-            ${d.restaurant_name?`<span style="font-size:11px;color:var(--th)">· ${d.restaurant_name}</span>`:''}
+          <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;flex-wrap:wrap">
+            ${d.cuisine_name?`<span>${d.cuisine_name}</span>`:''}
+            ${d.restaurant_name?`<span style="color:var(--th)">· ${d.restaurant_name}</span>`:''}
           </div>
-          ${d.note?`<div style="font-size:12px;color:var(--th);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic">${d.note}</div>`:''}
+          ${d.note?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(d.note)}</div>`:''}
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
-          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>`:`<span style="font-size:10px;color:var(--th)">${fmtDate(d.created_at)}</span>`}
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>`:`<span style="font-size:11px;color:var(--th)">${fmtDate(d.created_at)}</span>`}
           ${showDel?`<div style="display:flex;gap:4px">
-            <button class="edit-btn" onclick="event.stopPropagation();shareItem('discovery',${d.id})" style="font-size:10px;padding:2px 8px">分享</button>
-            <button class="edit-btn" onclick="event.stopPropagation();editDisc(${d.id})" style="font-size:10px;padding:2px 8px">编辑</button>
-            <button class="del-btn" onclick="event.stopPropagation();deleteDisc(${d.id})" style="font-size:14px">×</button>
+            <button class="edit-btn" onclick="event.stopPropagation();shareItem('discovery',${d.id})" style="font-size:11px;padding:2px 9px">分享</button>
+            <button class="edit-btn" onclick="event.stopPropagation();editDisc(${d.id})" style="font-size:11px;padding:2px 9px">编辑</button>
+            <button class="del-btn" onclick="event.stopPropagation();deleteDisc(${d.id})">×</button>
           </div>`:''}
         </div>
       </div>
@@ -953,54 +962,82 @@ function discCardHTML(d,showUser=false,showDel=false){
   </div>`;
 }
 
-function renderMine(){
-  const list=document.getElementById('mineList');
-  if(restFilter==='disc'){
-    list.innerHTML=myDiscs.length?myDiscs.map(d=>discCardHTML(d,false,true)).join(''):`<div class="empty"><div class="empty-en">Nothing yet</div><p>还没有发现记录</p></div>`;return;
-  }
-  let items=[...myRests];
-  if(restFilter!=='all')items=items.filter(r=>r.status===restFilter);
-  list.innerHTML=items.length?items.map(r=>restCardHTML(r)).join(''):`<div class="empty"><div class="empty-en">Nothing yet</div><p>还没有${restFilter==='wishlist'?'想去的':'去过的'}餐厅</p></div>`;
+// ── Render Mine ──
+function setRestFilter(f,btn){
+  restFilter=f;cityFilter='all';
+  document.querySelectorAll('#mine .filter-row:first-of-type .pill').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const showCity=f!=='disc';
+  document.getElementById('cityFilterRow').style.display=showCity?'flex':'none';
+  document.getElementById('groupToggleRow').style.display=showCity?'flex':'none';
+  if(showCity)buildCityFilter();
+  renderMine();
 }
 
+function renderMine(){
+  const list=document.getElementById('mineList');
+  const q=getSearch('mine');
+
+  if(restFilter==='disc'){
+    let items=[...myDiscs];
+    if(q)items=items.filter(d=>d.name.toLowerCase().includes(q)||(d.note||'').toLowerCase().includes(q)||(d.cuisine_name||'').toLowerCase().includes(q)||(d.restaurant_name||'').toLowerCase().includes(q));
+    list.innerHTML=items.length?items.map(d=>discCardHTML(d,false,true)).join(''):`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q?'没有找到相关记录':'还没有发现记录'}</p></div>`;
+    return;
+  }
+
+  let items=[...myRests];
+  if(restFilter!=='all')items=items.filter(r=>r.status===restFilter);
+  if(cityFilter!=='all')items=items.filter(r=>(r.city||'').trim()===cityFilter);
+  if(q)items=items.filter(r=>
+    r.name.toLowerCase().includes(q)||
+    (r.city||'').toLowerCase().includes(q)||
+    (r.cuisine_name||'').toLowerCase().includes(q)||
+    rtePlain(r.summary||'').toLowerCase().includes(q)||
+    rtePlain(r.notes||'').toLowerCase().includes(q)||
+    (r.awards||[]).some(a=>a.toLowerCase().includes(q))||
+    myDishes.filter(d=>d.restaurant_id===r.id).some(d=>d.name.toLowerCase().includes(q)||(d.note||'').toLowerCase().includes(q))
+  );
+
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q||cityFilter!=='all'?'没有找到相关记录':'还没有'+( restFilter==='wishlist'?'想去的':'去过的')+'餐厅'}</p></div>`;return}
+
+  if(groupByCity&&restFilter!=='disc'){
+    const groups={};
+    items.forEach(r=>{const c=r.city||'未填写城市';if(!groups[c])groups[c]=[];groups[c].push(r)});
+    list.innerHTML=Object.keys(groups).sort().map(city=>`
+      <div class="city-group">
+        <div class="city-group-title">${city} <span style="font-size:10px;color:var(--th);font-weight:400;letter-spacing:0">${groups[city].length}家</span></div>
+        ${groups[city].map(r=>restCardHTML(r)).join('')}
+      </div>`).join('');
+  }else{
+    list.innerHTML=items.map(r=>restCardHTML(r)).join('');
+  }
+}
+
+// ── Render Square ──
 function renderSquare(){
   const tf=document.getElementById('sqTypeFilter').value;
   const uf=document.getElementById('sqUserFilter').value;
+  const q=getSearch('sq');
   const list=document.getElementById('squareList');
   let items=[];
   if(tf!=='discoveries'){
     let r=[...allRests].filter(r=>!r.is_private||r.user_id===currentUser.id);
     if(uf!=='all')r=r.filter(x=>x.username===uf);
+    if(q)r=r.filter(x=>x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.summary||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(r.map(x=>({...x,_k:'rest',_ts:x.created_at})));
   }
   if(tf!=='restaurants'){
     let d=[...allDiscs].filter(d=>!d.is_private||d.user_id===currentUser.id);
     if(uf!=='all')d=d.filter(x=>x.username===uf);
+    if(q)d=d.filter(x=>x.name.toLowerCase().includes(q)||(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(d.map(x=>({...x,_k:'disc',_ts:x.created_at})));
   }
   items.sort((a,b)=>b._ts.localeCompare(a._ts));
-  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>还没有公开内容</p></div>`;return}
-  list.innerHTML=items.map(item=>{
-    if(item._k==='rest'){
-      const own=item.user_id===currentUser.id;
-      return`<div class="card rest-card" ${own?`onclick="openDetail(${item.id})"`:'style="cursor:default"'}>
-        <div class="card-inner">
-          <div class="rest-top"><div class="rest-name">${item.name}</div><span class="badge ${item.status==='wishlist'?'b-wishlist':'b-visited'}">${item.status==='wishlist'?'📌 想去':'✓ 去过'}</span></div>
-          <div class="rest-meta">${item.cuisine_name?`<span>${item.cuisine_name}</span>`:''} ${item.city?`<span>· ${item.city}</span>`:''} ${item.awards&&item.awards.length?item.awards.map(a=>`<span class="award-badge">${a}</span>`).join(''):''}</div>
-          ${item.summary?`<div class="rest-notes">${item.summary}</div>`:''}
-          <div class="rest-footer">
-            <div class="user-tag"><div class="user-tag-dot">${(item.display_name||item.username).charAt(0).toUpperCase()}</div>${item.display_name||item.username}</div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <span style="font-size:11px;color:var(--th)">${fmtDate(item.created_at)}</span>
-              ${item.rating?`<span style="color:#C8A832;font-size:13px">${item.rating.toFixed(1)} ★</span>`:''}
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }else{return discCardHTML(item,true,false)}
-  }).join('');
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>${q?'没有找到相关记录':'还没有公开内容'}</p></div>`;return}
+  list.innerHTML=items.map(item=>item._k==='rest'?restCardHTML(item,true):discCardHTML(item,true,false)).join('');
 }
 
+// ── Detail ──
 function openDetail(id){
   currentRestId=id;
   const own=myRests.some(r=>r.id===id);
@@ -1019,28 +1056,30 @@ function renderDetail(id){
   document.getElementById('detailMeta').innerHTML=`
     <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
       <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
-      ${r.cuisine_name?`<span class="badge" style="background:var(--bg-dd);color:var(--tm)">${r.cuisine_name}</span>`:''}
-      ${r.city?`<span style="font-size:12px;color:var(--th)">${r.city}</span>`:''}
-      ${r.rating?`<span style="font-size:14px;color:#C8A832">${r.rating.toFixed(1)} ★</span>`:''}
+      ${r.cuisine_name?`<span class="badge" style="background:var(--cream-d);color:var(--tm)">${r.cuisine_name}</span>`:''}
+      ${r.city?`<span style="font-size:13px;color:var(--th)">${r.city}</span>`:''}
+      ${r.rating?`<span style="font-size:15px;color:#E8B84B;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
       ${r.rating_label?`<span class="badge b-visited">${r.rating_label}</span>`:''}
       ${r.awards&&r.awards.length?r.awards.map(a=>`<span class="award-badge">${a}</span>`).join(''):''}
     </div>
-    ${r.summary?`<div style="font-size:13px;color:var(--tm);line-height:1.7;font-style:italic;padding:11px 13px;background:var(--bg-d);border-radius:var(--rs);margin-bottom:8px">${r.summary}</div>`:''}
-    ${r.notes?`<div style="font-size:12px;color:var(--th);line-height:1.6;padding:9px 13px;background:var(--bg-d);border-radius:var(--rs)">${r.notes}</div>`:''}`;
+    ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;padding:12px 14px;background:var(--cream-d);border-radius:var(--rs);margin-bottom:8px">${r.summary}</div>`:''}
+    ${r.notes?`<div style="font-size:13px;color:var(--th);line-height:1.7;padding:10px 14px;background:var(--cream-d);border-radius:var(--rs)">${r.notes}</div>`:''}
+    <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>`;
   const dl=own?myDishes.filter(d=>d.restaurant_id===id):[];
   document.getElementById('dishRows').innerHTML=dl.length?dl.map(d=>`
     <div class="dish-row"><div class="dish-dot"></div>
       <div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div>
       ${own?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
-    </div>`).join(''):'<div style="color:var(--th);font-size:13px;padding:8px 0">还没有菜品记录</div>';
+    </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">还没有菜品记录</div>';
   const rd=myDiscs.filter(d=>d.restaurant_id===id);
   document.getElementById('relatedDiscs').innerHTML=rd.length?rd.map(d=>`
-    <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(91,91,214,0.1)">
+    <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--wb)">
       <span style="font-size:14px;font-weight:600">${d.name}</span>
-      <span class="badge" style="${d.type==='inspo'?'background:var(--blue-l);color:var(--indigo-d)':'background:var(--indigo-l);color:var(--indigo-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
-    </div>`).join(''):'<div style="color:var(--th);font-size:13px;padding:8px 0">暂无相关发现</div>';
+      <span class="badge" style="${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+    </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">暂无相关发现</div>';
 }
 
+// ── Map ──
 function renderMap(){
   const visited=new Set(myRests.filter(r=>r.status==='visited').map(r=>r.cuisine_id));
   const total=CUISINES.length,exp=visited.size;
@@ -1054,21 +1093,23 @@ function renderMap(){
     }).join('')}</div></div>`).join('');
 }
 function filterMapCuisine(id,name){
-  switchTab('mine');restFilter='all';
-  document.querySelectorAll('#mine .pill').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('#mine .pill')[0].classList.add('active');
-  document.getElementById('mineList').innerHTML=myRests.filter(r=>r.cuisine_id===id).map(r=>restCardHTML(r)).join('')||'<div class="empty"><p>该菜系暂无餐厅</p></div>';
+  switchTab('mine');restFilter='all';cityFilter='all';
+  document.querySelectorAll('#mine .filter-row:first-of-type .pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#mine .filter-row:first-of-type .pill')[0].classList.add('active');
+  document.getElementById('mineSearch').value=name;
+  renderMine();
 }
 
+// ── Stats ──
 function renderStats(){
   document.getElementById('statsGrid').innerHTML=`
-    <div class="sc"><div class="sc-n" style="color:var(--indigo)">${myRests.filter(r=>r.status==='visited').length}</div><div class="sc-l">去过的餐厅</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--teal)">${myRests.filter(r=>r.status==='visited').length}</div><div class="sc-l">去过的餐厅</div></div>
     <div class="sc"><div class="sc-n" style="color:var(--blue)">${myRests.filter(r=>r.status==='wishlist').length}</div><div class="sc-l">想去的餐厅</div></div>
     <div class="sc"><div class="sc-n" style="color:var(--purple)">${myDishes.length}</div><div class="sc-l">菜品记录</div></div>
     <div class="sc"><div class="sc-n" style="color:var(--amber)">${myDiscs.length}</div><div class="sc-l">发现记录</div></div>`;
   const rank=CUISINES.map(c=>({name:c.name,count:myRests.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
   const max=rank[0]?.count||1;
-  document.getElementById('chartBars').innerHTML=rank.length?rank.map(c=>`<div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join(''):'<div style="color:var(--th);font-size:13px;text-align:center;padding:16px 0">暂无数据</div>';
+  document.getElementById('chartBars').innerHTML=rank.length?rank.map(c=>`<div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join(''):'<div style="color:var(--th);font-size:14px;text-align:center;padding:16px 0">暂无数据</div>';
 }
 
 function renderAll(){renderMine();renderSquare();renderMap();renderStats()}
@@ -1089,12 +1130,12 @@ async function searchUser(){
     res.innerHTML=`<div class="friend-item">
       <div class="friend-avatar">${(u.display_name||u.username).charAt(0).toUpperCase()}</div>
       <div class="friend-info"><div class="friend-name">${u.display_name||u.username}</div><div class="friend-username">@${u.username}</div></div>
-      ${isF?'<span style="font-size:12px;color:var(--indigo)">已是好友</span>':isPO?'<span style="font-size:12px;color:var(--th)">申请已发送</span>':`<button class="friend-action primary" onclick="sendFriendReq(${u.id})">加好友</button>`}
+      ${isF?'<span style="font-size:13px;color:var(--teal)">已是好友</span>':isPO?'<span style="font-size:13px;color:var(--th)">申请已发送</span>':`<button class="friend-action primary" onclick="sendFriendReq(${u.id})">加好友</button>`}
     </div>`;
-  }catch(e){res.innerHTML='<div style="font-size:13px;color:var(--rose)">搜索失败</div>'}
+  }catch(e){res.innerHTML='<div style="font-size:13px;color:var(--coral)">搜索失败</div>'}
 }
 async function sendFriendReq(fid){
-  try{const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});if(r&&r[0])pendingOut.push(r[0]);showToast('好友申请已发送');document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--indigo)">申请已发送</div>';}
+  try{const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});if(r&&r[0])pendingOut.push(r[0]);showToast('好友申请已发送');document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--teal)">申请已发送</div>';}
   catch(e){showToast('发送失败')}
 }
 async function acceptFriend(fid){
@@ -1124,7 +1165,7 @@ async function renderFriends(){
     pendList.innerHTML=pf.filter(f=>f._u).map(f=>`<div class="friend-item">
       <div class="friend-avatar">${(f._u.display_name||f._u.username).charAt(0).toUpperCase()}</div>
       <div class="friend-info"><div class="friend-name">${f._u.display_name||f._u.username}</div><div class="friend-username">@${f._u.username}</div></div>
-      <div style="display:flex;gap:6px"><button class="friend-action accept" onclick="acceptFriend(${f.id})">同意</button><button class="friend-action" onclick="declineFriend(${f.id})" style="color:var(--rose)">拒绝</button></div>
+      <div style="display:flex;gap:6px"><button class="friend-action accept" onclick="acceptFriend(${f.id})">同意</button><button class="friend-action" onclick="declineFriend(${f.id})" style="color:var(--coral)">拒绝</button></div>
     </div>`).join('');
   }else{pendSec.style.display='none'}
   if(!myFriends.length){list.innerHTML='<div class="empty" style="padding:24px 0"><p>还没有好友<br>用上方搜索添加</p></div>';return}
@@ -1132,7 +1173,7 @@ async function renderFriends(){
   list.innerHTML=friends.filter(f=>f._u).map(f=>`<div class="friend-item">
     <div class="friend-avatar">${(f._u.display_name||f._u.username).charAt(0).toUpperCase()}</div>
     <div class="friend-info"><div class="friend-name">${f._u.display_name||f._u.username}</div><div class="friend-username">@${f._u.username}</div></div>
-    <button class="friend-action" onclick="removeFriend(${f.id})" style="color:var(--rose)">删除</button>
+    <button class="friend-action" onclick="removeFriend(${f.id})" style="color:var(--coral)">删除</button>
   </div>`).join('');
 }
 
@@ -1158,10 +1199,10 @@ function copyShareLink(){
 }
 async function checkShareLink(){
   const token=new URLSearchParams(location.search).get('share');
-  if(!token)return;
+  if(!token)return false;
   try{
     const links=await sbGet(`share_links?token=eq.${token}&select=*`);
-    if(!links||!links.length)return;
+    if(!links||!links.length)return false;
     const link=links[0];
     document.getElementById('authScreen').classList.remove('open');
     document.getElementById('mainApp').style.display='none';
@@ -1171,33 +1212,41 @@ async function checkShareLink(){
     if(link.item_type==='restaurant'){
       const rests=await sbGet(`restaurants?id=eq.${link.item_id}&select=*`);
       const r=rests&&rests[0];
-      if(!r){content.innerHTML='<div class="empty"><p>记录不存在或已被删除</p></div>';return}
+      if(!r){content.innerHTML='<div class="empty"><p>记录不存在或已被删除</p></div>';return true}
       const dishes=await sbGet(`dishes?restaurant_id=eq.${r.id}&order=created_at.asc`);
-      const dl=dishes&&dishes.length?dishes.map(d=>`<div class="dish-row"><div class="dish-dot"></div><div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div></div>`).join(''):'<div style="color:var(--th);font-size:13px;padding:8px 0">暂无菜品记录</div>';
-      content.innerHTML=`
-        <div class="card"><div class="card-inner">
-          <div class="rest-top"><div class="rest-name">${r.name}</div><span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span></div>
-          <div class="rest-meta">${r.cuisine_name||''}${r.city?' · '+r.city:''}${r.awards&&r.awards.length?' · '+r.awards.join(' '):''}${r.rating?` · <span style="color:#C8A832">${r.rating.toFixed(1)} ★</span>`:''}</div>
-          ${r.summary?`<div class="rest-notes">${r.summary}</div>`:''}
-        </div></div>
-        <div style="font-size:10px;font-weight:700;color:var(--th);letter-spacing:.1em;text-transform:uppercase;margin:14px 0 10px">菜品记录</div>
-        <div class="card"><div class="card-inner">${dl}</div></div>
-        <div style="font-size:11px;color:var(--th);margin-top:10px;text-align:right">by ${r.display_name||r.username}</div>`;
+      const dl=dishes&&dishes.length?dishes.map(d=>`<div class="dish-row"><div class="dish-dot"></div><div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div></div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">暂无菜品记录</div>';
+      content.innerHTML=`<div class="card"><div class="card-inner">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px">
+          <div style="font-family:var(--serif);font-size:20px;font-weight:700">${r.name}</div>
+          <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;font-size:13px;color:var(--tm);margin-bottom:8px">
+          ${r.cuisine_name||''}${r.city?' · '+r.city:''}
+          ${r.rating?`<span style="color:#E8B84B;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
+          ${r.rating_label?`<span class="badge b-visited">${r.rating_label}</span>`:''}
+          ${r.awards&&r.awards.length?r.awards.map(a=>`<span class="award-badge">${a}</span>`).join(''):''}
+        </div>
+        ${r.summary?`<div style="font-size:14px;color:var(--tm);font-style:italic;line-height:1.6">${r.summary}</div>`:''}
+      </div></div>
+      <div style="font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin:14px 0 10px">菜品记录</div>
+      <div class="card"><div class="card-inner">${dl}</div></div>
+      <div style="font-size:12px;color:var(--th);margin-top:10px;text-align:right">by ${r.display_name||r.username}</div>`;
     }else{
       const discs=await sbGet(`discoveries?id=eq.${link.item_id}&select=*`);
       const d=discs&&discs[0];
-      if(!d){content.innerHTML='<div class="empty"><p>记录不存在</p></div>';return}
+      if(!d){content.innerHTML='<div class="empty"><p>记录不存在</p></div>';return true}
       content.innerHTML=`<div class="card disc-card">
         <div class="disc-bar ${d.type}"></div>
         <div class="disc-body">
-          <div class="disc-name">${d.name}</div>
-          <div class="disc-meta"><span class="badge" style="${d.type==='inspo'?'background:var(--blue-l);color:var(--indigo-d)':'background:var(--indigo-l);color:var(--indigo-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>${d.cuisine_name?`<span style="font-size:12px;color:var(--tm)">${d.cuisine_name}</span>`:''}</div>
-          ${d.note?`<div class="disc-note">${d.note}</div>`:''}
-          <div style="font-size:11px;color:var(--th);margin-top:8px">by ${d.display_name||d.username}</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:6px">${d.name}</div>
+          <div style="display:flex;gap:6px;margin-bottom:6px"><span class="badge" style="${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>${d.cuisine_name?`<span style="font-size:13px;color:var(--tm)">${d.cuisine_name}</span>`:''}</div>
+          ${d.note?`<div style="font-size:14px;color:var(--tm);font-style:italic;line-height:1.6">${d.note}</div>`:''}
+          <div style="font-size:12px;color:var(--th);margin-top:8px">by ${d.display_name||d.username}</div>
         </div>
       </div>`;
     }
-  }catch(e){console.error(e)}
+    return true;
+  }catch(e){console.error(e);return false}
 }
 
 // ── Import ──
@@ -1207,7 +1256,7 @@ function openImport(){
   document.getElementById('importStep1').style.display='block';document.getElementById('importStep2').style.display='none';
   document.getElementById('importSheet').classList.add('open');
 }
-function backToImportStep1(){document.getElementById('importStep1').style.display='block';document.getElementById('importStep2').style.display='none'}
+function backToStep1(){document.getElementById('importStep1').style.display='block';document.getElementById('importStep2').style.display='none'}
 async function fetchUrl(){
   const url=document.getElementById('importUrl').value.trim();
   if(!url){showToast('请输入文章链接');return}
@@ -1244,14 +1293,11 @@ async function analyzeArticle(){
     renderImportResults();
     document.getElementById('importLoading').style.display='none';
     document.getElementById('importResults').style.display='block';
-  }catch(e){
-    document.getElementById('importLoading').style.display='none';
-    document.getElementById('importError').style.display='block';
-  }
+  }catch(e){document.getElementById('importLoading').style.display='none';document.getElementById('importError').style.display='block'}
 }
 function renderImportResults(){
   const list=document.getElementById('importRestList');
-  if(!importedRests.length){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--th);font-size:13px">文章中没有找到餐厅信息</div>';document.getElementById('importSaveBtn').style.display='none';return}
+  if(!importedRests.length){list.innerHTML='<div style="text-align:center;padding:20px;color:var(--th);font-size:14px">文章中没有找到餐厅信息</div>';document.getElementById('importSaveBtn').style.display='none';return}
   document.getElementById('importSaveBtn').style.display='block';
   list.innerHTML=importedRests.map(r=>`<div class="import-rest-item ${r._checked?'checked':''}" onclick="toggleImportItem(${r._id})">
     <div class="import-rest-top">
@@ -1277,13 +1323,14 @@ async function saveImported(){
       if(res&&res[0]){myRests.unshift(res[0]);allRests.unshift(res[0]);}saved++;}
     catch(e){}
   }
-  closeSheet('importSheet');renderAll();showToast(`已导入 ${saved} 家餐厅`);
+  closeSheet('importSheet');buildCityFilter();renderAll();showToast(`已导入 ${saved} 家餐厅`);
   document.getElementById('importSaveBtn').textContent='加入想去列表';document.getElementById('importSaveBtn').disabled=false;
 }
 
 // ── Init ──
 async function init(){
-  await checkShareLink();
+  const isShare=await checkShareLink();
+  if(isShare)return;
   const saved=sessionStorage.getItem('fu_user');
   if(saved){try{setUser(JSON.parse(saved))}catch(e){sessionStorage.removeItem('fu_user')}}
 }
