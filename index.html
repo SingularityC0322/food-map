@@ -336,7 +336,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="app" id="mainApp" style="display:none">
   <div class="header">
     <div class="header-row">
-      <div><div class="h-en">Eat as <em>a Local</em></div><div class="h-zh">我的美食探索地图</div></div>
+      <div><div class="h-en" style="cursor:pointer" onclick="switchTab('mine');closeDetail()" title="返回首页">Eat as <em>a Local</em></div><div class="h-zh">我的美食探索地图</div></div>
       <div class="h-right">
         <div class="user-pill"><div class="user-avatar" id="userAvatar"></div><span id="userDisplayName" style="cursor:pointer" onclick="openSettings()" title="点击修改昵称"></span></div>
         <div style="display:flex;gap:10px;align-items:center">
@@ -468,9 +468,8 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
       </div>
     </div>
@@ -764,6 +763,7 @@ function setUser(user){
   document.getElementById('fabBtn').style.display='block';
   document.getElementById('userAvatar').textContent=(user.display_name||user.username).charAt(0).toUpperCase();
   document.getElementById('userDisplayName').textContent=user.display_name||user.username;
+  history.replaceState({page:'home'},'','');
   loadAll();
 }
 function doLogout(){
@@ -773,6 +773,7 @@ function doLogout(){
   document.getElementById('fabBtn').style.display='none';
   document.getElementById('authScreen').classList.add('open');
   switchAuthTab('login');
+  history.replaceState(null,'','');
 }
 
 function openSettings(){
@@ -916,7 +917,6 @@ function openRestSheet(rest=null){
     document.getElementById('rName').value=rest.name;
     document.getElementById('rCity').value=rest.city||'';
     rteSet('rSummary',rest.summary||'');
-    rteSet('rNotes',rest.notes||'');
     document.getElementById('restStarVal').textContent=rest.rating?rest.rating.toFixed(1):'—';
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((rest.status==='wishlist'&&b.textContent.includes('想去'))||(rest.status==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
@@ -929,11 +929,10 @@ function openRestSheet(rest=null){
     currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
     document.getElementById('remindCity').value=rest.remind_city||'';
     renderTagChips();renderImgPreviews();
-    document.getElementById('sheetDishSection') && (document.getElementById('sheetDishSection').style.display='none'); // legacy cleanup
     renderSheetDishes(rest.id);
   }else{
     const draft=JSON.parse(localStorage.getItem('rest_draft')||'null');
-    const hasDraft=draft&&(draft.name||draft.summary||draft.notes);
+    const hasDraft=draft&&(draft.name||draft.summary);
     if(hasDraft){
       togState.restStatus=draft.status||'wishlist';
       venueType=draft.venue||'restaurant';
@@ -942,22 +941,17 @@ function openRestSheet(rest=null){
       document.getElementById('rName').value=draft.name||'';
       document.getElementById('rCity').value=draft.city||'';
       rteSet('rSummary',draft.summary||'');
-      rteSet('rNotes',draft.notes||'');
       document.getElementById('restStarVal').textContent=draft.rating?parseFloat(draft.rating).toFixed(1):'—';
-      // show draft banner
       showToast('📝 已恢复上次草稿');
     }else{
       togState.restStatus='wishlist';venueType='restaurant';rlState.restLabel='';starState.rest=0;
       document.getElementById('rName').value='';document.getElementById('rCity').value='';
-      rteSet('rSummary','');rteSet('rNotes','');
+      rteSet('rSummary','');
       document.getElementById('restStarVal').textContent='—';
     }
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
-    document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{
-      const m=b.getAttribute('onclick')||'';
-      b.classList.toggle('on',m.includes("'"+venueType+"'"));
-    });
+    document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
     privState.rest=false;selectedAwards=[];
     currentTags=[];currentImages=[];
@@ -981,7 +975,7 @@ async function saveRest(){
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
+  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
   saving=true;
   try{
     if(editingRestId){
@@ -1112,7 +1106,7 @@ function startDraftSave(){
       rl:rlState.restLabel,
       rating:starState.rest,
       summary:rteGet('rSummary'),
-      notes:rteGet('rNotes'),
+      //notes removed,
     }));
   },1500);
 }
@@ -1523,9 +1517,13 @@ function openDetail(id){
   document.getElementById('detailShareBtn').style.display=own?'inline-block':'none';
   document.getElementById('detailDelBtn').style.display=own?'inline-block':'none';
   document.getElementById('addDishBtn').style.display=own?'block':'none';
+  history.pushState({page:'detail',id},'','');
   renderDetail(id);
 }
-function closeDetail(){document.getElementById('restDetail').classList.remove('open');currentRestId=null}
+function closeDetail(){
+  document.getElementById('restDetail').classList.remove('open');
+  currentRestId=null;
+}
 function renderDetail(id){
   const r=[...myRests,...allRests].find(x=>x.id===id);if(!r)return;
   document.getElementById('detailName').textContent=r.name;
@@ -1823,6 +1821,19 @@ async function saveImported(){
   closeSheet('importSheet');buildCityFilter();renderAll();showToast(`已导入 ${saved} 家餐厅`);
   document.getElementById('importSaveBtn').textContent='加入想去列表';document.getElementById('importSaveBtn').disabled=false;
 }
+
+// ── Keyboard & navigation ──
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  const openSheet=document.querySelector('.sheet-wrap.open');
+  if(openSheet){openSheet.classList.remove('open');stopDraftSave();return}
+  if(document.getElementById('restDetail').classList.contains('open')){closeDetail();return}
+});
+window.addEventListener('popstate',()=>{
+  const openSheet=document.querySelector('.sheet-wrap.open');
+  if(openSheet){openSheet.classList.remove('open');stopDraftSave();history.pushState(null,'','');return}
+  if(document.getElementById('restDetail').classList.contains('open')){closeDetail();history.pushState(null,'','');return}
+});
 
 // ── Init ──
 async function init(){
