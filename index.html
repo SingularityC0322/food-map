@@ -303,6 +303,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="auth-btn" onclick="doLogin()">登录</button>
       </div>
       <div id="registerForm" style="display:none">
+        <div class="auth-fg"><label class="auth-label">邀请码</label><input class="auth-input" id="regInvite" placeholder="请输入邀请码" onkeydown="if(event.key==='Enter')doRegister()"/></div>
         <div class="auth-fg"><label class="auth-label">用户名</label><input class="auth-input" id="regUser" placeholder="字母、数字、下划线"/></div>
         <div class="auth-fg"><label class="auth-label">昵称</label><input class="auth-input" id="regDisplay" placeholder="显示给别人看的名字"/></div>
         <div class="auth-fg"><label class="auth-label">密码</label><input class="auth-input" type="password" id="regPwd" placeholder="至少6位"/></div>
@@ -320,8 +321,11 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="header-row">
       <div><div class="h-en">Eat as <em>a Local</em></div><div class="h-zh">我的美食探索地图</div></div>
       <div class="h-right">
-        <div class="user-pill"><div class="user-avatar" id="userAvatar"></div><span id="userDisplayName"></span></div>
-        <button class="logout-btn" onclick="doLogout()">退出登录</button>
+        <div class="user-pill"><div class="user-avatar" id="userAvatar"></div><span id="userDisplayName" style="cursor:pointer" onclick="openSettings()" title="点击修改昵称"></span></div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="logout-btn" onclick="openSettings()" style="color:var(--teal)">⚙ 设置</button>
+          <button class="logout-btn" onclick="doLogout()">退出登录</button>
+        </div>
       </div>
     </div>
   </div>
@@ -442,28 +446,28 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <div class="tog-row" id="venueTypeRow">
         <button class="tog c-teal on" onclick="selVenueType(this,'restaurant')">🍽 餐厅</button>
         <button class="tog c-teal" onclick="selVenueType(this,'dessert')">🍰 甜品店</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'icecream')">🍦 冰激凌</button>
         <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包店</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
       </div>
     </div>
-    <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
+    <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="rCuisine"></select></div>
     <div class="fg"><label class="fl">整体评分（可选）</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
     <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
     <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
     <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
-    <div class="fg"><label class="fl">备注（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rNotes')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rNotes" contenteditable="true" data-placeholder="必吃什么、谁推荐的..."></div></div></div>
-    <!-- Inline dish section (shown after first save) -->
-    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
-    <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
-    <!-- Inline dish section shown after first save -->
-    <div id="sheetDishSection" style="display:none;border-top:1px solid var(--wb);margin-top:14px;padding-top:14px">
-      <div class="fl" style="margin-bottom:8px">菜品记录 <span id="sheetDishCount" style="font-weight:400;text-transform:none;font-size:12px;color:var(--th)"></span></div>
+    <!-- Dish section always visible -->
+    <div style="border-top:1px solid var(--wb);margin:4px 0 14px;padding-top:14px">
+      <div class="fl" style="margin-bottom:8px">菜品 / 单品记录 <span id="sheetDishCount" style="font-weight:400;text-transform:none;font-size:12px;color:var(--th)"></span></div>
       <div id="sheetDishList"></div>
-      <div style="background:var(--cream-d);border-radius:var(--rs);padding:12px;margin-top:8px">
+      <div style="background:var(--cream-d);border-radius:var(--rs);padding:12px;margin-top:6px">
         <div class="fr" style="margin-bottom:8px">
-          <input class="fi" id="sdName" placeholder="菜名" style="font-size:14px"/>
+          <input class="fi" id="sdName" placeholder="菜名 / 单品名" style="font-size:14px"/>
           <input class="fi" id="sdNote" placeholder="感受（可选）" style="font-size:14px"/>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
@@ -474,6 +478,8 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         </div>
       </div>
     </div>
+    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
+    <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
     <button class="btn-s" onclick="closeSheet('restSheet')">完成</button>
   </div>
 </div>
@@ -551,6 +557,30 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   </div>
 </div>
 
+<!-- Settings Sheet -->
+<div class="sheet-wrap" id="settingsSheet" onclick="if(event.target===this)closeSheet('settingsSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">账号设置</div>
+    <div class="fg">
+      <label class="fl">昵称</label>
+      <input class="fi" id="settingsDisplayName" placeholder="显示给别人看的名字"/>
+      <div style="font-size:12px;color:var(--th);margin-top:5px">昵称会显示在广场和好友列表中</div>
+    </div>
+    <div class="fg">
+      <label class="fl">用户名</label>
+      <div class="fi" style="background:var(--cream-d);color:var(--th);cursor:default" id="settingsUsername"></div>
+      <div style="font-size:12px;color:var(--th);margin-top:5px">用户名注册后不可修改</div>
+    </div>
+    <button class="btn-p" onclick="saveSettings()">保存昵称</button>
+    <button class="btn-s" onclick="closeSheet('settingsSheet')">取消</button>
+    <div style="border-top:1px solid var(--wb);margin-top:16px;padding-top:16px">
+      <div style="font-size:13px;color:var(--th);margin-bottom:12px">危险操作</div>
+      <button onclick="doLogout()" style="width:100%;padding:11px;background:transparent;color:var(--coral);border:1px solid var(--coral-l);border-radius:var(--rs);font-size:14px;cursor:pointer;font-family:inherit">退出登录</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -612,7 +642,7 @@ let cityFilter='all';
 let venueType='restaurant';
 const togState={restStatus:'wishlist',discType:'discovery'};
 
-const VENUE_TYPES={restaurant:'🍽 餐厅',dessert:'🍰 甜品店',cafe:'☕ 咖啡馆',bakery:'🥐 面包店',bar:'🍸 酒吧',other:'其他'};
+const VENUE_TYPES={restaurant:'🍽 餐厅',dessert:'🍰 甜品店',icecream:'🍦 冰激凌',cafe:'☕ 咖啡馆',bakery:'🥐 面包烘焙',bar:'🍸 酒吧',teahouse:'🍵 茶馆',streetfood:'🥢 街头小吃',market:'🛒 美食市集',other:'其他'};
 
 function selVenueType(btn,val){
   venueType=val;
@@ -665,6 +695,8 @@ async function doLogin(){
     setUser(res[0]);}catch(e){setAuthErr('登录失败，请重试')}
 }
 async function doRegister(){
+  const invite=document.getElementById('regInvite').value.trim();
+  if(invite!=='EatLocal2025'){setAuthErr('邀请码不正确');return}
   const u=document.getElementById('regUser').value.trim().toLowerCase();
   const d=document.getElementById('regDisplay').value.trim();
   const p=document.getElementById('regPwd').value;
@@ -697,6 +729,33 @@ function doLogout(){
   document.getElementById('fabBtn').style.display='none';
   document.getElementById('authScreen').classList.add('open');
   switchAuthTab('login');
+}
+
+function openSettings(){
+  document.getElementById('settingsDisplayName').value=currentUser.display_name||'';
+  document.getElementById('settingsUsername').textContent='@'+currentUser.username;
+  document.getElementById('settingsSheet').classList.add('open');
+}
+
+async function saveSettings(){
+  const newName=document.getElementById('settingsDisplayName').value.trim();
+  if(!newName){showToast('昵称不能为空');return}
+  if(newName===currentUser.display_name){closeSheet('settingsSheet');return}
+  try{
+    await sbPatch('users',currentUser.id,{display_name:newName});
+    currentUser.display_name=newName;
+    sessionStorage.setItem('fu_user',JSON.stringify(currentUser));
+    document.getElementById('userDisplayName').textContent=newName;
+    document.getElementById('userAvatar').textContent=newName.charAt(0).toUpperCase();
+    // update all local data
+    myRests=myRests.map(r=>r.user_id===currentUser.id?{...r,display_name:newName}:r);
+    allRests=allRests.map(r=>r.user_id===currentUser.id?{...r,display_name:newName}:r);
+    myDiscs=myDiscs.map(d=>d.user_id===currentUser.id?{...d,display_name:newName}:d);
+    allDiscs=allDiscs.map(d=>d.user_id===currentUser.id?{...d,display_name:newName}:d);
+    closeSheet('settingsSheet');
+    showToast('昵称已更新');
+    renderAll();
+  }catch(e){showToast('保存失败，请重试')}
 }
 
 // ── Load ──
@@ -817,11 +876,12 @@ function openRestSheet(rest=null){
     document.getElementById('restStarVal').textContent=rest.rating?rest.rating.toFixed(1):'—';
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((rest.status==='wishlist'&&b.textContent.includes('想去'))||(rest.status==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
+    document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rest.rating_label));
     if(rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
     privState.rest=!!rest.is_private;
     selectedAwards=rest.awards?[...rest.awards]:[];
-    document.getElementById('sheetDishSection').style.display='block';
+    document.getElementById('sheetDishSection') && (document.getElementById('sheetDishSection').style.display='none'); // legacy cleanup
     renderSheetDishes(rest.id);
   }else{
     const draft=JSON.parse(localStorage.getItem('rest_draft')||'null');
@@ -846,10 +906,14 @@ function openRestSheet(rest=null){
     }
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
-    document.querySelectorAll('#venueTypeRow .tog').forEach((b,i)=>{const vals=['restaurant','dessert','cafe','bakery','bar','other'];b.classList.toggle('on',vals[i]===venueType)});
+    document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{
+      const m=b.getAttribute('onclick')||'';
+      b.classList.toggle('on',m.includes("'"+venueType+"'"));
+    });
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
     privState.rest=false;selectedAwards=[];
-    document.getElementById('sheetDishSection').style.display='none';
+    document.getElementById('sheetDishList').innerHTML='';
+    document.getElementById('sheetDishCount').textContent='';
     startDraftSave();
   }
   document.getElementById('restPrivSwitch').classList.toggle('on',privState.rest);
@@ -885,10 +949,8 @@ async function saveRest(){
         clearDraft();
         document.getElementById('restSaveBtn').textContent='保存修改';
         document.getElementById('restSheetTitle').textContent='编辑餐厅';
-        document.getElementById('sheetDishSection').style.display='block';
-        starState.sd=0;buildStars('sdStars','sdStarVal','sd');
         renderSheetDishes(res[0].id);
-        showToast('已保存 ✓ 可在下方继续添加菜品');
+        showToast('已保存 ✓');
         buildCityFilter();renderAll();
       }
     }
@@ -931,7 +993,26 @@ function renderSheetDishes(restId){
     </div>`).join(''):'<div style="font-size:13px;color:var(--th);padding:4px 0 8px">在下方添加菜品 ↓</div>';
 }
 async function saveSheetDish(){
-  if(!editingRestId)return;
+  // If restaurant not saved yet, save it first
+  if(!editingRestId){
+    const name=document.getElementById('rName').value.trim();
+    if(!name){showToast('请先填写餐厅名称');return}
+    const cv=document.getElementById('rCuisine').value;
+    const[cid,cname]=cv?cv.split('|'):['',''];
+    const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
+    try{
+      const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
+      const res=await sbPost('restaurants',full);
+      if(res&&res[0]){
+        myRests.unshift(res[0]);allRests.unshift(res[0]);
+        editingRestId=res[0].id;
+        clearDraft();
+        document.getElementById('restSaveBtn').textContent='保存修改';
+        document.getElementById('restSheetTitle').textContent='编辑餐厅';
+        buildCityFilter();renderAll();
+      }
+    }catch(e){showToast('保存失败，请重试');return}
+  }
   const name=document.getElementById('sdName').value.trim();
   if(!name){showToast('请填写菜名');return}
   const entry={restaurant_id:editingRestId,user_id:currentUser.id,name,rating:starState.sd||null,rating_label:null,note:document.getElementById('sdNote').value.trim()||null};
@@ -943,7 +1024,7 @@ async function saveSheetDish(){
     starState.sd=0;buildStars('sdStars','sdStarVal','sd');
     document.getElementById('sdStarVal').textContent='—';
     renderSheetDishes(editingRestId);
-    showToast('菜品已添加');
+    showToast('已添加');
   }catch(e){showToast('添加失败')}
 }
 async function deleteSheetDish(id){
