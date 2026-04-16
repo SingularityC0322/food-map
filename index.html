@@ -469,7 +469,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
         <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/市场</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
       </div>
     </div>
@@ -524,6 +524,9 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
     <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
     <button class="btn-s" onclick="closeSheet('restSheet')">完成</button>
+    <div id="restSheetDeleteRow" style="display:none;margin-top:8px">
+      <button onclick="if(editingRestId){deleteRest(editingRestId);closeSheet('restSheet')}" style="width:100%;padding:11px;background:transparent;color:var(--coral);border:1px solid var(--coral-l);border-radius:var(--rs);font-size:14px;cursor:pointer;font-family:inherit">🗑 删除这家餐厅</button>
+    </div>
   </div>
 </div>
 
@@ -564,7 +567,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <h2 id="detailName"></h2>
     <button class="edit-btn" id="detailEditBtn" onclick="editRest(currentRestId)">编辑</button>
     <button class="edit-btn" id="detailShareBtn" onclick="shareItem('restaurant',currentRestId)">分享</button>
-    <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()">×</button>
+    <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()" style="font-size:15px;color:var(--coral)" title="删除这家餐厅">🗑</button>
   </div>
   <div class="detail-body">
     <div class="detail-sec" id="detailMeta"></div>
@@ -966,6 +969,8 @@ function openRestSheet(rest=null){
   document.getElementById('awardRow').innerHTML=AWARDS.map(a=>`<button class="award-chip${selectedAwards.includes(a)?' on':''}" onclick="toggleAward('${a}',this)">${a}</button>`).join('');
   document.getElementById('restSheetTitle').textContent=rest?'编辑餐厅':'添加餐厅';
   document.getElementById('restSaveBtn').textContent=rest?'保存修改':'保存';
+  const deleteRow=document.getElementById('restSheetDeleteRow');
+  if(deleteRow)deleteRow.style.display=rest?'block':'none';
   starState.sd=0;buildStars('sdStars','sdStarVal','sd');
   document.getElementById('restSheet').classList.add('open');
 }
@@ -1027,26 +1032,36 @@ function renderTagChips(){
 // ── Images ──
 let currentImages=[];  // array of {url, uploading}
 async function handleImgUpload(e){
-  const files=[...e.target.files].slice(0,4-currentImages.length);
+  const files=[...e.target.files].slice(0,4-currentImages.filter(x=>x.url).length);
   if(!files.length)return;
   for(const file of files){
     const idx=currentImages.length;
     currentImages.push({url:null,uploading:true});
     renderImgPreviews();
     try{
-      const ext=file.name.split('.').pop();
-      const path=`${currentUser.id}/${Date.now()}_${idx}.${ext}`;
+      const ext=file.name.split('.').pop().toLowerCase().replace('jpg','jpeg');
+      const path=`${currentUser.id}/${Date.now()}.${ext}`;
       const res=await fetch(`${SB}/storage/v1/object/food-images/${path}`,{
         method:'POST',
-        headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type,'x-upsert':'true'},
+        headers:{
+          'apikey':KEY,
+          'Authorization':'Bearer '+KEY,
+          'Content-Type':file.type||'image/jpeg',
+          'x-upsert':'true'
+        },
         body:file
       });
-      if(!res.ok)throw new Error('upload failed');
+      if(!res.ok){
+        const errText=await res.text();
+        console.error('Upload error:',res.status,errText);
+        throw new Error(errText);
+      }
       const url=`${SB}/storage/v1/object/public/food-images/${path}`;
       currentImages[idx]={url,uploading:false};
     }catch(err){
+      console.error('Image upload failed:',err);
       currentImages.splice(idx,1);
-      showToast('图片上传失败');
+      showToast('图片上传失败，请检查 Storage 设置');
     }
     renderImgPreviews();
   }
@@ -1298,7 +1313,7 @@ function restCardHTML(r,showUser=false){
           ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
           ${isOwn&&r.status==='wishlist'?`<button class="checkin-btn" onclick="event.stopPropagation();quickCheckin(${r.id})">✓ 已去</button>`:''}
           <span style="font-size:11px;color:var(--th)">${fmtDate(r.created_at)}</span>
-          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button>`}
+          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<div style="display:flex;gap:5px"><button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button><button class="del-btn" onclick="event.stopPropagation();deleteRest(${r.id})" style="font-size:13px" title="删除">🗑</button></div>`}
         </div>
       </div>
     </div>
