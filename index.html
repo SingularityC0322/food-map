@@ -438,17 +438,43 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <div class="fg"><label class="fl">餐厅名称</label><input class="fi" id="rName" placeholder="餐厅名"/></div>
       <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="东京、台北、上海..."/></div>
     </div>
-    <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
-    <div id="visitedFields" style="display:none">
-      <div class="fg"><label class="fl">整体评分</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
-      <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
-      <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
-      <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
+    <div class="fg"><label class="fl">店铺类型</label>
+      <div class="tog-row" id="venueTypeRow">
+        <button class="tog c-teal on" onclick="selVenueType(this,'restaurant')">🍽 餐厅</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'dessert')">🍰 甜品店</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包店</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
+      </div>
     </div>
+    <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
+    <div class="fg"><label class="fl">整体评分（可选）</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
+    <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
+    <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
+    <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
     <div class="fg"><label class="fl">备注（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rNotes')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rNotes" contenteditable="true" data-placeholder="必吃什么、谁推荐的..."></div></div></div>
+    <!-- Inline dish section (shown after first save) -->
     <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
     <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
-    <button class="btn-s" onclick="closeSheet('restSheet')">取消</button>
+    <!-- Inline dish section shown after first save -->
+    <div id="sheetDishSection" style="display:none;border-top:1px solid var(--wb);margin-top:14px;padding-top:14px">
+      <div class="fl" style="margin-bottom:8px">菜品记录 <span id="sheetDishCount" style="font-weight:400;text-transform:none;font-size:12px;color:var(--th)"></span></div>
+      <div id="sheetDishList"></div>
+      <div style="background:var(--cream-d);border-radius:var(--rs);padding:12px;margin-top:8px">
+        <div class="fr" style="margin-bottom:8px">
+          <input class="fi" id="sdName" placeholder="菜名" style="font-size:14px"/>
+          <input class="fi" id="sdNote" placeholder="感受（可选）" style="font-size:14px"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="stars" id="sdStars" style="font-size:18px"></div>
+          <span class="star-val" id="sdStarVal" style="font-size:13px">—</span>
+          <div class="star-adj"><button onclick="adjStar('sd',-0.1)">−</button><button onclick="adjStar('sd',0.1)">+</button></div>
+          <button onclick="saveSheetDish()" style="margin-left:auto;padding:7px 16px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:inherit">+ 添加</button>
+        </div>
+      </div>
+    </div>
+    <button class="btn-s" onclick="closeSheet('restSheet')">完成</button>
   </div>
 </div>
 
@@ -583,7 +609,16 @@ let editingRestId=null,editingDiscId=null;
 let selectedAwards=[];
 let groupByCity=false;
 let cityFilter='all';
+let venueType='restaurant';
 const togState={restStatus:'wishlist',discType:'discovery'};
+
+const VENUE_TYPES={restaurant:'🍽 餐厅',dessert:'🍰 甜品店',cafe:'☕ 咖啡馆',bakery:'🥐 面包店',bar:'🍸 酒吧',other:'其他'};
+
+function selVenueType(btn,val){
+  venueType=val;
+  document.querySelectorAll('#venueTypeRow .tog').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
 const rlState={restLabel:'',dishLabel:''};
 const starState={rest:0,dish:0};
 const privState={rest:false,disc:false};
@@ -608,7 +643,10 @@ async function sbPost(table,body){const r=await fetch(`${SB}/rest/v1/${table}`,{
 async function sbPatch(table,id,body){const r=await fetch(`${SB}/rest/v1/${table}?id=eq.${id}`,{method:'PATCH',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});if(!r.ok)throw new Error(await r.text());return r.json()}
 async function sbDel(table,id){const r=await fetch(`${SB}/rest/v1/${table}?id=eq.${id}`,{method:'DELETE',headers:{'apikey':KEY,'Authorization':'Bearer '+KEY}});if(!r.ok)throw new Error(await r.text())}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-function closeSheet(id){document.getElementById(id).classList.remove('open')}
+function closeSheet(id){
+  document.getElementById(id).classList.remove('open');
+  if(id==='restSheet')stopDraftSave();
+}
 
 // ── Auth ──
 function switchAuthTab(tab){
@@ -748,7 +786,6 @@ function selTog(btn,key,val){
   togState[key]=val;
   btn.closest('.tog-row').querySelectorAll('.tog').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  if(key==='restStatus')document.getElementById('visitedFields').style.display=val==='visited'?'block':'none';
 }
 function selRl(btn,key,val){rlState[key]=val;btn.closest('.rl-row').querySelectorAll('.rl').forEach(b=>b.classList.remove('on'));btn.classList.add('on')}
 function buildStars(cid,vid,key){
@@ -757,7 +794,8 @@ function buildStars(cid,vid,key){
 }
 function adjStar(key,delta){
   starState[key]=Math.max(0,Math.min(5,Math.round((starState[key]+delta)*10)/10));
-  const cid=key==='rest'?'restStars':'dishStars',vid=key==='rest'?'restStarVal':'dishStarVal';
+  const cid=key==='rest'?'restStars':key==='dish'?'dishStars':'sdStars';
+  const vid=key==='rest'?'restStarVal':key==='dish'?'dishStarVal':'sdStarVal';
   buildStars(cid,vid,key);document.getElementById(vid).textContent=starState[key]?starState[key].toFixed(1):'—';
 }
 function togglePriv(key){privState[key]=!privState[key];document.getElementById(key==='rest'?'restPrivSwitch':'discPrivSwitch').classList.toggle('on',privState[key])}
@@ -767,26 +805,59 @@ function toggleAward(a,btn){if(selectedAwards.includes(a)){selectedAwards=select
 function openRestSheet(rest=null){
   editingRestId=rest?rest.id:null;
   buildCuisineSelect('rCuisine');
-  togState.restStatus=rest?rest.status:'wishlist';
-  rlState.restLabel=rest?rest.rating_label||'':'';
-  starState.rest=rest?rest.rating||0:0;
-  document.getElementById('rName').value=rest?rest.name:'';
-  document.getElementById('rCity').value=rest?rest.city||'':'';
-  rteSet('rSummary',rest?rest.summary||'':'');
-  rteSet('rNotes',rest?rest.notes||'':'');
-  document.getElementById('restStarVal').textContent=rest&&rest.rating?rest.rating.toFixed(1):'—';
-  document.getElementById('visitedFields').style.display=(rest?rest.status:'wishlist')==='visited'?'block':'none';
-  document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
-  document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
-  document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',rest&&b.textContent===rest.rating_label));
-  if(rest&&rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
-  buildStars('restStars','restStarVal','rest');
-  privState.rest=rest?!!rest.is_private:false;
+  if(rest){
+    togState.restStatus=rest.status;
+    rlState.restLabel=rest.rating_label||'';
+    starState.rest=rest.rating||0;
+    venueType=rest.venue_type||'restaurant';
+    document.getElementById('rName').value=rest.name;
+    document.getElementById('rCity').value=rest.city||'';
+    rteSet('rSummary',rest.summary||'');
+    rteSet('rNotes',rest.notes||'');
+    document.getElementById('restStarVal').textContent=rest.rating?rest.rating.toFixed(1):'—';
+    document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#restSheet .tog').forEach(b=>{if((rest.status==='wishlist'&&b.textContent.includes('想去'))||(rest.status==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
+    document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rest.rating_label));
+    if(rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
+    privState.rest=!!rest.is_private;
+    selectedAwards=rest.awards?[...rest.awards]:[];
+    document.getElementById('sheetDishSection').style.display='block';
+    renderSheetDishes(rest.id);
+  }else{
+    const draft=JSON.parse(localStorage.getItem('rest_draft')||'null');
+    const hasDraft=draft&&(draft.name||draft.summary||draft.notes);
+    if(hasDraft){
+      togState.restStatus=draft.status||'wishlist';
+      venueType=draft.venue||'restaurant';
+      rlState.restLabel=draft.rl||'';
+      starState.rest=draft.rating||0;
+      document.getElementById('rName').value=draft.name||'';
+      document.getElementById('rCity').value=draft.city||'';
+      rteSet('rSummary',draft.summary||'');
+      rteSet('rNotes',draft.notes||'');
+      document.getElementById('restStarVal').textContent=draft.rating?parseFloat(draft.rating).toFixed(1):'—';
+      // show draft banner
+      showToast('📝 已恢复上次草稿');
+    }else{
+      togState.restStatus='wishlist';venueType='restaurant';rlState.restLabel='';starState.rest=0;
+      document.getElementById('rName').value='';document.getElementById('rCity').value='';
+      rteSet('rSummary','');rteSet('rNotes','');
+      document.getElementById('restStarVal').textContent='—';
+    }
+    document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
+    document.querySelectorAll('#venueTypeRow .tog').forEach((b,i)=>{const vals=['restaurant','dessert','cafe','bakery','bar','other'];b.classList.toggle('on',vals[i]===venueType)});
+    document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
+    privState.rest=false;selectedAwards=[];
+    document.getElementById('sheetDishSection').style.display='none';
+    startDraftSave();
+  }
   document.getElementById('restPrivSwitch').classList.toggle('on',privState.rest);
-  selectedAwards=rest&&rest.awards?[...rest.awards]:[];
+  buildStars('restStars','restStarVal','rest');
   document.getElementById('awardRow').innerHTML=AWARDS.map(a=>`<button class="award-chip${selectedAwards.includes(a)?' on':''}" onclick="toggleAward('${a}',this)">${a}</button>`).join('');
   document.getElementById('restSheetTitle').textContent=rest?'编辑餐厅':'添加餐厅';
   document.getElementById('restSaveBtn').textContent=rest?'保存修改':'保存';
+  starState.sd=0;buildStars('sdStars','sdStarVal','sd');
   document.getElementById('restSheet').classList.add('open');
 }
 async function saveRest(){
@@ -795,7 +866,7 @@ async function saveRest(){
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim()||null,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
+  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
   saving=true;
   try{
     if(editingRestId){
@@ -804,17 +875,81 @@ async function saveRest(){
       myRests=myRests.map(r=>r.id===editingRestId?{...r,...upd}:r);
       allRests=allRests.map(r=>r.id===editingRestId?{...r,...upd}:r);
       showToast('已更新');
+      closeSheet('restSheet');buildCityFilter();renderAll();
     }else{
       const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
       const res=await sbPost('restaurants',full);
-      if(res&&res[0]){myRests.unshift(res[0]);allRests.unshift(res[0]);}
-      showToast('已保存');
+      if(res&&res[0]){
+        myRests.unshift(res[0]);allRests.unshift(res[0]);
+        editingRestId=res[0].id;
+        clearDraft();
+        document.getElementById('restSaveBtn').textContent='保存修改';
+        document.getElementById('restSheetTitle').textContent='编辑餐厅';
+        document.getElementById('sheetDishSection').style.display='block';
+        starState.sd=0;buildStars('sdStars','sdStarVal','sd');
+        renderSheetDishes(res[0].id);
+        showToast('已保存 ✓ 可在下方继续添加菜品');
+        buildCityFilter();renderAll();
+      }
     }
-    closeSheet('restSheet');buildCityFilter();renderAll();
   }catch(e){showToast('保存失败')}
   saving=false;
 }
 function editRest(id){const r=myRests.find(x=>x.id===id);if(r)openRestSheet(r)}
+
+// ── Draft autosave ──
+let _draftTimer=null;
+function startDraftSave(){
+  stopDraftSave();
+  _draftTimer=setInterval(()=>{
+    localStorage.setItem('rest_draft',JSON.stringify({
+      name:document.getElementById('rName').value,
+      city:document.getElementById('rCity').value,
+      status:togState.restStatus,
+      venue:venueType,
+      rl:rlState.restLabel,
+      rating:starState.rest,
+      summary:rteGet('rSummary'),
+      notes:rteGet('rNotes'),
+    }));
+  },1500);
+}
+function stopDraftSave(){if(_draftTimer){clearInterval(_draftTimer);_draftTimer=null}}
+function clearDraft(){localStorage.removeItem('rest_draft')}
+
+// ── Inline dish in restSheet ──
+function renderSheetDishes(restId){
+  const dishes=myDishes.filter(d=>d.restaurant_id===restId);
+  const cnt=document.getElementById('sheetDishCount');
+  if(cnt)cnt.textContent=dishes.length?`（${dishes.length}道）`:'';
+  document.getElementById('sheetDishList').innerHTML=dishes.length?dishes.map(d=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--wb);font-size:13px">
+      <span style="flex:1;font-weight:600">${d.name}</span>
+      <span style="color:var(--th);font-size:12px">${d.rating?d.rating.toFixed(1)+' ★':''} ${d.rating_label||''}</span>
+      ${d.note?`<span style="color:var(--th);font-size:12px">${d.note}</span>`:''}
+      <button class="del-btn" style="font-size:14px" onclick="deleteSheetDish(${d.id})">×</button>
+    </div>`).join(''):'<div style="font-size:13px;color:var(--th);padding:4px 0 8px">在下方添加菜品 ↓</div>';
+}
+async function saveSheetDish(){
+  if(!editingRestId)return;
+  const name=document.getElementById('sdName').value.trim();
+  if(!name){showToast('请填写菜名');return}
+  const entry={restaurant_id:editingRestId,user_id:currentUser.id,name,rating:starState.sd||null,rating_label:null,note:document.getElementById('sdNote').value.trim()||null};
+  try{
+    const res=await sbPost('dishes',entry);
+    if(res&&res[0])myDishes.push(res[0]);
+    document.getElementById('sdName').value='';
+    document.getElementById('sdNote').value='';
+    starState.sd=0;buildStars('sdStars','sdStarVal','sd');
+    document.getElementById('sdStarVal').textContent='—';
+    renderSheetDishes(editingRestId);
+    showToast('菜品已添加');
+  }catch(e){showToast('添加失败')}
+}
+async function deleteSheetDish(id){
+  try{await sbDel('dishes',id);myDishes=myDishes.filter(d=>d.id!==id);renderSheetDishes(editingRestId);}
+  catch(e){showToast('删除失败')}
+}
 
 // ── Dish sheet ──
 function openDishSheet(){
@@ -840,14 +975,27 @@ async function saveDish(){
 function openDiscSheet(disc=null){
   editingDiscId=disc?disc.id:null;
   buildCuisineSelect('diCuisine');buildRestSelect();
-  togState.discType=disc?disc.type:'discovery';
-  document.getElementById('diName').value=disc?disc.name:'';
-  rteSet('diNote',disc?disc.note||'':'');
+  if(disc){
+    togState.discType=disc.type;
+    document.getElementById('diName').value=disc.name;
+    rteSet('diNote',disc.note||'');
+    if(disc.cuisine_id){const sel=document.getElementById('diCuisine');[...sel.options].forEach(o=>{if(o.value===`${disc.cuisine_id}|${disc.cuisine_name}`)o.selected=true})}
+    if(disc.restaurant_id){const sel=document.getElementById('diRest');[...sel.options].forEach(o=>{if(o.value===`${disc.restaurant_id}|${disc.restaurant_name}`)o.selected=true})}
+    privState.disc=!!disc.is_private;
+  }else{
+    const draft=JSON.parse(localStorage.getItem('disc_draft')||'{}');
+    togState.discType=draft.type||'discovery';
+    document.getElementById('diName').value=draft.name||'';
+    rteSet('diNote',draft.note||'');
+    privState.disc=false;
+    // start disc draft autosave
+    stopDiscDraft();
+    _discDraftTimer=setInterval(()=>{
+      localStorage.setItem('disc_draft',JSON.stringify({type:togState.discType,name:document.getElementById('diName').value,note:rteGet('diNote')}));
+    },2000);
+  }
   document.querySelectorAll('#discSheet .tog').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#discSheet .tog').forEach(b=>{if((togState.discType==='discovery'&&b.textContent.includes('发现'))||(togState.discType==='inspo'&&b.textContent.includes('灵感')))b.classList.add('on')});
-  if(disc&&disc.cuisine_id){const sel=document.getElementById('diCuisine');[...sel.options].forEach(o=>{if(o.value===`${disc.cuisine_id}|${disc.cuisine_name}`)o.selected=true})}
-  if(disc&&disc.restaurant_id){const sel=document.getElementById('diRest');[...sel.options].forEach(o=>{if(o.value===`${disc.restaurant_id}|${disc.restaurant_name}`)o.selected=true})}
-  privState.disc=disc?!!disc.is_private:false;
   document.getElementById('discPrivSwitch').classList.toggle('on',privState.disc);
   document.getElementById('discSheetTitle').textContent=disc?'编辑发现':'记录发现';
   document.getElementById('discSaveBtn').textContent=disc?'保存修改':'保存';
@@ -875,6 +1023,7 @@ async function saveDisc(){
       const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
       const res=await sbPost('discoveries',full);
       if(res&&res[0]){myDiscs.unshift(res[0]);allDiscs.unshift(res[0]);}
+      stopDiscDraft();localStorage.removeItem('disc_draft');
       showToast('已保存');
     }
     closeSheet('discSheet');renderAll();
@@ -882,6 +1031,9 @@ async function saveDisc(){
   saving=false;
 }
 function editDisc(id){const d=myDiscs.find(x=>x.id===id);if(d)openDiscSheet(d)}
+
+let _discDraftTimer=null;
+function stopDiscDraft(){if(_discDraftTimer){clearInterval(_discDraftTimer);_discDraftTimer=null}}
 
 // ── Delete ──
 async function deleteRest(id){
@@ -903,7 +1055,7 @@ async function deleteDish(id){
 
 // ── Render cards ──
 function restCardHTML(r,showUser=false){
-  const dc=myDishes.filter(d=>d.restaurant_id===r.id).length;
+  const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
   return`<div class="card rest-card" onclick="openDetail(${r.id})" style="margin-bottom:7px">
     <div class="card-inner" style="padding:12px 14px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -912,12 +1064,13 @@ function restCardHTML(r,showUser=false){
             <span class="rest-name">${r.name}</span>
             <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
             ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+            ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
             ${r.is_private?'<span class="priv-badge on">私密</span>':''}
           </div>
           <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tm)">
             ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}
             ${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
-            ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+( r.awards.length-1):''}</span>`:''}
+            ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+(r.awards.length-1):''}</span>`:''}
           </div>
           ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
           ${!r.summary&&r.notes&&r.status==='wishlist'?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.notes)}</div>`:''}
@@ -1023,18 +1176,103 @@ function renderSquare(){
   if(tf!=='discoveries'){
     let r=[...allRests].filter(r=>!r.is_private||r.user_id===currentUser.id);
     if(uf!=='all')r=r.filter(x=>x.username===uf);
-    if(q)r=r.filter(x=>x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.summary||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
+    if(q)r=r.filter(x=>x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||rtePlain(x.summary||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(r.map(x=>({...x,_k:'rest',_ts:x.created_at})));
   }
   if(tf!=='restaurants'){
     let d=[...allDiscs].filter(d=>!d.is_private||d.user_id===currentUser.id);
     if(uf!=='all')d=d.filter(x=>x.username===uf);
-    if(q)d=d.filter(x=>x.name.toLowerCase().includes(q)||(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
+    if(q)d=d.filter(x=>x.name.toLowerCase().includes(q)||rtePlain(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(d.map(x=>({...x,_k:'disc',_ts:x.created_at})));
   }
   items.sort((a,b)=>b._ts.localeCompare(a._ts));
   if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>${q?'没有找到相关记录':'还没有公开内容'}</p></div>`;return}
-  list.innerHTML=items.map(item=>item._k==='rest'?restCardHTML(item,true):discCardHTML(item,true,false)).join('');
+  list.innerHTML=items.map(item=>item._k==='rest'?sqRestCardHTML(item):sqDiscCardHTML(item)).join('');
+}
+
+function sqRestCardHTML(r){
+  const isOwn=r.user_id===currentUser.id;
+  return`<div class="card" id="sqr_${r.id}" style="margin-bottom:7px;cursor:pointer" onclick="toggleSqExpand('sqr_${r.id}',${r.id},'rest')">
+    <div class="card-inner" style="padding:12px 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:600">${r.name}</span>
+            <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+            ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+          </div>
+          <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;flex-wrap:wrap">
+            ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
+            ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+(r.awards.length-1):''}</span>`:''}
+          </div>
+          ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="sq-preview">${rtePlain(r.summary)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+          ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
+          <div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>
+          <span style="font-size:11px;color:var(--th)">▾</span>
+        </div>
+      </div>
+      <div class="sq-expand" style="display:none;margin-top:12px;border-top:1px solid var(--wb);padding-top:10px"></div>
+    </div>
+  </div>`;
+}
+
+function sqDiscCardHTML(d){
+  return`<div class="card disc-card" id="sqd_${d.id}" style="margin-bottom:7px;cursor:pointer" onclick="toggleSqExpand('sqd_${d.id}',${d.id},'disc')">
+    <div class="disc-bar ${d.type}"></div>
+    <div class="disc-body" style="padding:11px 14px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="font-size:15px;font-weight:600">${d.name}</span>
+            <span class="badge" style="font-size:10px;${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+          </div>
+          <div style="font-size:13px;color:var(--tm);display:flex;gap:6px">${d.cuisine_name?`<span>${d.cuisine_name}</span>`:''} ${d.restaurant_name?`<span style="color:var(--th)">· ${d.restaurant_name}</span>`:''}</div>
+          ${d.note?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="sq-preview">${rtePlain(d.note)}</div>`:''}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
+          <div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>
+          <span style="font-size:11px;color:var(--th)">▾</span>
+        </div>
+      </div>
+      <div class="sq-expand" style="display:none;margin-top:12px;border-top:1px solid var(--wb);padding-top:10px"></div>
+    </div>
+  </div>`;
+}
+
+function toggleSqExpand(cardId,itemId,type){
+  const card=document.getElementById(cardId);
+  const exp=card.querySelector('.sq-expand');
+  const preview=card.querySelector('.sq-preview');
+  const arrow=card.querySelector('span[style*="▾"],span[style*="▴"]');
+  const isOpen=exp.style.display!=='none';
+  // close all others
+  document.querySelectorAll('.sq-expand').forEach(e=>{
+    e.style.display='none';
+    const p=e.closest('.card-inner,.disc-body')?.querySelector('.sq-preview');
+    if(p)p.style.cssText='font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+  });
+  document.querySelectorAll('.sq-arrow').forEach(a=>a.textContent='▾');
+  if(isOpen)return;
+  // expand this one
+  if(preview)preview.style.cssText='font-size:13px;color:var(--th);margin-top:4px;white-space:normal';
+  exp.style.display='block';
+  if(arrow)arrow.textContent='▴';
+  if(type==='rest'){
+    const r=[...allRests].find(x=>x.id===itemId);
+    if(!r){exp.innerHTML='';return}
+    exp.innerHTML=`
+      ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;margin-bottom:8px">${r.summary}</div>`:''}
+      ${r.notes?`<div style="font-size:13px;color:var(--th);line-height:1.6;padding:8px 12px;background:var(--cream-d);border-radius:var(--rs)">${r.notes}</div>`:''}
+      <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>`;
+  }else{
+    const d=[...allDiscs].find(x=>x.id===itemId);
+    if(!d){exp.innerHTML='';return}
+    exp.innerHTML=`
+      ${d.note?`<div style="font-size:14px;color:var(--tm);line-height:1.7">${d.note}</div>`:''}
+      <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(d.created_at)}</div>`;
+  }
 }
 
 // ── Detail ──
