@@ -260,6 +260,23 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 .empty{text-align:center;padding:48px 20px;color:var(--th)}
 .empty-en{font-family:var(--serif);font-size:19px;color:var(--cream-dd);margin-bottom:10px;font-style:italic}
 .empty p{font-size:14px;line-height:1.7}
+/* Tags */
+.tag-chips{display:flex;gap:6px;flex-wrap:wrap;min-height:4px}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--teal-l);border:1px solid rgba(42,122,92,.25);border-radius:20px;font-size:12px;color:var(--teal-d);font-weight:600}
+.tag-chip button{background:none;border:none;cursor:pointer;color:var(--teal-d);font-size:14px;line-height:1;padding:0 0 1px;opacity:.6}
+.tag-chip button:hover{opacity:1}
+.tag-preset{cursor:pointer;color:var(--teal);text-decoration:underline;text-decoration-style:dotted;margin-right:6px}
+.tag-preset:hover{opacity:.7}
+.tag-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--teal-l);color:var(--teal-d);font-weight:600}
+/* Image preview */
+.img-thumb{position:relative;width:72px;height:72px;border-radius:var(--rs);overflow:hidden;flex-shrink:0}
+.img-thumb img{width:100%;height:100%;object-fit:cover}
+.img-thumb button{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.5);color:white;border:none;border-radius:50%;width:18px;height:18px;cursor:pointer;font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center}
+.img-uploading{width:72px;height:72px;border-radius:var(--rs);background:var(--cream-d);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;border:1px solid var(--wb)}
+/* Remind badge */
+.remind-badge{font-size:10px;padding:2px 8px;border-radius:10px;background:var(--amber-l);color:var(--amber);font-weight:600;border:1px solid rgba(200,138,42,.2)}
+.checkin-btn{padding:5px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.3);border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+.checkin-btn:hover{background:var(--teal);color:white}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--text);color:white;padding:9px 20px;border-radius:20px;font-size:13px;z-index:400;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 /* Rich text editor */
@@ -358,6 +375,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <button class="pill" id="groupByCity" onclick="toggleGroupBy()" style="font-size:12px;padding:4px 12px">按城市</button>
     </div>
     <button class="import-btn" onclick="openImport()">✦ 从文章智能导入餐厅</button>
+    <div id="reminderBanner" style="display:none;margin-bottom:12px"></div>
     <div id="mineList"></div>
   </div>
 
@@ -461,6 +479,32 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
     <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
     <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
+    <!-- Tags -->
+    <div class="fg">
+      <label class="fl">自定义标签</label>
+      <div class="tag-input-wrap">
+        <div class="tag-chips" id="tagChips"></div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <input class="fi" id="tagInput" placeholder="输入标签回车添加，如：约会、性价比高..." style="font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"/>
+          <button onclick="addTag()" class="btn-fetch" style="padding:8px 14px">添加</button>
+        </div>
+        <div style="font-size:12px;color:var(--th);margin-top:5px">常用：<span class="tag-preset" onclick="addTagVal('约会')">约会</span> <span class="tag-preset" onclick="addTagVal('朋友聚')">朋友聚</span> <span class="tag-preset" onclick="addTagVal('一个人')">一个人</span> <span class="tag-preset" onclick="addTagVal('性价比')">性价比</span> <span class="tag-preset" onclick="addTagVal('环境好')">环境好</span> <span class="tag-preset" onclick="addTagVal('适合拍照')">适合拍照</span></div>
+      </div>
+    </div>
+    <!-- Remind city (wishlist only) -->
+    <div class="fg" id="remindCityFg">
+      <label class="fl">去哪个城市时提醒我</label>
+      <input class="fi" id="remindCity" placeholder="填城市名，下次浏览时会提醒（可选）" style="font-size:14px"/>
+    </div>
+    <!-- Image upload -->
+    <div class="fg">
+      <label class="fl">图片（可选）</label>
+      <div id="imgPreviewRow" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+      <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px dashed var(--wb2);border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--tm);transition:all .15s" id="imgUploadLabel">
+        <span>📷</span><span>上传图片（最多4张）</span>
+        <input type="file" id="imgUpload" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)"/>
+      </label>
+    </div>
     <!-- Dish section always visible -->
     <div style="border-top:1px solid var(--wb);margin:4px 0 14px;padding-top:14px">
       <div class="fl" style="margin-bottom:8px">菜品 / 单品记录 <span id="sheetDishCount" style="font-weight:400;text-transform:none;font-size:12px;color:var(--th)"></span></div>
@@ -881,6 +925,10 @@ function openRestSheet(rest=null){
     if(rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
     privState.rest=!!rest.is_private;
     selectedAwards=rest.awards?[...rest.awards]:[];
+    currentTags=rest.tags?[...rest.tags]:[];
+    currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
+    document.getElementById('remindCity').value=rest.remind_city||'';
+    renderTagChips();renderImgPreviews();
     document.getElementById('sheetDishSection') && (document.getElementById('sheetDishSection').style.display='none'); // legacy cleanup
     renderSheetDishes(rest.id);
   }else{
@@ -912,8 +960,11 @@ function openRestSheet(rest=null){
     });
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
     privState.rest=false;selectedAwards=[];
+    currentTags=[];currentImages=[];
+    document.getElementById('remindCity').value='';
     document.getElementById('sheetDishList').innerHTML='';
     document.getElementById('sheetDishCount').textContent='';
+    renderTagChips();renderImgPreviews();
     startDraftSave();
   }
   document.getElementById('restPrivSwitch').classList.toggle('on',privState.rest);
@@ -930,7 +981,7 @@ async function saveRest(){
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
+  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:rteGet('rNotes')||null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
   saving=true;
   try{
     if(editingRestId){
@@ -958,6 +1009,95 @@ async function saveRest(){
   saving=false;
 }
 function editRest(id){const r=myRests.find(x=>x.id===id);if(r)openRestSheet(r)}
+
+// ── Tags ──
+let currentTags=[];
+function addTag(){
+  const input=document.getElementById('tagInput');
+  addTagVal(input.value.trim());
+  input.value='';
+}
+function addTagVal(val){
+  if(!val||currentTags.includes(val)||currentTags.length>=10)return;
+  currentTags.push(val);
+  renderTagChips();
+}
+function removeTag(t){
+  currentTags=currentTags.filter(x=>x!==t);
+  renderTagChips();
+}
+function renderTagChips(){
+  document.getElementById('tagChips').innerHTML=currentTags.map(t=>`<span class="tag-chip">${t}<button onclick="removeTag('${t}')">×</button></span>`).join('');
+}
+
+// ── Images ──
+let currentImages=[];  // array of {url, uploading}
+async function handleImgUpload(e){
+  const files=[...e.target.files].slice(0,4-currentImages.length);
+  if(!files.length)return;
+  for(const file of files){
+    const idx=currentImages.length;
+    currentImages.push({url:null,uploading:true});
+    renderImgPreviews();
+    try{
+      const ext=file.name.split('.').pop();
+      const path=`${currentUser.id}/${Date.now()}_${idx}.${ext}`;
+      const res=await fetch(`${SB}/storage/v1/object/food-images/${path}`,{
+        method:'POST',
+        headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':file.type,'x-upsert':'true'},
+        body:file
+      });
+      if(!res.ok)throw new Error('upload failed');
+      const url=`${SB}/storage/v1/object/public/food-images/${path}`;
+      currentImages[idx]={url,uploading:false};
+    }catch(err){
+      currentImages.splice(idx,1);
+      showToast('图片上传失败');
+    }
+    renderImgPreviews();
+  }
+  e.target.value='';
+}
+function renderImgPreviews(){
+  const row=document.getElementById('imgPreviewRow');
+  row.innerHTML=currentImages.map((img,i)=>
+    img.uploading
+      ?`<div class="img-uploading"><div class="import-spinner" style="width:20px;height:20px;border-width:2px"></div></div>`
+      :`<div class="img-thumb"><img src="${img.url}"/><button onclick="removeImg(${i})">×</button></div>`
+  ).join('');
+  const label=document.getElementById('imgUploadLabel');
+  if(label)label.style.display=currentImages.length>=4?'none':'flex';
+}
+function removeImg(i){currentImages.splice(i,1);renderImgPreviews()}
+function showImgFull(url){
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+  d.innerHTML=`<img src="${url}" style="max-width:95vw;max-height:95vh;object-fit:contain;border-radius:8px">`;
+  d.onclick=()=>d.remove();
+  document.body.appendChild(d);
+}
+
+// ── Quick checkin ──
+async function quickCheckin(id){
+  if(!confirm('标记为「已去过」？'))return;
+  try{
+    await sbPatch('restaurants',id,{status:'visited'});
+    myRests=myRests.map(r=>r.id===id?{...r,status:'visited'}:r);
+    allRests=allRests.map(r=>r.id===id?{...r,status:'visited'}:r);
+    renderAll();showToast('✓ 已标记为去过');
+  }catch(e){showToast('操作失败')}
+}
+
+// ── Remind city check ──
+function checkReminders(){
+  if(!myRests||!currentUser)return;
+  const reminded=JSON.parse(sessionStorage.getItem('reminded_ids')||'[]');
+  myRests.filter(r=>r.status==='wishlist'&&r.remind_city).forEach(r=>{
+    if(reminded.includes(r.id))return;
+    // simple: always remind on load if remind_city is set
+    // user can dismiss by checking in
+  });
+}
 
 // ── Draft autosave ──
 let _draftTimer=null;
@@ -999,7 +1139,7 @@ async function saveSheetDish(){
     if(!name){showToast('请先填写餐厅名称');return}
     const cv=document.getElementById('rCuisine').value;
     const[cid,cname]=cv?cv.split('|'):['',''];
-    const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null};
+    const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
     try{
       const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
       const res=await sbPost('restaurants',full);
@@ -1137,27 +1277,32 @@ async function deleteDish(id){
 // ── Render cards ──
 function restCardHTML(r,showUser=false){
   const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
+  const isOwn=!showUser||(currentUser&&r.user_id===currentUser.id);
+  const imgs=r.images&&r.images.length?`<div style="display:flex;gap:5px;margin-top:6px;overflow:hidden">${r.images.slice(0,3).map(url=>`<img src="${url}" style="width:56px;height:56px;object-fit:cover;border-radius:6px;flex-shrink:0" onclick="event.stopPropagation();showImgFull('${url}')">`).join('')}${r.images.length>3?`<div style="width:56px;height:56px;border-radius:6px;background:var(--cream-d);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--th);flex-shrink:0">+${r.images.length-3}</div>`:''}</div>`:'';
   return`<div class="card rest-card" onclick="openDetail(${r.id})" style="margin-bottom:7px">
     <div class="card-inner" style="padding:12px 14px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
             <span class="rest-name">${r.name}</span>
             <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
             ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
             ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
             ${r.is_private?'<span class="priv-badge on">私密</span>':''}
+            ${r.remind_city?`<span class="remind-badge">📍 ${r.remind_city}</span>`:''}
           </div>
-          <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tm)">
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tm)">
             ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}
             ${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
             ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+(r.awards.length-1):''}</span>`:''}
           </div>
+          ${r.tags&&r.tags.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${r.tags.map(t=>`<span class="tag-badge">${t}</span>`).join('')}</div>`:''}
           ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
-          ${!r.summary&&r.notes&&r.status==='wishlist'?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.notes)}</div>`:''}
+          ${imgs}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
           ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
+          ${isOwn&&r.status==='wishlist'?`<button class="checkin-btn" onclick="event.stopPropagation();quickCheckin(${r.id})">✓ 已去</button>`:''}
           <span style="font-size:11px;color:var(--th)">${fmtDate(r.created_at)}</span>
           ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button>`}
         </div>
@@ -1212,9 +1357,19 @@ function renderMine(){
   const list=document.getElementById('mineList');
   const q=getSearch('mine');
 
+  // Remind banner
+  const reminders=myRests.filter(r=>r.status==='wishlist'&&r.remind_city&&r.remind_city.trim());
+  const reminderBanner=document.getElementById('reminderBanner');
+  if(reminderBanner){
+    if(reminders.length&&restFilter==='all'&&!q){
+      reminderBanner.style.display='block';
+      reminderBanner.innerHTML=`<div style="display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap">${reminders.map(r=>`<span style="display:inline-flex;align-items:center;gap:5px;background:var(--amber-l);border:1px solid rgba(200,138,42,.25);border-radius:20px;padding:4px 12px;font-size:13px;color:var(--amber);cursor:pointer" onclick="filterByRemind('${r.remind_city}')">📍 去${r.remind_city}时：${r.name}</span>`).join('')}</div>`;
+    }else{reminderBanner.style.display='none'}
+  }
+
   if(restFilter==='disc'){
     let items=[...myDiscs];
-    if(q)items=items.filter(d=>d.name.toLowerCase().includes(q)||(d.note||'').toLowerCase().includes(q)||(d.cuisine_name||'').toLowerCase().includes(q)||(d.restaurant_name||'').toLowerCase().includes(q));
+    if(q)items=items.filter(d=>d.name.toLowerCase().includes(q)||rtePlain(d.note||'').toLowerCase().includes(q)||(d.cuisine_name||'').toLowerCase().includes(q)||(d.restaurant_name||'').toLowerCase().includes(q));
     list.innerHTML=items.length?items.map(d=>discCardHTML(d,false,true)).join(''):`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q?'没有找到相关记录':'还没有发现记录'}</p></div>`;
     return;
   }
@@ -1226,10 +1381,13 @@ function renderMine(){
     r.name.toLowerCase().includes(q)||
     (r.city||'').toLowerCase().includes(q)||
     (r.cuisine_name||'').toLowerCase().includes(q)||
+    VENUE_TYPES[r.venue_type]?.toLowerCase().includes(q)||
     rtePlain(r.summary||'').toLowerCase().includes(q)||
     rtePlain(r.notes||'').toLowerCase().includes(q)||
     (r.awards||[]).some(a=>a.toLowerCase().includes(q))||
-    myDishes.filter(d=>d.restaurant_id===r.id).some(d=>d.name.toLowerCase().includes(q)||(d.note||'').toLowerCase().includes(q))
+    (r.tags||[]).some(t=>t.toLowerCase().includes(q))||
+    (r.remind_city||'').toLowerCase().includes(q)||
+    myDishes.filter(d=>d.restaurant_id===r.id).some(d=>d.name.toLowerCase().includes(q)||rtePlain(d.note||'').toLowerCase().includes(q))
   );
 
   if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q||cityFilter!=='all'?'没有找到相关记录':'还没有'+( restFilter==='wishlist'?'想去的':'去过的')+'餐厅'}</p></div>`;return}
@@ -1372,17 +1530,22 @@ function renderDetail(id){
   const r=[...myRests,...allRests].find(x=>x.id===id);if(!r)return;
   document.getElementById('detailName').textContent=r.name;
   const own=r.user_id===currentUser.id;
+  const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
+  const imgs=r.images&&r.images.length?`<div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">${r.images.map(url=>`<img src="${url}" style="width:90px;height:90px;object-fit:cover;border-radius:var(--rs);cursor:pointer" onclick="showImgFull('${url}')">`).join('')}</div>`:'';
   document.getElementById('detailMeta').innerHTML=`
     <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
       <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+      ${vLabel?`<span style="font-size:11px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
       ${r.cuisine_name?`<span class="badge" style="background:var(--cream-d);color:var(--tm)">${r.cuisine_name}</span>`:''}
       ${r.city?`<span style="font-size:13px;color:var(--th)">${r.city}</span>`:''}
       ${r.rating?`<span style="font-size:15px;color:#E8B84B;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
       ${r.rating_label?`<span class="badge b-visited">${r.rating_label}</span>`:''}
       ${r.awards&&r.awards.length?r.awards.map(a=>`<span class="award-badge">${a}</span>`).join(''):''}
+      ${r.remind_city?`<span class="remind-badge">📍 去${r.remind_city}时提醒</span>`:''}
     </div>
+    ${r.tags&&r.tags.length?`<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px">${r.tags.map(t=>`<span class="tag-badge" style="font-size:12px;padding:3px 10px">${t}</span>`).join('')}</div>`:''}
     ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;padding:12px 14px;background:var(--cream-d);border-radius:var(--rs);margin-bottom:8px">${r.summary}</div>`:''}
-    ${r.notes?`<div style="font-size:13px;color:var(--th);line-height:1.7;padding:10px 14px;background:var(--cream-d);border-radius:var(--rs)">${r.notes}</div>`:''}
+    ${imgs}
     <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>`;
   const dl=own?myDishes.filter(d=>d.restaurant_id===id):[];
   document.getElementById('dishRows').innerHTML=dl.length?dl.map(d=>`
@@ -1429,6 +1592,21 @@ function renderStats(){
   const rank=CUISINES.map(c=>({name:c.name,count:myRests.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
   const max=rank[0]?.count||1;
   document.getElementById('chartBars').innerHTML=rank.length?rank.map(c=>`<div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join(''):'<div style="color:var(--th);font-size:14px;text-align:center;padding:16px 0">暂无数据</div>';
+}
+
+function filterByRemind(city){
+  cityFilter=city;
+  restFilter='wishlist';
+  document.querySelectorAll('#typeFilterRow .pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#typeFilterRow .pill')[1].classList.add('active');
+  buildCityFilter();
+  setTimeout(()=>{
+    document.querySelectorAll('#cityFilterRow .pill').forEach(b=>{
+      if(b.textContent===city)b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  },50);
+  renderMine();
 }
 
 function renderAll(){renderMine();renderSquare();renderMap();renderStats()}
