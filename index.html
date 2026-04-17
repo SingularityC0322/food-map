@@ -445,7 +445,16 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="stats-grid" id="statsGrid"></div>
     <div class="chart-sec"><div class="chart-title">探索最多的菜系</div><div id="chartBars"></div></div>
     <div id="statsExtra"></div>
+    <!-- Share card -->
     <div style="margin-top:16px;background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px 20px">
+      <div style="font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">美食探索年度总结</div>
+      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.6">生成精美总结图，直接保存发朋友圈。</div>
+      <button onclick="openShareCard()" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:var(--amber);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s;margin-bottom:12px">
+        <span>✨</span><span>生成分享图</span>
+      </button>
+    </div>
+    <!-- Export -->
+    <div style="margin-top:14px;background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px 20px">
       <div style="font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">数据备份</div>
       <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.6">将所有记录导出为 Excel 文件保存到本地，建议定期备份。</div>
       <button onclick="exportData()" id="exportBtn" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s">
@@ -453,6 +462,26 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       </button>
       <div id="exportProgress" style="display:none;margin-top:10px;font-size:13px;color:var(--tm)"></div>
     </div>
+  </div>
+</div>
+
+<!-- User Profile Page -->
+<div id="profilePage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:60;overflow-y:auto">
+  <div style="position:sticky;top:0;background:rgba(250,248,243,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--wb);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:5">
+    <button onclick="closeProfile()" style="display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--teal);padding:6px 12px;border-radius:20px;background:var(--teal-l);border:none;cursor:pointer">← 返回</button>
+    <span id="profileName" style="font-size:16px;font-weight:700;font-family:var(--serif)"></span>
+  </div>
+  <div style="max-width:700px;margin:0 auto;padding:16px 18px">
+    <div id="profileContent"></div>
+  </div>
+</div>
+
+<!-- Share Card Overlay -->
+<div id="shareCardOverlay" style="display:none;position:fixed;inset:0;background:rgba(28,26,22,.6);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:20px">
+  <canvas id="shareCanvas" style="max-width:100%;max-height:70vh;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.4)"></canvas>
+  <div style="display:flex;gap:10px">
+    <button onclick="downloadShareCard()" style="padding:12px 24px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">⬇ 保存图片</button>
+    <button onclick="closeShareCard()" style="padding:12px 20px;background:rgba(255,255,255,.15);color:white;border:1px solid rgba(255,255,255,.3);border-radius:var(--rs);font-size:14px;cursor:pointer;font-family:inherit">关闭</button>
   </div>
 </div>
 
@@ -965,7 +994,14 @@ async function loadAll(){
     const fs=res[5]||[];
     myVisits=res[6]||[];
     myComments=res[7]||[];
-    myFriends=fs.filter(f=>f.status==='accepted');
+    // Deduplicate friends - A→B and B→A should count as one
+    const acceptedRaw=fs.filter(f=>f.status==='accepted');
+    const seenPairs=new Set();
+    myFriends=acceptedRaw.filter(f=>{
+      const pair=[Math.min(f.user_id,f.friend_id),Math.max(f.user_id,f.friend_id)].join('-');
+      if(seenPairs.has(pair))return false;
+      seenPairs.add(pair);return true;
+    });
     pendingIn=fs.filter(f=>f.friend_id===currentUser.id&&f.status==='pending');
     pendingOut=fs.filter(f=>f.user_id===currentUser.id&&f.status==='pending');
     buildUserFilter();buildCityFilter();
@@ -1659,7 +1695,8 @@ function sqRestCardHTML(r){
   const visBadge=vis==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':'';
   const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
   // own items → click to open detail; others → click to expand in place
-  const clickAction=isOwn?`openDetail(${r.id})`:`toggleSq('sqr_${r.id}',${r.id},'rest')`;
+  // All cards open detail - own cards show edit/delete, others show comment
+  const clickAction=`openDetail(${r.id})`;
   return`<div class="card" id="sqr_${r.id}" style="margin-bottom:7px;cursor:pointer" onclick="${clickAction}">
     <div class="card-inner" style="padding:12px 14px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1680,11 +1717,10 @@ function sqRestCardHTML(r){
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
           ${r.rating?`<span style="color:#E8B84B;font-size:14px;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
-          <div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>
-          ${isOwn?`<span style="font-size:11px;color:var(--teal)">点击查看详情 →</span>`:`<span style="font-size:11px;color:var(--th)" class="sq-arrow">▾ 展开</span>`}
+          <div class="user-tag" style="cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>
+          <span style="font-size:11px;color:var(--teal)">查看详情 →</span>
         </div>
       </div>
-      ${!isOwn?`<div class="sq-expand" style="display:none"></div>`:''}
     </div>
   </div>`;
 }
@@ -1707,7 +1743,7 @@ function sqDiscCardHTML(d){
           ${d.note?`<div class="sq-preview" style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(d.note)}</div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
-          <div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>
+          <div class="user-tag" style="cursor:pointer" onclick="event.stopPropagation();openProfile(${d.user_id},'${(d.display_name||d.username||'').replace(/'/g,"\\'")}','${(d.username||'').replace(/'/g,"\\'")}')"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>
           <span style="font-size:11px;color:var(--th)" class="sq-arrow">▾ 展开</span>
         </div>
       </div>
@@ -1753,7 +1789,7 @@ function toggleSq(cardId,itemId,type){
 }
 
 // ── Detail ──
-function openDetail(id){
+async function openDetail(id){
   currentRestId=id;
   const own=myRests.some(r=>r.id===id);
   const r=[...myRests,...allRests].find(x=>x.id===id);
@@ -1762,22 +1798,25 @@ function openDetail(id){
   document.getElementById('detailShareBtn').style.display=own?'inline-block':'none';
   document.getElementById('detailDelBtn').style.display=own?'inline-block':'none';
   document.getElementById('addDishBtn').style.display=own?'block':'none';
-  // Show visit diary for own records
+  // Visit diary: own only
   const visitsSec=document.getElementById('visitsSec');
-  const addVisitBtn=document.getElementById('addVisitBtn');
   if(visitsSec)visitsSec.style.display=own?'block':'none';
-  if(addVisitBtn)addVisitBtn.style.display=own?'block':'none';
-  // Show comments section if restaurant has allow_comments=true OR it's own record
+  // Comments: always show, but only non-owners can add
   const commentsSec=document.getElementById('commentsSec');
   const addCommentBtn=document.getElementById('addCommentBtn');
-  if(commentsSec){
-    const allowComments=r&&r.allow_comments;
-    const isFriendOwner=r&&myFriends.some(f=>(f.user_id===currentUser.id&&f.friend_id===r.user_id)||(f.friend_id===currentUser.id&&f.user_id===r.user_id));
-    const showComments=own||allowComments||(r&&r.user_id!==currentUser.id);
-    commentsSec.style.display=showComments?'block':'none';
-    if(addCommentBtn)addCommentBtn.style.display=(!own)?'block':'none'; // only others can comment
-  }
+  if(commentsSec)commentsSec.style.display='block';
+  if(addCommentBtn)addCommentBtn.style.display=own?'none':'block';
   history.pushState({page:'detail',id},'','');
+  // For other people's restaurants, fetch their dishes if not cached
+  if(!own){
+    try{
+      const cached=window._otherDishes=window._otherDishes||{};
+      if(!cached[id]){
+        const dishes=await sbGet(`dishes?restaurant_id=eq.${id}&order=created_at.asc`);
+        cached[id]=dishes||[];
+      }
+    }catch(e){}
+  }
   renderDetail(id);
 }
 function closeDetail(){
@@ -1805,12 +1844,12 @@ function renderDetail(id){
     ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;padding:12px 14px;background:var(--cream-d);border-radius:var(--rs);margin-bottom:8px">${r.summary}</div>`:''}
     ${imgs}
     <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>`;
-  const dl=own?myDishes.filter(d=>d.restaurant_id===id):[];
+  const dl=own ? myDishes.filter(d=>d.restaurant_id===id) : (window._otherDishes&&window._otherDishes[id]||[]);
   document.getElementById('dishRows').innerHTML=dl.length?dl.map(d=>`
     <div class="dish-row"><div class="dish-dot"></div>
       <div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div>
       ${own?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
-    </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">还没有菜品记录</div>';
+    </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">暂无菜品记录</div>';
   // Render visits
   renderVisits(id,own);
   // Render comments
@@ -2112,8 +2151,19 @@ async function searchUser(){
   }catch(e){res.innerHTML='<div style="font-size:13px;color:var(--coral)">搜索失败，请重试</div>'}
 }
 async function sendFriendReq(fid){
-  try{const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});if(r&&r[0])pendingOut.push(r[0]);showToast('好友申请已发送');document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--teal)">申请已发送</div>';}
-  catch(e){showToast('发送失败')}
+  try{
+    // Check if reverse friendship already exists (they already sent us a request or we're already friends)
+    const existing=await sbGet(`friendships?or=(and(user_id.eq.${currentUser.id},friend_id.eq.${fid}),and(user_id.eq.${fid},friend_id.eq.${currentUser.id}))&select=id,status`);
+    if(existing&&existing.length){
+      const e=existing[0];
+      if(e.status==='accepted'){showToast('你们已经是好友了');return;}
+      if(e.status==='pending'){showToast('申请已存在');return;}
+    }
+    const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});
+    if(r&&r[0])pendingOut.push(r[0]);
+    showToast('好友申请已发送');
+    document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--teal)">申请已发送</div>';
+  }catch(e){showToast('发送失败')}
 }
 async function acceptFriend(fid){
   try{await sbPatch('friendships',fid,{status:'accepted'});const f=pendingIn.find(x=>x.id===fid);if(f){f.status='accepted';myFriends.push(f);pendingIn=pendingIn.filter(x=>x.id!==fid);}showToast('已添加好友');updateFriendBadge();renderFriends();}
@@ -2152,6 +2202,113 @@ async function renderFriends(){
     <div class="friend-info"><div class="friend-name">${f._u.display_name||f._u.username}</div><div class="friend-username">@${f._u.username}</div></div>
     <button class="friend-action" onclick="removeFriend(${f.id})" style="color:var(--coral)">删除</button>
   </div>`).join('');
+}
+
+async function renderFriends(){
+  const pendSec=document.getElementById('pendingInSection');
+  const pendList=document.getElementById('pendingInList');
+  const list=document.getElementById('friendList');
+  if(pendingIn.length){
+    pendSec.style.display='block';
+    const pf=await Promise.all(pendingIn.map(f=>getOtherUser(f).then(u=>({...f,_u:u}))));
+    pendList.innerHTML=pf.filter(f=>f._u).map(f=>`<div class="friend-item">
+      <div class="friend-avatar" style="cursor:pointer" onclick="openProfile(${f._u.id},'${(f._u.display_name||f._u.username).replace(/'/g,"\\'")}','${f._u.username}')">${(f._u.display_name||f._u.username).charAt(0).toUpperCase()}</div>
+      <div class="friend-info" style="cursor:pointer" onclick="openProfile(${f._u.id},'${(f._u.display_name||f._u.username).replace(/'/g,"\\'")}','${f._u.username}')">
+        <div class="friend-name">${f._u.display_name||f._u.username}</div><div class="friend-username">@${f._u.username}</div>
+      </div>
+      <div style="display:flex;gap:6px"><button class="friend-action accept" onclick="acceptFriend(${f.id})">同意</button><button class="friend-action" onclick="declineFriend(${f.id})" style="color:var(--coral)">拒绝</button></div>
+    </div>`).join('');
+  }else{pendSec.style.display='none'}
+  if(!myFriends.length){list.innerHTML='<div class="empty" style="padding:24px 0"><p>还没有好友<br>用上方搜索添加</p></div>';return}
+  const friends=await Promise.all(myFriends.map(f=>getOtherUser(f).then(u=>({...f,_u:u}))));
+  list.innerHTML=friends.filter(f=>f._u).map(f=>`<div class="friend-item">
+    <div class="friend-avatar" style="cursor:pointer" onclick="openProfile(${f._u.id},'${(f._u.display_name||f._u.username).replace(/'/g,"\\'")}','${f._u.username}')">${(f._u.display_name||f._u.username).charAt(0).toUpperCase()}</div>
+    <div class="friend-info" style="cursor:pointer" onclick="openProfile(${f._u.id},'${(f._u.display_name||f._u.username).replace(/'/g,"\\'")}','${f._u.username}')">
+      <div class="friend-name">${f._u.display_name||f._u.username}</div><div class="friend-username">@${f._u.username} · 点击查看主页</div>
+    </div>
+    <button class="friend-action" onclick="removeFriend(${f.id})" style="color:var(--coral)">删除</button>
+  </div>`).join('');
+}
+
+// ── User Profile ──
+async function openProfile(uid,displayName,username){
+  const page=document.getElementById('profilePage');
+  const content=document.getElementById('profileContent');
+  document.getElementById('profileName').textContent=displayName||username;
+  page.style.display='block';
+  content.innerHTML='<div style="text-align:center;padding:32px;color:var(--th)">加载中...</div>';
+  history.pushState({page:'profile',uid},'','');
+  try{
+    const [rests,discs]=await Promise.all([
+      sbGet(`restaurants?user_id=eq.${uid}&is_private=eq.false&order=created_at.desc`),
+      sbGet(`discoveries?user_id=eq.${uid}&is_private=eq.false&order=created_at.desc`),
+    ]);
+    const VENUE={restaurant:'餐厅',dessert:'甜品店',icecream:'冰激凌',cafe:'咖啡馆',bakery:'面包烘焙',bar:'酒吧',teahouse:'茶馆',streetfood:'街头小吃',market:'美食市集',other:'其他'};
+    const visited=(rests||[]).filter(r=>r.status==='visited');
+    const wishlist=(rests||[]).filter(r=>r.status==='wishlist');
+    const rated=visited.filter(r=>r.rating);
+    const avg=rated.length?(rated.reduce((s,r)=>s+r.rating,0)/rated.length).toFixed(1):'';
+
+    const statsHtml=`<div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+      <div style="flex:1;min-width:80px;background:var(--teal-l);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--teal)">${visited.length}</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:3px">去过</div>
+      </div>
+      <div style="flex:1;min-width:80px;background:var(--blue-l);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--blue)">${wishlist.length}</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:3px">想去</div>
+      </div>
+      ${avg?`<div style="flex:1;min-width:80px;background:var(--amber-l);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--amber)">${avg}</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:3px">平均分</div>
+      </div>`:''}
+      <div style="flex:1;min-width:80px;background:var(--purple-l);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--purple)">${(discs||[]).length}</div>
+        <div style="font-size:12px;color:var(--tm);margin-top:3px">发现</div>
+      </div>
+    </div>`;
+
+    const restHtml=rests&&rests.length?`
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--th);margin-bottom:12px">餐厅记录</div>
+      ${rests.map(r=>`
+        <div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openDetail(${r.id})">
+          <div class="card-inner" style="padding:12px 14px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+              <span style="font-size:14px;font-weight:600">${r.name}</span>
+              <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+              ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+            </div>
+            <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+              ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
+              ${r.rating?`<span style="color:#E8B84B;font-weight:700;margin-left:auto">${r.rating.toFixed(1)} ★</span>`:''}
+            </div>
+            ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+          </div>
+        </div>`).join('')}`
+      :'<div style="color:var(--th);font-size:14px;padding:16px 0">暂无公开餐厅记录</div>';
+
+    const discHtml=discs&&discs.length?`
+      <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--th);margin:18px 0 12px">发现 & 灵感</div>
+      ${discs.map(d=>`
+        <div class="card disc-card" style="margin-bottom:8px">
+          <div style="width:4px;flex-shrink:0;background:${d.type==='inspo'?'var(--purple)':'var(--teal)'}"></div>
+          <div style="flex:1;padding:11px 14px">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+              <span style="font-size:14px;font-weight:600">${d.name}</span>
+              <span class="badge" style="font-size:10px;${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+            </div>
+            ${d.note?`<div style="font-size:13px;color:var(--th);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(d.note)}</div>`:''}
+          </div>
+        </div>`).join('')}`:'';
+
+    content.innerHTML=statsHtml+restHtml+discHtml;
+    // Cache these rests for detail page
+    if(rests){rests.forEach(r=>{if(!allRests.find(x=>x.id===r.id))allRests.push(r);})}
+  }catch(e){content.innerHTML='<div style="color:var(--coral);padding:16px">加载失败，请重试</div>';}
+}
+function closeProfile(){
+  document.getElementById('profilePage').style.display='none';
+  history.back();
 }
 
 // ── Share ──
@@ -2528,9 +2685,138 @@ document.addEventListener('keydown',e=>{
 });
 window.addEventListener('popstate',()=>{
   const openSheet=document.querySelector('.sheet-wrap.open');
-  if(openSheet){openSheet.classList.remove('open');stopDraftSave();history.pushState(null,'','');return}
-  if(document.getElementById('restDetail').classList.contains('open')){closeDetail();history.pushState(null,'','');return}
+  if(openSheet){openSheet.classList.remove('open');stopDraftSave();return}
+  if(document.getElementById('profilePage').style.display==='block'){document.getElementById('profilePage').style.display='none';return}
+  if(document.getElementById('restDetail').classList.contains('open')){closeDetail();return}
 });
+
+// ── Share Card ──
+function openShareCard(){
+  const overlay=document.getElementById('shareCardOverlay');
+  overlay.style.display='flex';
+  drawShareCard();
+}
+function closeShareCard(){
+  document.getElementById('shareCardOverlay').style.display='none';
+}
+function downloadShareCard(){
+  const canvas=document.getElementById('shareCanvas');
+  const a=document.createElement('a');
+  a.download=`EatAsALocal_${new Date().getFullYear()}年度总结.png`;
+  a.href=canvas.toDataURL('image/png');
+  a.click();
+}
+
+function drawShareCard(){
+  const canvas=document.getElementById('shareCanvas');
+  const W=640,H=1040;
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const year=new Date().getFullYear();
+
+  const visited=myRests.filter(r=>r.status==='visited');
+  const wishlist=myRests.filter(r=>r.status==='wishlist');
+  const rated=visited.filter(r=>r.rating);
+  const avgRating=rated.length?(rated.reduce((s,r)=>s+r.rating,0)/rated.length).toFixed(1):'—';
+  const cities=[...new Set(visited.filter(r=>r.city).map(r=>r.city.trim()))];
+  const topCuisines=CUISINES.map(c=>({name:c.name,count:visited.filter(r=>r.cuisine_id===c.id).length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,3);
+  const topRated=[...visited].filter(r=>r.rating).sort((a,b)=>b.rating-a.rating).slice(0,3);
+  const thisYear=visited.filter(r=>r.created_at&&r.created_at.startsWith(String(year)));
+
+  // Background
+  const grad=ctx.createLinearGradient(0,0,W,H);
+  grad.addColorStop(0,'#0F2318');grad.addColorStop(0.5,'#1A3D28');grad.addColorStop(1,'#0A1A0F');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
+  ctx.globalAlpha=0.07;ctx.fillStyle='#4AE89A';
+  ctx.beginPath();ctx.arc(W+80,120,220,0,Math.PI*2);ctx.fill();
+  ctx.beginPath();ctx.arc(-80,H-80,180,0,Math.PI*2);ctx.fill();
+  ctx.globalAlpha=1;
+
+  const round=(x,y,w,h,r)=>{ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();};
+  const card=(x,y,w,h,a=0.12)=>{ctx.fillStyle=`rgba(255,255,255,${a})`;round(x,y,w,h,14);ctx.fill();};
+
+  // Header
+  ctx.fillStyle='rgba(255,255,255,0.2)';ctx.font='bold 13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='center';
+  ctx.fillText('EAT AS A LOCAL',W/2,52);
+  ctx.fillStyle='rgba(255,255,255,0.06)';ctx.font='bold 120px -apple-system,PingFang SC,sans-serif';
+  ctx.fillText(year,W/2,155);
+  ctx.fillStyle='white';ctx.font='bold 28px -apple-system,PingFang SC,sans-serif';
+  ctx.fillText('我的美食探索年度总结',W/2,186);
+  ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='15px -apple-system,PingFang SC,sans-serif';
+  ctx.fillText(`${currentUser.display_name||currentUser.username} · ${year}`,W/2,216);
+
+  // Stats row
+  const sY=250;
+  [{n:thisYear.length,l:'今年探索',c:'#5EE89A'},{n:visited.length,l:'共去过',c:'#7DD3FA'},{n:wishlist.length,l:'心愿单',c:'#FCD34D'},{n:myDishes.length,l:'道菜品',c:'#F9A8D4'}].forEach((s,i)=>{
+    const x=32+i*(W-64)/4,w=(W-64)/4-8;
+    card(x,sY,w,88);
+    ctx.fillStyle=s.c;ctx.font='bold 36px -apple-system,PingFang SC,sans-serif';ctx.textAlign='center';
+    ctx.fillText(s.n,x+w/2,sY+50);
+    ctx.fillStyle='rgba(255,255,255,0.5)';ctx.font='12px -apple-system,PingFang SC,sans-serif';
+    ctx.fillText(s.l,x+w/2,sY+72);
+  });
+
+  // Avg rating bar
+  const rY=360;card(32,rY,W-64,78,0.14);
+  ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+  ctx.fillText('平均评分',52,rY+28);
+  ctx.fillStyle='#FCD34D';ctx.font='bold 40px -apple-system,PingFang SC,sans-serif';
+  ctx.fillText(avgRating,52,rY+64);
+  const bX=210,bY=rY+30,bW=W-64-210-20,bH=10;
+  ctx.fillStyle='rgba(255,255,255,0.1)';round(bX,bY,bW,bH,5);ctx.fill();
+  if(avgRating!=='—'){ctx.fillStyle='#FCD34D';round(bX,bY,Math.round(bW*parseFloat(avgRating)/5),bH,5);ctx.fill();}
+  ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='12px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+  ctx.fillText(`${rated.length}家有评分 · ${cities.length}个城市`,bX,bY+bH+20);
+
+  // Cities
+  const cY=462;
+  ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font='bold 14px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+  ctx.fillText('📍 探索城市',32,cY);
+  let cx2=32,cy2=cY+18;
+  (cities.length?cities.slice(0,10):['还没有记录城市~']).forEach(city=>{
+    ctx.font='12px -apple-system,PingFang SC,sans-serif';
+    const tw=ctx.measureText(city).width+20;
+    if(cx2+tw>W-32){cx2=32;cy2+=30;}
+    ctx.fillStyle='rgba(255,255,255,0.12)';round(cx2,cy2,tw,24,12);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.82)';ctx.textAlign='center';
+    ctx.fillText(city,cx2+tw/2,cy2+16);cx2+=tw+8;
+  });
+
+  // Top cuisines
+  const cuY=Math.max(cy2+44,580);
+  ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font='bold 14px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+  ctx.fillText('🍜 最爱菜系',32,cuY);
+  const cColors=['#5EE89A','#7DD3FA','#FCD34D'];
+  (topCuisines.length?topCuisines:[{name:'记录多了这里会显示',count:0}]).forEach((c,i)=>{
+    const bx=32,by=cuY+18+i*40,bw=W-64;card(bx,by,bw,32,0.1);
+    if(c.count>0){const fw=Math.round((bw-120)*c.count/Math.max(...topCuisines.map(x=>x.count),1));ctx.fillStyle=cColors[i]+'28';round(bx,by,fw+80,32,8);ctx.fill();}
+    ctx.fillStyle=cColors[i]||'rgba(255,255,255,0.5)';ctx.font='bold 14px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+    ctx.fillText(`${c.count?'0123'.charAt(i+1)+'. ':''}${c.name}`,bx+14,by+21);
+    if(c.count){ctx.font='bold 13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='right';ctx.fillStyle=cColors[i];ctx.fillText(`${c.count}家`,bx+bw-14,by+21);}
+  });
+
+  // Top rated restaurants
+  const tY=cuY+18+3*40+20;
+  ctx.fillStyle='rgba(255,255,255,0.65)';ctx.font='bold 14px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';
+  ctx.fillText('⭐ 最爱餐厅',32,tY);
+  const medals=['🥇','🥈','🥉'];
+  (topRated.length?topRated:[]).forEach((r,i)=>{
+    const bx=32,by=tY+18+i*54,bw=W-64;card(bx,by,bw,46,0.1);
+    ctx.font='20px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';ctx.fillText(medals[i],bx+12,by+30);
+    ctx.fillStyle='white';ctx.font='bold 14px -apple-system,PingFang SC,sans-serif';
+    ctx.fillText(r.name.length>18?r.name.slice(0,17)+'…':r.name,bx+46,by+21);
+    ctx.fillStyle='rgba(255,255,255,0.45)';ctx.font='12px -apple-system,PingFang SC,sans-serif';
+    ctx.fillText([r.city,r.cuisine_name].filter(Boolean).join(' · '),bx+46,by+38);
+    ctx.fillStyle='#FCD34D';ctx.font='bold 16px -apple-system,PingFang SC,sans-serif';ctx.textAlign='right';
+    ctx.fillText(r.rating.toFixed(1)+' ★',bx+bw-14,by+28);
+  });
+  if(!topRated.length){ctx.fillStyle='rgba(255,255,255,0.3)';ctx.font='13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='left';ctx.fillText('给餐厅评分后会显示最爱~',32,tY+36);}
+
+  // Footer
+  ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(32,H-56,W-64,1);
+  ctx.fillStyle='rgba(255,255,255,0.28)';ctx.font='13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='center';
+  ctx.fillText('Eat as a Local · 我的美食探索地图',W/2,H-28);
+}
 
 // ── Init ──
 async function init(){
