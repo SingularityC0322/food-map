@@ -527,7 +527,14 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         </div>
       </div>
     </div>
-    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="restPrivSwitch" onclick="togglePriv('rest')"><div class="tog-switch-thumb"></div></div></div>
+    <div class="priv-row">
+      <div><div class="priv-row-label">可见范围</div><div class="priv-row-sub">决定谁能在广场看到这条记录</div></div>
+      <div class="tog-row" id="restVisRow" style="flex-shrink:0">
+        <button class="tog c-teal on" onclick="selVisibility('rest','public',this)">🌐 公开</button>
+        <button class="tog c-blue" onclick="selVisibility('rest','friends',this)">👥 好友</button>
+        <button class="tog c-teal" onclick="selVisibility('rest','private',this)">🔒 私密</button>
+      </div>
+    </div>
     <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
     <button class="btn-s" onclick="closeSheet('restSheet')">完成</button>
     <div id="restSheetDeleteRow" style="display:none;margin-top:8px">
@@ -560,7 +567,14 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="diCuisine"></select></div>
     <div class="fg"><label class="fl">关联餐厅（可选）</label><select class="fi" id="diRest"></select></div>
     <div class="fg"><label class="fl">感受 / 描述</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'diNote')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="diNote" contenteditable="true" data-placeholder="味道感受、搭配逻辑、为什么想试..."></div></div></div>
-    <div class="priv-row"><div><div class="priv-row-label">设为私密</div><div class="priv-row-sub">私密内容不出现在广场</div></div><div class="tog-switch" id="discPrivSwitch" onclick="togglePriv('disc')"><div class="tog-switch-thumb"></div></div></div>
+    <div class="priv-row">
+      <div><div class="priv-row-label">可见范围</div><div class="priv-row-sub">决定谁能在广场看到这条记录</div></div>
+      <div class="tog-row" id="discVisRow" style="flex-shrink:0">
+        <button class="tog c-teal on" onclick="selVisibility('disc','public',this)">🌐 公开</button>
+        <button class="tog c-blue" onclick="selVisibility('disc','friends',this)">👥 好友</button>
+        <button class="tog c-teal" onclick="selVisibility('disc','private',this)">🔒 私密</button>
+      </div>
+    </div>
     <button class="btn-p" id="discSaveBtn" onclick="saveDisc()">保存</button>
     <button class="btn-s" onclick="closeSheet('discSheet')">取消</button>
   </div>
@@ -709,7 +723,17 @@ function selVenueType(btn,val){
 }
 const rlState={restLabel:'',dishLabel:''};
 const starState={rest:0,dish:0};
-const privState={rest:false,disc:false};
+const visState={rest:'public',disc:'public'};
+
+function selVisibility(key,val,btn){
+  visState[key]=val;
+  const rowId=key==='rest'?'restVisRow':'discVisRow';
+  document.querySelectorAll('#'+rowId+' .tog').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+// legacy compat
+function togglePriv(key){} // no-op, replaced by selVisibility
 
 function fmtDate(s){if(!s)return'';const d=new Date(s);return`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`}
 
@@ -944,7 +968,7 @@ function openRestSheet(rest=null){
     document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rest.rating_label));
     if(rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
-    privState.rest=!!rest.is_private;
+    visState.rest=rest.visibility||( rest.is_private?'private':'public');
     selectedAwards=rest.awards?[...rest.awards]:[];
     currentTags=rest.tags?[...rest.tags]:[];
     currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
@@ -974,7 +998,7 @@ function openRestSheet(rest=null){
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
     document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
-    privState.rest=false;selectedAwards=[];
+    visState.rest='public';selectedAwards=[];
     currentTags=[];currentImages=[];
     document.getElementById('remindCity').value='';
     document.getElementById('sheetDishList').innerHTML='';
@@ -982,7 +1006,8 @@ function openRestSheet(rest=null){
     renderTagChips();renderImgPreviews();
     startDraftSave();
   }
-  document.getElementById('restPrivSwitch').classList.toggle('on',privState.rest);
+  // set visibility buttons
+  ['public','friends','private'].forEach((v,i)=>{const btns=document.querySelectorAll('#restVisRow .tog');if(btns[i])btns[i].classList.toggle('on',v===visState.rest);});
   buildStars('restStars','restStarVal','rest');
   document.getElementById('awardRow').innerHTML=AWARDS.map(a=>`<button class="award-chip${selectedAwards.includes(a)?' on':''}" onclick="toggleAward('${a}',this)">${a}</button>`).join('');
   document.getElementById('restSheetTitle').textContent=rest?'编辑餐厅':'添加餐厅';
@@ -998,7 +1023,7 @@ async function saveRest(){
   if(!name){showToast('请填写餐厅名称');return}
   const cv=document.getElementById('rCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
-  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
+  const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:visState.rest==='private',visibility:visState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
   saving=true;
   try{
     if(editingRestId){
@@ -1166,7 +1191,7 @@ async function saveSheetDish(){
     if(!name){showToast('请先填写餐厅名称');return}
     const cv=document.getElementById('rCuisine').value;
     const[cid,cname]=cv?cv.split('|'):['',''];
-    const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:privState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
+    const entry={name,city:document.getElementById('rCity').value.trim()||null,venue_type:venueType,cuisine_id:cid||null,cuisine_name:cname||null,status:togState.restStatus,rating:starState.rest||null,rating_label:rlState.restLabel||null,summary:rteGet('rSummary')||null,notes:null,is_private:visState.rest==='private',visibility:visState.rest,awards:selectedAwards.length?selectedAwards:null,tags:currentTags.length?currentTags:null,images:currentImages.filter(x=>x.url&&!x.uploading).map(x=>x.url),remind_city:document.getElementById('remindCity').value.trim()||null};
     try{
       const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
       const res=await sbPost('restaurants',full);
@@ -1229,13 +1254,13 @@ function openDiscSheet(disc=null){
     rteSet('diNote',disc.note||'');
     if(disc.cuisine_id){const sel=document.getElementById('diCuisine');[...sel.options].forEach(o=>{if(o.value===`${disc.cuisine_id}|${disc.cuisine_name}`)o.selected=true})}
     if(disc.restaurant_id){const sel=document.getElementById('diRest');[...sel.options].forEach(o=>{if(o.value===`${disc.restaurant_id}|${disc.restaurant_name}`)o.selected=true})}
-    privState.disc=!!disc.is_private;
+    visState.disc=disc.visibility||(disc.is_private?'private':'public');
   }else{
     const draft=JSON.parse(localStorage.getItem('disc_draft')||'{}');
     togState.discType=draft.type||'discovery';
     document.getElementById('diName').value=draft.name||'';
     rteSet('diNote',draft.note||'');
-    privState.disc=false;
+    visState.disc='public';
     // start disc draft autosave
     stopDiscDraft();
     _discDraftTimer=setInterval(()=>{
@@ -1244,7 +1269,7 @@ function openDiscSheet(disc=null){
   }
   document.querySelectorAll('#discSheet .tog').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('#discSheet .tog').forEach(b=>{if((togState.discType==='discovery'&&b.textContent.includes('发现'))||(togState.discType==='inspo'&&b.textContent.includes('灵感')))b.classList.add('on')});
-  document.getElementById('discPrivSwitch').classList.toggle('on',privState.disc);
+  ['public','friends','private'].forEach((v,i)=>{const btns=document.querySelectorAll('#discVisRow .tog');if(btns[i])btns[i].classList.toggle('on',v===visState.disc);});
   document.getElementById('discSheetTitle').textContent=disc?'编辑发现':'记录发现';
   document.getElementById('discSaveBtn').textContent=disc?'保存修改':'保存';
   document.getElementById('discSheet').classList.add('open');
@@ -1258,7 +1283,7 @@ async function saveDisc(){
   const[cid,cname]=cv?cv.split('|'):['',''];
   const rv=document.getElementById('diRest').value;
   const[rid,rname]=rv?rv.split('|'):['',''];
-  const entry={name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:rteGet('diNote')||null,is_private:privState.disc};
+  const entry={name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,note:rteGet('diNote')||null,is_private:visState.disc==='private',visibility:visState.disc};
   saving=true;
   try{
     if(editingDiscId){
@@ -1315,7 +1340,7 @@ function restCardHTML(r,showUser=false){
             <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
             ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
             ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
-            ${r.is_private?'<span class="priv-badge on">私密</span>':''}
+            ${r.visibility==='private'||r.is_private?'<span class="priv-badge on">🔒 私密</span>':r.visibility==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':''}
             ${r.remind_city?`<span class="remind-badge">📍 ${r.remind_city}</span>`:''}
           </div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--tm)">
@@ -1347,7 +1372,7 @@ function discCardHTML(d,showUser=false,showDel=false){
           <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:15px;font-weight:600;color:var(--text)">${d.name}</span>
             <span class="badge" style="font-size:10px;${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
-            ${d.is_private?'<span class="priv-badge on">私密</span>':''}
+            ${d.visibility==='private'||d.is_private?'<span class="priv-badge on">🔒 私密</span>':d.visibility==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':''}
           </div>
           <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;flex-wrap:wrap">
             ${d.cuisine_name?`<span>${d.cuisine_name}</span>`:''}
@@ -1446,15 +1471,24 @@ function renderSquare(){
   const uf=document.getElementById('sqUserFilter').value;
   const q=getSearch('sq');
   const list=document.getElementById('squareList');
+  // get friend user IDs for friends-only filtering
+  const friendIds=new Set(myFriends.map(f=>f.user_id===currentUser.id?f.friend_id:f.user_id));
+  const canSee=(item)=>{
+    if(item.user_id===currentUser.id)return true; // own content always visible
+    const vis=item.visibility||( item.is_private?'private':'public');
+    if(vis==='private')return false;
+    if(vis==='friends')return friendIds.has(item.user_id);
+    return true; // public
+  };
   let items=[];
   if(tf!=='discoveries'){
-    let r=[...allRests].filter(r=>!r.is_private||r.user_id===currentUser.id);
+    let r=[...allRests].filter(canSee);
     if(uf!=='all')r=r.filter(x=>x.username===uf);
     if(q)r=r.filter(x=>x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||rtePlain(x.summary||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(r.map(x=>({...x,_k:'rest',_ts:x.created_at})));
   }
   if(tf!=='restaurants'){
-    let d=[...allDiscs].filter(d=>!d.is_private||d.user_id===currentUser.id);
+    let d=[...allDiscs].filter(canSee);
     if(uf!=='all')d=d.filter(x=>x.username===uf);
     if(q)d=d.filter(x=>x.name.toLowerCase().includes(q)||rtePlain(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     items=items.concat(d.map(x=>({...x,_k:'disc',_ts:x.created_at})));
@@ -1466,86 +1500,100 @@ function renderSquare(){
 
 function sqRestCardHTML(r){
   const isOwn=r.user_id===currentUser.id;
-  return`<div class="card" id="sqr_${r.id}" style="margin-bottom:7px;cursor:pointer" onclick="toggleSqExpand('sqr_${r.id}',${r.id},'rest')">
+  const vis=r.visibility||(r.is_private?'private':'public');
+  const visBadge=vis==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':'';
+  const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
+  // own items → click to open detail; others → click to expand in place
+  const clickAction=isOwn?`openDetail(${r.id})`:`toggleSq('sqr_${r.id}',${r.id},'rest')`;
+  return`<div class="card" id="sqr_${r.id}" style="margin-bottom:7px;cursor:pointer" onclick="${clickAction}">
     <div class="card-inner" style="padding:12px 14px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:15px;font-weight:600">${r.name}</span>
             <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
             ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+            ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
+            ${visBadge}
           </div>
           <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;flex-wrap:wrap">
             ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
             ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+(r.awards.length-1):''}</span>`:''}
           </div>
-          ${r.summary?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="sq-preview">${rtePlain(r.summary)}</div>`:''}
+          ${r.tags&&r.tags.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${r.tags.map(t=>`<span class="tag-badge">${t}</span>`).join('')}</div>`:''}
+          ${r.summary?`<div class="sq-preview" style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
-          ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
+          ${r.rating?`<span style="color:#E8B84B;font-size:14px;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
           <div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>
-          <span style="font-size:11px;color:var(--th)">▾</span>
+          ${isOwn?`<span style="font-size:11px;color:var(--teal)">点击查看详情 →</span>`:`<span style="font-size:11px;color:var(--th)" class="sq-arrow">▾ 展开</span>`}
         </div>
       </div>
-      <div class="sq-expand" style="display:none;margin-top:12px;border-top:1px solid var(--wb);padding-top:10px"></div>
+      ${!isOwn?`<div class="sq-expand" style="display:none"></div>`:''}
     </div>
   </div>`;
 }
 
 function sqDiscCardHTML(d){
-  return`<div class="card disc-card" id="sqd_${d.id}" style="margin-bottom:7px;cursor:pointer" onclick="toggleSqExpand('sqd_${d.id}',${d.id},'disc')">
-    <div class="disc-bar ${d.type}"></div>
-    <div class="disc-body" style="padding:11px 14px">
+  const isOwn=d.user_id===currentUser.id;
+  const vis=d.visibility||(d.is_private?'private':'public');
+  const visBadge=vis==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':'';
+  return`<div class="card disc-card" id="sqd_${d.id}" style="margin-bottom:7px;cursor:pointer" onclick="toggleSq('sqd_${d.id}',${d.id},'disc')">
+    <div style="width:4px;flex-shrink:0;background:${d.type==='inspo'?'var(--purple)':'var(--teal)'}"></div>
+    <div style="flex:1;padding:11px 14px">
       <div style="display:flex;align-items:center;gap:10px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:7px;margin-bottom:4px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
             <span style="font-size:15px;font-weight:600">${d.name}</span>
             <span class="badge" style="font-size:10px;${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
+            ${visBadge}
           </div>
           <div style="font-size:13px;color:var(--tm);display:flex;gap:6px">${d.cuisine_name?`<span>${d.cuisine_name}</span>`:''} ${d.restaurant_name?`<span style="color:var(--th)">· ${d.restaurant_name}</span>`:''}</div>
-          ${d.note?`<div style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="sq-preview">${rtePlain(d.note)}</div>`:''}
+          ${d.note?`<div class="sq-preview" style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(d.note)}</div>`:''}
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
           <div class="user-tag"><div class="user-tag-dot">${(d.display_name||d.username||'?').charAt(0).toUpperCase()}</div>${d.display_name||d.username}</div>
-          <span style="font-size:11px;color:var(--th)">▾</span>
+          <span style="font-size:11px;color:var(--th)" class="sq-arrow">▾ 展开</span>
         </div>
       </div>
-      <div class="sq-expand" style="display:none;margin-top:12px;border-top:1px solid var(--wb);padding-top:10px"></div>
+      <div class="sq-expand" style="display:none"></div>
     </div>
   </div>`;
 }
 
-function toggleSqExpand(cardId,itemId,type){
+function toggleSq(cardId,itemId,type){
   const card=document.getElementById(cardId);
+  if(!card)return;
   const exp=card.querySelector('.sq-expand');
+  if(!exp)return;
+  const arrow=card.querySelector('.sq-arrow');
   const preview=card.querySelector('.sq-preview');
-  const arrow=card.querySelector('span[style*="▾"],span[style*="▴"]');
-  const isOpen=exp.style.display!=='none';
-  // close all others
-  document.querySelectorAll('.sq-expand').forEach(e=>{
-    e.style.display='none';
-    const p=e.closest('.card-inner,.disc-body')?.querySelector('.sq-preview');
-    if(p)p.style.cssText='font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-  });
-  document.querySelectorAll('.sq-arrow').forEach(a=>a.textContent='▾');
+  const isOpen=exp.style.display==='block';
+  // close all
+  document.querySelectorAll('.sq-expand').forEach(e=>e.style.display='none');
+  document.querySelectorAll('.sq-arrow').forEach(a=>a.textContent='▾ 展开');
+  document.querySelectorAll('.sq-preview').forEach(p=>{p.style.overflow='hidden';p.style.textOverflow='ellipsis';p.style.whiteSpace='nowrap'});
   if(isOpen)return;
-  // expand this one
-  if(preview)preview.style.cssText='font-size:13px;color:var(--th);margin-top:4px;white-space:normal';
+  // open this
+  if(preview){preview.style.overflow='visible';preview.style.whiteSpace='normal';preview.style.textOverflow='unset'}
+  if(arrow)arrow.textContent='▴ 收起';
   exp.style.display='block';
-  if(arrow)arrow.textContent='▴';
   if(type==='rest'){
-    const r=[...allRests].find(x=>x.id===itemId);
-    if(!r){exp.innerHTML='';return}
-    exp.innerHTML=`
-      ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;margin-bottom:8px">${r.summary}</div>`:''}
-      ${r.notes?`<div style="font-size:13px;color:var(--th);line-height:1.6;padding:8px 12px;background:var(--cream-d);border-radius:var(--rs)">${r.notes}</div>`:''}
-      <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>`;
+    const r=[...allRests].find(x=>x.id===itemId);if(!r)return;
+    const imgs=r.images&&r.images.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${r.images.map(url=>`<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:8px;cursor:pointer" onclick="event.stopPropagation();showImgFull('${url}')">`).join('')}</div>`:'';
+    const dishes=myDishes.filter(d=>d.restaurant_id===r.id);
+    const dishHtml=dishes.length?`<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--wb)"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--th);margin-bottom:8px">菜品记录</div>${dishes.map(d=>`<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--cream-d);font-size:13px"><span style="flex:1;font-weight:600">${d.name}</span><span style="color:var(--th)">${d.rating?d.rating.toFixed(1)+' ★':''} ${d.rating_label||''}</span></div>`).join('')}</div>`:'';
+    exp.innerHTML=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--wb)">
+      ${r.summary?`<div style="font-size:14px;color:var(--tm);line-height:1.7;margin-bottom:6px">${r.summary}</div>`:''}
+      ${imgs}${dishHtml}
+      <div style="font-size:11px;color:var(--th);margin-top:8px">${fmtDate(r.created_at)}</div>
+    </div>`;
   }else{
-    const d=[...allDiscs].find(x=>x.id===itemId);
-    if(!d){exp.innerHTML='';return}
-    exp.innerHTML=`
-      ${d.note?`<div style="font-size:14px;color:var(--tm);line-height:1.7">${d.note}</div>`:''}
-      <div style="font-size:12px;color:var(--th);margin-top:8px">${fmtDate(d.created_at)}</div>`;
+    const d=[...allDiscs].find(x=>x.id===itemId);if(!d)return;
+    exp.innerHTML=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--wb)">
+      ${d.note?`<div style="font-size:14px;color:var(--tm);line-height:1.7">${d.note}</div>`:'<div style="font-size:13px;color:var(--th)">暂无描述</div>'}
+      <div style="font-size:11px;color:var(--th);margin-top:8px">${fmtDate(d.created_at)}</div>
+    </div>`;
   }
 }
 
@@ -1652,23 +1700,32 @@ function renderAll(){renderMine();renderSquare();renderMap();renderStats()}
 
 // ── Friends ──
 async function searchUser(){
-  const q=document.getElementById('friendSearch').value.trim().toLowerCase();
-  if(!q){showToast('请输入用户名');return}
+  const q=document.getElementById('friendSearch').value.trim();
+  if(!q){showToast('请输入用户名或昵称');return}
   const res=document.getElementById('friendSearchResult');
   res.innerHTML='<div style="font-size:13px;color:var(--th)">搜索中...</div>';
   try{
-    const users=await sbGet(`users?username=eq.${encodeURIComponent(q)}&select=id,username,display_name`);
-    if(!users||!users.length){res.innerHTML='<div style="font-size:13px;color:var(--th)">未找到该用户</div>';return}
-    const u=users[0];
-    if(u.id===currentUser.id){res.innerHTML='<div style="font-size:13px;color:var(--th)">这是你自己</div>';return}
-    const isF=myFriends.some(f=>(f.user_id===currentUser.id&&f.friend_id===u.id)||(f.friend_id===currentUser.id&&f.user_id===u.id));
-    const isPO=pendingOut.some(f=>f.friend_id===u.id);
-    res.innerHTML=`<div class="friend-item">
-      <div class="friend-avatar">${(u.display_name||u.username).charAt(0).toUpperCase()}</div>
-      <div class="friend-info"><div class="friend-name">${u.display_name||u.username}</div><div class="friend-username">@${u.username}</div></div>
-      ${isF?'<span style="font-size:13px;color:var(--teal)">已是好友</span>':isPO?'<span style="font-size:13px;color:var(--th)">申请已发送</span>':`<button class="friend-action primary" onclick="sendFriendReq(${u.id})">加好友</button>`}
-    </div>`;
-  }catch(e){res.innerHTML='<div style="font-size:13px;color:var(--coral)">搜索失败</div>'}
+    // 同时搜索用户名和昵称
+    const [byUsername, byDisplay] = await Promise.all([
+      sbGet(`users?username=ilike.${encodeURIComponent('*'+q+'*')}&select=id,username,display_name&limit=5`),
+      sbGet(`users?display_name=ilike.${encodeURIComponent('*'+q+'*')}&select=id,username,display_name&limit=5`)
+    ]);
+    // 合并去重
+    const all=[...(byUsername||[]),...(byDisplay||[])];
+    const seen=new Set();
+    const users=all.filter(u=>{if(seen.has(u.id))return false;seen.add(u.id);return true})
+      .filter(u=>u.id!==currentUser.id);
+    if(!users.length){res.innerHTML='<div style="font-size:13px;color:var(--th)">未找到用户，试试完整的用户名或昵称</div>';return}
+    res.innerHTML=users.map(u=>{
+      const isF=myFriends.some(f=>(f.user_id===currentUser.id&&f.friend_id===u.id)||(f.friend_id===currentUser.id&&f.user_id===u.id));
+      const isPO=pendingOut.some(f=>f.friend_id===u.id);
+      return`<div class="friend-item">
+        <div class="friend-avatar">${(u.display_name||u.username).charAt(0).toUpperCase()}</div>
+        <div class="friend-info"><div class="friend-name">${u.display_name||u.username}</div><div class="friend-username">@${u.username}</div></div>
+        ${isF?'<span style="font-size:13px;color:var(--teal)">已是好友</span>':isPO?'<span style="font-size:13px;color:var(--th)">申请已发送</span>':`<button class="friend-action primary" onclick="sendFriendReq(${u.id})">加好友</button>`}
+      </div>`;
+    }).join('');
+  }catch(e){res.innerHTML='<div style="font-size:13px;color:var(--coral)">搜索失败，请重试</div>'}
 }
 async function sendFriendReq(fid){
   try{const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});if(r&&r[0])pendingOut.push(r[0]);showToast('好友申请已发送');document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--teal)">申请已发送</div>';}
