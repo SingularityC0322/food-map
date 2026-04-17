@@ -19,7 +19,7 @@
   --r:14px;--rs:9px;
   --serif:'Playfair Display',Georgia,serif;
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:15px}
 .app{max-width:700px;margin:0 auto;padding:0 18px 110px}
 
@@ -71,15 +71,20 @@ body{font-family:-apple-system,'PingFang SC','Hiragino Sans GB',sans-serif;backg
 .section{display:none}.section.active{display:block}
 
 /* FAB */
-.fab{position:fixed;bottom:24px;right:50%;transform:translateX(50%);max-width:664px;width:calc(100% - 36px);background:var(--teal);color:white;border:none;border-radius:var(--rs);padding:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;letter-spacing:.04em;transition:background .15s}
+.fab{position:fixed;bottom:24px;right:50%;transform:translateX(50%);max-width:664px;width:calc(100% - 36px);background:var(--teal);color:white;border:none;border-radius:var(--rs);padding:15px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;z-index:20;letter-spacing:.04em;transition:all .15s;box-shadow:0 4px 20px rgba(42,122,92,.35)}
+.fab:hover{background:var(--teal-d)}
+.fab:active{transform:translateX(50%) scale(.98)}
 .fab:hover{background:var(--teal-d)}
 
 /* Sheets */
 .sheet-wrap{display:none;position:fixed;inset:0;background:rgba(28,26,22,.45);z-index:100;align-items:flex-end;justify-content:center}
 .sheet-wrap.open{display:flex}
 .sheet{background:var(--cream);border-radius:18px 18px 0 0;padding:6px 20px 50px;width:100%;max-width:700px;max-height:93vh;overflow-y:auto}
-.sheet-handle{width:36px;height:4px;background:var(--cream-dd);border-radius:2px;margin:13px auto 18px}
-.sheet-title{font-family:var(--serif);font-size:20px;font-weight:700;margin-bottom:18px;color:var(--text)}
+.sheet-handle{width:36px;height:4px;background:var(--cream-dd);border-radius:2px;margin:13px auto 0}
+.sheet-top{display:flex;align-items:center;justify-content:space-between;padding:16px 0 14px}
+.sheet-title{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--text);flex:1}
+.sheet-close-btn{width:32px;height:32px;border-radius:50%;background:var(--cream-d);border:none;cursor:pointer;font-size:18px;color:var(--tm);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;line-height:1}
+.sheet-close-btn:hover{background:var(--cream-dd);color:var(--text)}
 .fg{margin-bottom:15px}
 .fl{font-size:11px;color:var(--th);font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
 .fi{width:100%;padding:11px 13px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:15px;font-family:inherit;color:var(--text);background:white;outline:none;transition:border .15s}
@@ -156,8 +161,9 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 /* Filters */
 .filter-row{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .filter-row::-webkit-scrollbar{display:none}
-.pill{padding:6px 14px;border-radius:20px;border:1px solid var(--wb2);background:white;font-size:13px;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-.pill.active{background:var(--teal);color:white;border-color:var(--teal)}
+.pill{padding:7px 16px;border-radius:20px;border:1px solid var(--wb2);background:white;font-size:13px;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.pill.active{background:var(--teal);color:white;border-color:var(--teal);font-weight:600}
+.pill:active{transform:scale(.97)}
 .sq-filter{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .sq-select{padding:7px 12px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--text);background:white;outline:none;cursor:pointer}
 
@@ -199,7 +205,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 /* Detail */
 .detail-wrap{display:none;position:fixed;inset:0;background:var(--cream);z-index:50;overflow-y:auto}
 .detail-wrap.open{display:block}
-.detail-header{padding:14px 18px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--cream);z-index:5}
+.detail-header{padding:10px 14px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--cream);z-index:5}
 .back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm);padding:2px 6px}
 .detail-header h2{font-family:var(--serif);font-size:18px;font-weight:700;flex:1;color:var(--text)}
 .detail-body{padding:16px 18px;max-width:700px;margin:0 auto}
@@ -431,7 +437,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="importSheet" onclick="if(event.target===this)closeSheet('importSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">从文章导入餐厅</div>
+    <div class="sheet-top"><div class="sheet-title">从文章导入餐厅</div><button class="sheet-close-btn" onclick="closeSheet('importSheet')">×</button></div>
     <div id="importStep1">
       <div class="fg"><label class="fl">文章链接</label><div style="display:flex;gap:8px"><input class="fi" id="importUrl" placeholder="粘贴文章链接..." style="flex:1"/><button onclick="fetchUrl()" class="btn-fetch">抓取</button></div><div style="font-size:12px;color:var(--th);margin-top:5px">或直接粘贴文字到下方</div></div>
       <div class="fg"><label class="fl">文章内容</label><textarea class="fi" id="importText" placeholder="把文章文字粘贴到这里..." style="min-height:130px"></textarea></div>
@@ -454,7 +460,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="restSheet" onclick="if(event.target===this)closeSheet('restSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="restSheetTitle">添加餐厅</div>
+    <div class="sheet-top"><div class="sheet-title" id="restSheetTitle">添加餐厅</div><button class="sheet-close-btn" onclick="closeSheet('restSheet')">×</button></div>
     <div class="fg"><label class="fl">状态</label><div class="tog-row"><button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button><button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button></div></div>
     <div class="fr">
       <div class="fg"><label class="fl">餐厅名称</label><input class="fi" id="rName" placeholder="餐厅名"/></div>
@@ -468,6 +474,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
         <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
@@ -534,7 +541,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="dishSheet" onclick="if(event.target===this)closeSheet('dishSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">添加一道菜</div>
+    <div class="sheet-top"><div class="sheet-title">添加一道菜</div><button class="sheet-close-btn" onclick="closeSheet('dishSheet')">×</button></div>
     <div class="fg"><label class="fl">菜名</label><input class="fi" id="dName" placeholder="比如：黑松露炒饭"/></div>
     <div class="fg"><label class="fl">评分</label><div class="star-row"><div class="stars" id="dishStars"></div><span class="star-val" id="dishStarVal">—</span><div class="star-adj"><button onclick="adjStar('dish',-0.1)">−</button><button onclick="adjStar('dish',0.1)">+</button></div></div></div>
     <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'dishLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button></div></div>
@@ -548,7 +555,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="discSheet" onclick="if(event.target===this)closeSheet('discSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title" id="discSheetTitle">记录发现</div>
+    <div class="sheet-top"><div class="sheet-title" id="discSheetTitle">记录发现</div><button class="sheet-close-btn" onclick="closeSheet('discSheet')">×</button></div>
     <div class="fg"><label class="fl">类型</label><div class="tog-row"><button class="tog c-teal on" onclick="selTog(this,'discType','discovery')">发现（已尝过 / 自己做的）</button><button class="tog c-blue" onclick="selTog(this,'discType','inspo')">灵感（待尝试）</button></div></div>
     <div class="fg"><label class="fl">名称</label><input class="fi" id="diName" placeholder="比如：剥皮辣椒、秋葵纳豆拌饭"/></div>
     <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="diCuisine"></select></div>
@@ -563,11 +570,13 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <!-- Restaurant Detail -->
 <div class="detail-wrap" id="restDetail">
   <div class="detail-header">
-    <button class="back-btn" onclick="closeDetail()">←</button>
-    <h2 id="detailName"></h2>
-    <button class="edit-btn" id="detailEditBtn" onclick="editRest(currentRestId)">编辑</button>
-    <button class="edit-btn" id="detailShareBtn" onclick="shareItem('restaurant',currentRestId)">分享</button>
-    <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()" style="font-size:15px;color:var(--coral)" title="删除这家餐厅">🗑</button>
+    <button class="back-btn" onclick="closeDetail()" style="display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--teal);padding:6px 10px;border-radius:20px;background:var(--teal-l);border:none;cursor:pointer;white-space:nowrap">← 返回</button>
+    <h2 id="detailName" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 8px"></h2>
+    <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      <button class="edit-btn" id="detailEditBtn" onclick="editRest(currentRestId)">✏️ 编辑</button>
+      <button class="edit-btn" id="detailShareBtn" onclick="shareItem('restaurant',currentRestId)">分享</button>
+      <button class="del-btn" id="detailDelBtn" onclick="deleteCurrentRest()" style="font-size:15px;color:var(--coral)" title="删除">🗑</button>
+    </div>
   </div>
   <div class="detail-body">
     <div class="detail-sec" id="detailMeta"></div>
@@ -580,7 +589,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="shareSheet" onclick="if(event.target===this)closeSheet('shareSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">生成分享链接</div>
+    <div class="sheet-top"><div class="sheet-title">生成分享链接</div><button class="sheet-close-btn" onclick="closeSheet('shareSheet')">×</button></div>
     <p style="font-size:14px;color:var(--tm);line-height:1.6;margin-bottom:16px">任何拿到链接的人都能查看，无需登录。</p>
     <div id="shareLoading" style="text-align:center;padding:20px;color:var(--th);font-size:14px">生成中...</div>
     <div id="shareLinkArea" style="display:none">
@@ -593,8 +602,12 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 
 <!-- Share Page -->
 <div id="sharePage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:600;overflow-y:auto">
+  <div style="position:sticky;top:0;background:rgba(250,248,243,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--wb);padding:12px 20px;display:flex;align-items:center;gap:10px" id="sharePageNav">
+    <button onclick="closeSharPage()" style="display:none;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--teal);padding:6px 12px;border-radius:20px;background:var(--teal-l);border:none;cursor:pointer" id="sharePageBack">← 返回</button>
+    <div style="font-family:var(--serif);font-size:15px;font-weight:700;flex:1;text-align:center">Eat as <em style="font-style:italic;font-weight:400;color:var(--teal)">a Local</em></div>
+    <div style="width:60px"></div>
+  </div>
   <div class="share-page">
-    <div class="share-page-header"><div class="share-page-logo">Eat as <em>a Local</em></div><div class="share-page-sub">美食探索分享</div></div>
     <div id="sharePageContent"></div>
     <div style="text-align:center;margin-top:32px;padding-top:20px;border-top:1px solid var(--wb)">
       <p style="font-size:13px;color:var(--th);margin-bottom:10px">想记录自己的美食探索？</p>
@@ -607,7 +620,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="settingsSheet" onclick="if(event.target===this)closeSheet('settingsSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-title">账号设置</div>
+    <div class="sheet-top"><div class="sheet-title">账号设置</div><button class="sheet-close-btn" onclick="closeSheet('settingsSheet')">×</button></div>
     <div class="fg">
       <label class="fl">昵称</label>
       <input class="fi" id="settingsDisplayName" placeholder="显示给别人看的名字"/>
@@ -847,9 +860,15 @@ function buildCityFilter(){
     cities.map(c=>`<button class="pill" onclick="setCityFilter('${c}',this)">${c}</button>`).join('');
 }
 function setCityFilter(city,btn){
-  cityFilter=city;
-  document.querySelectorAll('#cityFilterRow .pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if(cityFilter===city&&city!=='all'){
+    cityFilter='all';
+    document.querySelectorAll('#cityFilterRow .pill').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#cityFilterRow .pill')[0].classList.add('active');
+  }else{
+    cityFilter=city;
+    document.querySelectorAll('#cityFilterRow .pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
   renderMine();
 }
 function toggleGroupBy(){
@@ -1352,9 +1371,17 @@ function discCardHTML(d,showUser=false,showDel=false){
 
 // ── Render Mine ──
 function setRestFilter(f,btn){
+  // 点击已激活的标签 → 回到「全部」
+  if(restFilter===f&&f!=='all'){
+    f='all';
+    document.querySelectorAll('#typeFilterRow .pill').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('#typeFilterRow .pill')[0].classList.add('active');
+  }else{
+    restFilter=f;
+    document.querySelectorAll('#typeFilterRow .pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
   restFilter=f;cityFilter='all';
-  document.querySelectorAll('#mine .filter-row:first-of-type .pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
   const showCity=f!=='disc';
   document.getElementById('cityFilterRow').style.display=showCity?'flex':'none';
   document.getElementById('groupToggleRow').style.display=showCity?'flex':'none';
@@ -1714,6 +1741,12 @@ async function checkShareLink(){
     const links=await sbGet(`share_links?token=eq.${token}&select=*`);
     if(!links||!links.length)return false;
     const link=links[0];
+    // Check if user is already logged in - if so show back button
+    const savedUser=sessionStorage.getItem('fu_user');
+    if(savedUser){
+      const backBtn=document.getElementById('sharePageBack');
+      if(backBtn){backBtn.style.display='flex';}
+    }
     document.getElementById('authScreen').classList.remove('open');
     document.getElementById('mainApp').style.display='none';
     document.getElementById('fabBtn').style.display='none';
@@ -1835,6 +1868,16 @@ async function saveImported(){
   }
   closeSheet('importSheet');buildCityFilter();renderAll();showToast(`已导入 ${saved} 家餐厅`);
   document.getElementById('importSaveBtn').textContent='加入想去列表';document.getElementById('importSaveBtn').disabled=false;
+}
+
+function closeSharPage(){
+  document.getElementById('sharePage').style.display='none';
+  if(currentUser){
+    document.getElementById('mainApp').style.display='block';
+    document.getElementById('fabBtn').style.display='block';
+  }else{
+    document.getElementById('authScreen').classList.add('open');
+  }
 }
 
 // ── Keyboard & navigation ──
