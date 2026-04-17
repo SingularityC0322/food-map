@@ -367,7 +367,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <input type="text" id="mineSearch" placeholder="搜索餐厅名、城市、菜系、食材..." oninput="renderMine()"/>
       <button class="search-clear" id="mineSearchClear" onclick="clearSearch('mine')">×</button>
     </div>
-    <div class="filter-row">
+    <div class="filter-row" id="typeFilterRow">
       <button class="pill active" onclick="setRestFilter('all',this)">全部</button>
       <button class="pill" onclick="setRestFilter('wishlist',this)">📌 想去</button>
       <button class="pill" onclick="setRestFilter('visited',this)">✓ 去过</button>
