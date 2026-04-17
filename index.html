@@ -474,9 +474,8 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
       </div>
     </div>
@@ -1373,7 +1372,7 @@ function discCardHTML(d,showUser=false,showDel=false){
 function setRestFilter(f,btn){
   // 点击已激活的标签 → 回到「全部」
   if(restFilter===f&&f!=='all'){
-    f='all';
+    restFilter='all';
     document.querySelectorAll('#typeFilterRow .pill').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('#typeFilterRow .pill')[0].classList.add('active');
   }else{
@@ -1381,8 +1380,8 @@ function setRestFilter(f,btn){
     document.querySelectorAll('#typeFilterRow .pill').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
   }
-  restFilter=f;cityFilter='all';
-  const showCity=f!=='disc';
+  cityFilter='all';
+  const showCity=restFilter!=='disc';
   document.getElementById('cityFilterRow').style.display=showCity?'flex':'none';
   document.getElementById('groupToggleRow').style.display=showCity?'flex':'none';
   if(showCity)buildCityFilter();
