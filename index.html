@@ -8,7 +8,7 @@
 <style>
 :root{
   --teal:#2A7A5C;--teal-l:#E1F5EE;--teal-d:#1A5940;
-  --purple:#7F77DD;--purple-l:#EEEDFE;
+  --purple:#7F77DD;--purple-l:#EEEDFE;--purple-d:#5048AA;
   --amber:#C88A2A;--amber-l:#FDF3DC;
   --coral:#C4523A;--coral-l:#FAECE7;
   --blue:#3A7FBF;--blue-l:#E6F1FB;
@@ -375,10 +375,26 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     </div>
     <!-- City sub-filter (shown when browsing restaurants) -->
     <div id="cityFilterRow" class="filter-row" style="margin-top:-4px"></div>
-    <!-- Group by toggle -->
-    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center" id="groupToggleRow">
-      <span style="font-size:12px;color:var(--th)">分组</span>
-      <button class="pill" id="groupByCity" onclick="toggleGroupBy()" style="font-size:12px;padding:4px 12px">按城市</button>
+    <!-- Group + Sort + Filter controls -->
+    <div style="display:flex;gap:6px;margin-bottom:12px;align-items:center;flex-wrap:wrap" id="groupToggleRow">
+      <button class="pill" id="groupByCity" onclick="toggleGroupBy()" style="font-size:12px;padding:5px 12px">📍 按城市</button>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:auto">
+        <select id="sortSelect" onchange="renderMine()" style="padding:5px 10px;border:1px solid var(--wb2);border-radius:20px;font-size:12px;font-family:inherit;color:var(--tm);background:white;outline:none;cursor:pointer">
+          <option value="time_desc">最新优先</option>
+          <option value="time_asc">最早优先</option>
+          <option value="rating_desc">评分从高到低</option>
+          <option value="rating_asc">评分从低到高</option>
+          <option value="name_asc">名称 A→Z</option>
+        </select>
+        <select id="ratingFilter" onchange="renderMine()" style="padding:5px 10px;border:1px solid var(--wb2);border-radius:20px;font-size:12px;font-family:inherit;color:var(--tm);background:white;outline:none;cursor:pointer">
+          <option value="all">全部评分</option>
+          <option value="4.5">4.5分以上</option>
+          <option value="4">4分以上</option>
+          <option value="3">3分以上</option>
+          <option value="rated">有评分</option>
+          <option value="unrated">未评分</option>
+        </select>
+      </div>
     </div>
     <button class="import-btn" onclick="openImport()">✦ 从文章智能导入餐厅</button>
     <div id="reminderBanner" style="display:none;margin-bottom:12px"></div>
@@ -428,6 +444,15 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div id="stats" class="section">
     <div class="stats-grid" id="statsGrid"></div>
     <div class="chart-sec"><div class="chart-title">探索最多的菜系</div><div id="chartBars"></div></div>
+    <div id="statsExtra"></div>
+    <div style="margin-top:16px;background:white;border:1px solid var(--wb);border-radius:var(--r);padding:18px 20px">
+      <div style="font-size:11px;font-weight:700;color:var(--th);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">数据备份</div>
+      <div style="font-size:13px;color:var(--tm);margin-bottom:14px;line-height:1.6">将所有记录导出为 Excel 文件保存到本地，建议定期备份。</div>
+      <button onclick="exportData()" id="exportBtn" style="display:flex;align-items:center;gap:8px;padding:11px 18px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s">
+        <span>⬇</span><span>导出全部数据</span>
+      </button>
+      <div id="exportProgress" style="display:none;margin-top:10px;font-size:13px;color:var(--tm)"></div>
+    </div>
   </div>
 </div>
 
@@ -474,8 +499,9 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
         <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
         <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/市场</button>
+        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
         <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
       </div>
     </div>
@@ -594,7 +620,85 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div class="detail-body">
     <div class="detail-sec" id="detailMeta"></div>
     <div class="detail-sec"><div class="detail-sec-title">菜品记录</div><div id="dishRows"></div><button class="add-dish-btn" id="addDishBtn" onclick="openDishSheet()">+ 添加一道菜</button></div>
+    <!-- Visit diary -->
+    <div class="detail-sec" id="visitsSec" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div class="detail-sec-title" style="margin-bottom:0">探访日记</div>
+        <button class="add-dish-btn" id="addVisitBtn" onclick="openVisitSheet()" style="width:auto;padding:7px 14px;margin:0;font-size:13px">+ 记录这次探访</button>
+      </div>
+      <div id="visitRows"></div>
+    </div>
+    <!-- Friend comments -->
+    <div class="detail-sec" id="commentsSec" style="display:none">
+      <div class="detail-sec-title">好友评价</div>
+      <div id="commentRows"></div>
+      <button class="add-dish-btn" id="addCommentBtn" onclick="openCommentSheet()" style="margin-top:8px">+ 写评价</button>
+    </div>
     <div class="detail-sec"><div class="detail-sec-title">相关发现</div><div id="relatedDiscs"></div></div>
+  </div>
+</div>
+
+<!-- Visit Diary Sheet -->
+<div class="sheet-wrap" id="visitSheet" onclick="if(event.target===this)closeSheet('visitSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top"><div class="sheet-title" id="visitSheetTitle">记录这次探访</div><button class="sheet-close-btn" onclick="closeSheet('visitSheet')">×</button></div>
+    <div class="fg"><label class="fl">探访日期</label><input class="fi" type="date" id="visitDate"/></div>
+    <div class="fg"><label class="fl">这次的评分</label>
+      <div class="star-row"><div class="stars" id="visitStars"></div><span class="star-val" id="visitStarVal">—</span>
+        <div class="star-adj"><button onclick="adjStar('visit',-0.1)">−</button><button onclick="adjStar('visit',0.1)">+</button></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">评价标签</label>
+      <div class="rl-row">
+        <button class="rl" onclick="selRl(this,'visitLabel','必试')">必试</button>
+        <button class="rl" onclick="selRl(this,'visitLabel','值得一吃')">值得一吃</button>
+        <button class="rl" onclick="selRl(this,'visitLabel','一般')">一般</button>
+        <button class="rl" onclick="selRl(this,'visitLabel','不推荐')">不推荐</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">这次的感受</label>
+      <div class="rte-wrap">
+        <div class="rte-toolbar" onmousedown="return false">
+          <button onclick="rf('bold')"><b>B</b></button><button onclick="rf('italic')"><i>I</i></button>
+          <button onclick="rf('underline')"><u>U</u></button>
+          <span class="rte-sep"></span>
+          <button onclick="rf('fontSize','1')">小</button><button onclick="rf('fontSize','3')">中</button><button onclick="rf('fontSize','5')">大</button>
+          <span class="rte-sep"></span>
+          <button onclick="rfColor('visitSummary')" class="rte-color-btn">A</button>
+          <span class="rte-sep"></span><button onclick="rf('removeFormat')">✕</button>
+        </div>
+        <div class="rte-body" id="visitSummary" contenteditable="true" data-placeholder="这次去了什么感受，和上次有什么不同..."></div>
+      </div>
+    </div>
+    <button class="btn-p" onclick="saveVisit()">保存日记</button>
+    <button class="btn-s" onclick="closeSheet('visitSheet')">取消</button>
+  </div>
+</div>
+
+<!-- Comment Sheet -->
+<div class="sheet-wrap" id="commentSheet" onclick="if(event.target===this)closeSheet('commentSheet')">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-top"><div class="sheet-title">写评价</div><button class="sheet-close-btn" onclick="closeSheet('commentSheet')">×</button></div>
+    <div class="fg"><label class="fl">评分</label>
+      <div class="star-row"><div class="stars" id="commentStars"></div><span class="star-val" id="commentStarVal">—</span>
+        <div class="star-adj"><button onclick="adjStar('comment',-0.1)">−</button><button onclick="adjStar('comment',0.1)">+</button></div>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">评价标签</label>
+      <div class="rl-row">
+        <button class="rl" onclick="selRl(this,'commentLabel','必试')">必试</button>
+        <button class="rl" onclick="selRl(this,'commentLabel','值得一吃')">值得一吃</button>
+        <button class="rl" onclick="selRl(this,'commentLabel','一般')">一般</button>
+        <button class="rl" onclick="selRl(this,'commentLabel','不推荐')">不推荐</button>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">评价内容</label>
+      <textarea class="fi" id="commentText" placeholder="分享你的看法..." style="min-height:100px"></textarea>
+    </div>
+    <button class="btn-p" onclick="saveComment()">发布评价</button>
+    <button class="btn-s" onclick="closeSheet('commentSheet')">取消</button>
   </div>
 </div>
 
@@ -704,6 +808,7 @@ const AWARDS=['米其林一星','米其林二星','米其林三星','米其林�
 
 let currentUser=null;
 let myRests=[],myDishes=[],myDiscs=[];
+let myVisits=[],myComments=[]; // visits diary, friend comments
 let allRests=[],allDiscs=[];
 let myFriends=[],pendingIn=[],pendingOut=[];
 let restFilter='all',currentTab='mine',currentRestId=null,saving=false;
@@ -721,8 +826,8 @@ function selVenueType(btn,val){
   document.querySelectorAll('#venueTypeRow .tog').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-const rlState={restLabel:'',dishLabel:''};
-const starState={rest:0,dish:0};
+const rlState={restLabel:'',dishLabel:'',visitLabel:'',commentLabel:''};
+const starState={rest:0,dish:0,sd:0,visit:0,comment:0};
 const visState={rest:'public',disc:'public'};
 
 function selVisibility(key,val,btn){
@@ -852,10 +957,14 @@ async function loadAll(){
       sbGet('restaurants?order=created_at.desc&limit=300'),
       sbGet('discoveries?order=created_at.desc&limit=300'),
       sbGet(`friendships?or=(user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id})`),
+      sbGet(`visits?user_id=eq.${currentUser.id}&order=visited_date.desc`),
+      sbGet(`restaurant_comments?order=created_at.desc&limit=500`),
     ]);
     myRests=res[0]||[];myDishes=res[1]||[];myDiscs=res[2]||[];
     allRests=res[3]||[];allDiscs=res[4]||[];
     const fs=res[5]||[];
+    myVisits=res[6]||[];
+    myComments=res[7]||[];
     myFriends=fs.filter(f=>f.status==='accepted');
     pendingIn=fs.filter(f=>f.friend_id===currentUser.id&&f.status==='pending');
     pendingOut=fs.filter(f=>f.user_id===currentUser.id&&f.status==='pending');
@@ -944,10 +1053,12 @@ function buildStars(cid,vid,key){
   for(let i=1;i<=5;i++){const s=document.createElement('span');s.className='star'+(starState[key]>=i?' on':'');s.textContent='★';s.onclick=(v=>()=>{starState[key]=v;buildStars(cid,vid,key);document.getElementById(vid).textContent=v.toFixed(1)})(i);c.appendChild(s);}
 }
 function adjStar(key,delta){
-  starState[key]=Math.max(0,Math.min(5,Math.round((starState[key]+delta)*10)/10));
-  const cid=key==='rest'?'restStars':key==='dish'?'dishStars':'sdStars';
-  const vid=key==='rest'?'restStarVal':key==='dish'?'dishStarVal':'sdStarVal';
-  buildStars(cid,vid,key);document.getElementById(vid).textContent=starState[key]?starState[key].toFixed(1):'—';
+  starState[key]=Math.max(0,Math.min(5,Math.round(((starState[key]||0)+delta)*10)/10));
+  const ids={rest:['restStars','restStarVal'],dish:['dishStars','dishStarVal'],sd:['sdStars','sdStarVal'],visit:['visitStars','visitStarVal'],comment:['commentStars','commentStarVal']};
+  const [cid,vid]=ids[key]||[key+'Stars',key+'StarVal'];
+  buildStars(cid,vid,key);
+  const el=document.getElementById(vid);
+  if(el)el.textContent=starState[key]?starState[key].toFixed(1):'—';
 }
 function togglePriv(key){privState[key]=!privState[key];document.getElementById(key==='rest'?'restPrivSwitch':'discPrivSwitch').classList.toggle('on',privState[key])}
 function toggleAward(a,btn){if(selectedAwards.includes(a)){selectedAwards=selectedAwards.filter(x=>x!==a);btn.classList.remove('on')}else{selectedAwards.push(a);btn.classList.add('on')}}
@@ -1466,6 +1577,13 @@ function renderMine(){
   let items=[...myRests];
   if(restFilter!=='all')items=items.filter(r=>r.status===restFilter);
   if(cityFilter!=='all')items=items.filter(r=>(r.city||'').trim()===cityFilter);
+
+  // Rating filter
+  const rf=document.getElementById('ratingFilter')?.value||'all';
+  if(rf==='rated')items=items.filter(r=>r.rating);
+  else if(rf==='unrated')items=items.filter(r=>!r.rating);
+  else if(rf!=='all')items=items.filter(r=>r.rating>= parseFloat(rf));
+
   if(q)items=items.filter(r=>
     r.name.toLowerCase().includes(q)||
     (r.city||'').toLowerCase().includes(q)||
@@ -1479,7 +1597,15 @@ function renderMine(){
     myDishes.filter(d=>d.restaurant_id===r.id).some(d=>d.name.toLowerCase().includes(q)||rtePlain(d.note||'').toLowerCase().includes(q))
   );
 
-  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q||cityFilter!=='all'?'没有找到相关记录':'还没有'+( restFilter==='wishlist'?'想去的':'去过的')+'餐厅'}</p></div>`;return}
+  // Sort
+  const sort=document.getElementById('sortSelect')?.value||'time_desc';
+  if(sort==='time_desc')items.sort((a,b)=>b.created_at.localeCompare(a.created_at));
+  else if(sort==='time_asc')items.sort((a,b)=>a.created_at.localeCompare(b.created_at));
+  else if(sort==='rating_desc')items.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if(sort==='rating_asc')items.sort((a,b)=>(a.rating||0)-(b.rating||0));
+  else if(sort==='name_asc')items.sort((a,b)=>a.name.localeCompare(b.name,'zh'));
+
+  if(!items.length){list.innerHTML=`<div class="empty"><div class="empty-en">Nothing yet</div><p>${q||cityFilter!=='all'||rf!=='all'?'没有找到相关记录':'还没有'+( restFilter==='wishlist'?'想去的':'去过的')+'餐厅'}</p></div>`;return}
 
   if(groupByCity&&restFilter!=='disc'){
     const groups={};
@@ -1630,11 +1756,27 @@ function toggleSq(cardId,itemId,type){
 function openDetail(id){
   currentRestId=id;
   const own=myRests.some(r=>r.id===id);
+  const r=[...myRests,...allRests].find(x=>x.id===id);
   document.getElementById('restDetail').classList.add('open');
   document.getElementById('detailEditBtn').style.display=own?'inline-block':'none';
   document.getElementById('detailShareBtn').style.display=own?'inline-block':'none';
   document.getElementById('detailDelBtn').style.display=own?'inline-block':'none';
   document.getElementById('addDishBtn').style.display=own?'block':'none';
+  // Show visit diary for own records
+  const visitsSec=document.getElementById('visitsSec');
+  const addVisitBtn=document.getElementById('addVisitBtn');
+  if(visitsSec)visitsSec.style.display=own?'block':'none';
+  if(addVisitBtn)addVisitBtn.style.display=own?'block':'none';
+  // Show comments section if restaurant has allow_comments=true OR it's own record
+  const commentsSec=document.getElementById('commentsSec');
+  const addCommentBtn=document.getElementById('addCommentBtn');
+  if(commentsSec){
+    const allowComments=r&&r.allow_comments;
+    const isFriendOwner=r&&myFriends.some(f=>(f.user_id===currentUser.id&&f.friend_id===r.user_id)||(f.friend_id===currentUser.id&&f.user_id===r.user_id));
+    const showComments=own||allowComments||(r&&r.user_id!==currentUser.id);
+    commentsSec.style.display=showComments?'block':'none';
+    if(addCommentBtn)addCommentBtn.style.display=(!own)?'block':'none'; // only others can comment
+  }
   history.pushState({page:'detail',id},'','');
   renderDetail(id);
 }
@@ -1669,12 +1811,123 @@ function renderDetail(id){
       <div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div>
       ${own?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
     </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">还没有菜品记录</div>';
+  // Render visits
+  renderVisits(id,own);
+  // Render comments
+  renderComments(id,own);
   const rd=myDiscs.filter(d=>d.restaurant_id===id);
   document.getElementById('relatedDiscs').innerHTML=rd.length?rd.map(d=>`
     <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--wb)">
       <span style="font-size:14px;font-weight:600">${d.name}</span>
       <span class="badge" style="${d.type==='inspo'?'background:var(--purple-l);color:#3C3489':'background:var(--teal-l);color:var(--teal-d)'}">${d.type==='inspo'?'灵感':'发现'}</span>
     </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">暂无相关发现</div>';
+}
+
+// ── Visit diary ──
+function renderVisits(restId,own){
+  const el=document.getElementById('visitRows');
+  if(!el)return;
+  const visits=myVisits.filter(v=>v.restaurant_id===restId).sort((a,b)=>b.visited_date?.localeCompare(a.visited_date||'')||0);
+  if(!visits.length){el.innerHTML='<div style="color:var(--th);font-size:14px;padding:8px 0">还没有探访日记，点上方按钮记录这次体验</div>';return}
+  el.innerHTML=visits.map(v=>`
+    <div style="border:1px solid var(--wb);border-radius:var(--rs);padding:13px 15px;margin-bottom:10px;background:white">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--text)">${v.visited_date||fmtDate(v.created_at)}</span>
+        ${v.rating?`<span style="color:#E8B84B;font-weight:700;font-size:14px">${parseFloat(v.rating).toFixed(1)} ★</span>`:''}
+        ${v.rating_label?`<span class="badge b-visited" style="font-size:10px">${v.rating_label}</span>`:''}
+        ${own?`<button class="del-btn" style="margin-left:auto" onclick="deleteVisit(${v.id})">×</button>`:''}
+      </div>
+      ${v.summary?`<div style="font-size:13.5px;color:var(--tm);line-height:1.7">${v.summary}</div>`:''}
+    </div>`).join('');
+}
+function openVisitSheet(){
+  rlState.visitLabel='';starState.visit=0;
+  rteSet('visitSummary','');
+  document.getElementById('visitDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('visitStarVal').textContent='—';
+  document.querySelectorAll('#visitSheet .rl').forEach(b=>b.classList.remove('on'));
+  buildStars('visitStars','visitStarVal','visit');
+  document.getElementById('visitSheet').classList.add('open');
+}
+async function saveVisit(){
+  if(!currentRestId)return;
+  const entry={restaurant_id:currentRestId,user_id:currentUser.id,
+    visited_date:document.getElementById('visitDate').value||null,
+    rating:starState.visit||null,
+    rating_label:rlState.visitLabel||null,
+    summary:rteGet('visitSummary')||null};
+  try{
+    const res=await sbPost('visits',entry);
+    if(res&&res[0])myVisits.unshift(res[0]);
+    closeSheet('visitSheet');
+    renderVisits(currentRestId,true);
+    showToast('日记已保存');
+  }catch(e){showToast('保存失败')}
+}
+async function deleteVisit(id){
+  if(!confirm('确定删除这条日记？'))return;
+  try{
+    await sbDel('visits',id);
+    myVisits=myVisits.filter(v=>v.id!==id);
+    renderVisits(currentRestId,true);
+    showToast('已删除');
+  }catch(e){showToast('删除失败')}
+}
+
+// ── Comments ──
+function renderComments(restId,own){
+  const el=document.getElementById('commentRows');
+  if(!el)return;
+  const comments=myComments.filter(c=>c.restaurant_id===restId);
+  if(!comments.length){el.innerHTML='<div style="color:var(--th);font-size:14px;padding:8px 0">暂无好友评价</div>';return}
+  // avg rating from comments
+  const rated=comments.filter(c=>c.rating);
+  const avg=rated.length?(rated.reduce((s,c)=>s+parseFloat(c.rating),0)/rated.length).toFixed(1):'';
+  el.innerHTML=(avg?`<div style="font-size:13px;color:var(--th);margin-bottom:10px">好友平均评分：<span style="color:#E8B84B;font-weight:700">${avg} ★</span>（${rated.length}人评价）</div>`:'')
+    +comments.map(c=>`
+    <div style="border-left:3px solid var(--teal-l);padding:10px 14px;margin-bottom:10px;background:white;border-radius:0 var(--rs) var(--rs) 0;border:1px solid var(--wb);border-left:3px solid var(--teal)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <div class="user-tag-dot" style="width:22px;height:22px;font-size:10px">${(c.display_name||c.username||'?').charAt(0).toUpperCase()}</div>
+        <span style="font-size:13px;font-weight:600">${c.display_name||c.username}</span>
+        ${c.rating?`<span style="color:#E8B84B;font-size:13px;font-weight:700">${parseFloat(c.rating).toFixed(1)} ★</span>`:''}
+        ${c.rating_label?`<span class="badge b-visited" style="font-size:10px">${c.rating_label}</span>`:''}
+        <span style="font-size:11px;color:var(--th);margin-left:auto">${fmtDate(c.created_at)}</span>
+        ${c.user_id===currentUser.id?`<button class="del-btn" onclick="deleteComment(${c.id})">×</button>`:''}
+      </div>
+      ${c.comment?`<div style="font-size:13.5px;color:var(--tm);line-height:1.7">${c.comment}</div>`:''}
+    </div>`).join('');
+}
+function openCommentSheet(){
+  rlState.commentLabel='';starState.comment=0;
+  document.getElementById('commentText').value='';
+  document.getElementById('commentStarVal').textContent='—';
+  document.querySelectorAll('#commentSheet .rl').forEach(b=>b.classList.remove('on'));
+  buildStars('commentStars','commentStarVal','comment');
+  document.getElementById('commentSheet').classList.add('open');
+}
+async function saveComment(){
+  if(!currentRestId)return;
+  const entry={restaurant_id:currentRestId,user_id:currentUser.id,
+    username:currentUser.username,display_name:currentUser.display_name,
+    rating:starState.comment||null,
+    rating_label:rlState.commentLabel||null,
+    comment:document.getElementById('commentText').value.trim()||null};
+  try{
+    const res=await sbPost('restaurant_comments',entry);
+    if(res&&res[0])myComments.unshift(res[0]);
+    closeSheet('commentSheet');
+    renderComments(currentRestId,false);
+    showToast('评价已发布');
+  }catch(e){showToast('发布失败')}
+}
+async function deleteComment(id){
+  if(!confirm('确定删除这条评价？'))return;
+  try{
+    await sbDel('restaurant_comments',id);
+    myComments=myComments.filter(c=>c.id!==id);
+    renderComments(currentRestId,currentRestId&&myRests.some(r=>r.id===currentRestId));
+    showToast('已删除');
+  }catch(e){showToast('删除失败')}
 }
 
 // ── Map ──
@@ -1700,14 +1953,108 @@ function filterMapCuisine(id,name){
 
 // ── Stats ──
 function renderStats(){
+  const visited=myRests.filter(r=>r.status==='visited');
+  const wishlist=myRests.filter(r=>r.status==='wishlist');
+  const rated=visited.filter(r=>r.rating);
+  const avgRating=rated.length?(rated.reduce((s,r)=>s+r.rating,0)/rated.length).toFixed(1):'—';
+  const cities=new Set(visited.filter(r=>r.city).map(r=>r.city.trim())).size;
+
+  // Top stat cards
   document.getElementById('statsGrid').innerHTML=`
-    <div class="sc"><div class="sc-n" style="color:var(--teal)">${myRests.filter(r=>r.status==='visited').length}</div><div class="sc-l">去过的餐厅</div></div>
-    <div class="sc"><div class="sc-n" style="color:var(--blue)">${myRests.filter(r=>r.status==='wishlist').length}</div><div class="sc-l">想去的餐厅</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--teal)">${visited.length}</div><div class="sc-l">去过的地方</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--blue)">${wishlist.length}</div><div class="sc-l">想去的地方</div></div>
     <div class="sc"><div class="sc-n" style="color:var(--purple)">${myDishes.length}</div><div class="sc-l">菜品记录</div></div>
-    <div class="sc"><div class="sc-n" style="color:var(--amber)">${myDiscs.length}</div><div class="sc-l">发现记录</div></div>`;
-  const rank=CUISINES.map(c=>({name:c.name,count:myRests.filter(r=>r.cuisine_id===c.id&&r.status==='visited').length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
-  const max=rank[0]?.count||1;
-  document.getElementById('chartBars').innerHTML=rank.length?rank.map(c=>`<div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/max*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join(''):'<div style="color:var(--th);font-size:14px;text-align:center;padding:16px 0">暂无数据</div>';
+    <div class="sc"><div class="sc-n" style="color:var(--amber)">${myDiscs.length}</div><div class="sc-l">发现记录</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--teal)">${avgRating}</div><div class="sc-l">平均评分</div></div>
+    <div class="sc"><div class="sc-n" style="color:var(--coral)">${cities}</div><div class="sc-l">探索城市数</div></div>`;
+
+  // Cuisine chart
+  const rank=CUISINES.map(c=>({name:c.name,count:visited.filter(r=>r.cuisine_id===c.id).length})).filter(c=>c.count>0).sort((a,b)=>b.count-a.count).slice(0,8);
+  const maxC=rank[0]?.count||1;
+  document.getElementById('chartBars').innerHTML=rank.length?rank.map(c=>`<div class="bar-row"><div class="bar-lbl">${c.name}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(c.count/maxC*100)}%"></div></div><div class="bar-cnt">${c.count}</div></div>`).join(''):'<div style="color:var(--th);font-size:14px;text-align:center;padding:16px 0">暂无数据</div>';
+
+  // Monthly activity (last 12 months)
+  const now=new Date();
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=i===0?'本月':`${d.getMonth()+1}月`;
+    months.push({key,label,count:0});
+  }
+  visited.forEach(r=>{
+    if(!r.created_at)return;
+    const key=r.created_at.slice(0,7);
+    const m=months.find(x=>x.key===key);
+    if(m)m.count++;
+  });
+  const maxM=Math.max(...months.map(m=>m.count),1);
+  const monthlyHtml=`<div class="chart-sec" style="margin-top:14px">
+    <div class="chart-title">每月探索记录（近12个月）</div>
+    <div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin-top:8px">
+      ${months.map(m=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="width:100%;background:var(--teal);border-radius:3px 3px 0 0;height:${Math.max(m.count?Math.round(m.count/maxM*64):0,m.count?4:0)}px;min-height:${m.count?4:0}px;transition:height .3s" title="${m.count}家"></div>
+        <div style="font-size:9px;color:var(--th);white-space:nowrap">${m.label}</div>
+        ${m.count?`<div style="font-size:10px;color:var(--teal);font-weight:700">${m.count}</div>`:'<div style="font-size:10px;color:transparent">0</div>'}
+      </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Rating distribution
+  const ratingBuckets=[
+    {label:'5 ★',min:4.75,count:0},
+    {label:'4–5',min:3.75,count:0},
+    {label:'3–4',min:2.75,count:0},
+    {label:'2–3',min:1.75,count:0},
+    {label:'1–2',min:0,count:0},
+  ];
+  rated.forEach(r=>{
+    const b=ratingBuckets.find(b=>r.rating>=b.min);
+    if(b)b.count++;
+  });
+  const maxR=Math.max(...ratingBuckets.map(b=>b.count),1);
+  const ratingHtml=rated.length?`<div class="chart-sec" style="margin-top:14px">
+    <div class="chart-title">评分分布</div>
+    ${ratingBuckets.map(b=>`<div class="bar-row">
+      <div class="bar-lbl" style="color:${b.count?'var(--text)':'var(--th)'}">${b.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(b.count/maxR*100)}%;background:${b.label==='5 ★'?'var(--amber)':'var(--teal)'}"></div></div>
+      <div class="bar-cnt">${b.count}</div>
+    </div>`).join('')}
+  </div>`:'';
+
+  // Venue type breakdown
+  const venueCounts={};
+  visited.forEach(r=>{const v=r.venue_type||'restaurant';venueCounts[v]=(venueCounts[v]||0)+1;});
+  const venueRank=Object.entries(venueCounts).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const venueHtml=venueRank.length>1?`<div class="chart-sec" style="margin-top:14px">
+    <div class="chart-title">店铺类型分布</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+      ${venueRank.map(([k,n])=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--purple-l);border-radius:20px">
+        <span style="font-size:13px">${VENUE_TYPES[k]||k}</span>
+        <span style="font-size:13px;font-weight:700;color:var(--purple-d)">${n}</span>
+      </div>`).join('')}
+    </div>
+  </div>`:'';
+
+  // Label distribution
+  const labels=['必试','值得一吃','一般','不推荐'];
+  const labelColors={'必试':'var(--teal)','值得一吃':'var(--blue)','一般':'var(--th)','不推荐':'var(--coral)'};
+  const labelCounts={};
+  visited.forEach(r=>{if(r.rating_label)labelCounts[r.rating_label]=(labelCounts[r.rating_label]||0)+1;});
+  const labelHtml=Object.keys(labelCounts).length?`<div class="chart-sec" style="margin-top:14px">
+    <div class="chart-title">评价标签分布</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+      ${labels.filter(l=>labelCounts[l]).map(l=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;background:var(--cream-d)">
+        <span style="width:8px;height:8px;border-radius:50%;background:${labelColors[l]||'var(--th)'};flex-shrink:0"></span>
+        <span style="font-size:13px;color:var(--text)">${l}</span>
+        <span style="font-size:13px;font-weight:700;color:var(--tm)">${labelCounts[l]}</span>
+      </div>`).join('')}
+    </div>
+  </div>`:'';
+
+  // Insert all extra charts after chartBars
+  const extra=document.getElementById('statsExtra');
+  if(extra)extra.innerHTML=monthlyHtml+ratingHtml+venueHtml+labelHtml;
 }
 
 function filterByRemind(city){
@@ -1973,7 +2320,206 @@ function closeSharPage(){
   }
 }
 
-// ── Keyboard & navigation ──
+// ── Export ──
+async function exportData(){
+  const btn=document.getElementById('exportBtn');
+  const prog=document.getElementById('exportProgress');
+  btn.disabled=true;btn.innerHTML='<span>⏳</span><span>导出中...</span>';
+  prog.style.display='block';prog.textContent='正在获取数据...';
+  try{
+    // fetch all data
+    const[rests,dishes,discs]=await Promise.all([
+      sbGet(`restaurants?user_id=eq.${currentUser.id}&order=created_at.desc`),
+      sbGet(`dishes?user_id=eq.${currentUser.id}&order=created_at.asc`),
+      sbGet(`discoveries?user_id=eq.${currentUser.id}&order=created_at.desc`),
+    ]);
+    prog.textContent='正在生成文件...';
+
+    const VENUE={restaurant:'餐厅',dessert:'甜品店',icecream:'冰激凌',cafe:'咖啡馆',bakery:'面包烘焙',bar:'酒吧',teahouse:'茶馆',streetfood:'街头小吃',market:'美食市集',other:'其他'};
+    const VIS={public:'公开',friends:'好友可见',private:'私密'};
+
+    // Sheet 1: restaurants
+    const restHeaders=['餐厅名称','城市','状态','店铺类型','菜系','评分','评价标签','总结','荣誉认证','自定义标签','提醒城市','可见范围','创建时间'];
+    const restRows=(rests||[]).map(r=>[
+      r.name||'',
+      r.city||'',
+      r.status==='visited'?'去过':'想去',
+      VENUE[r.venue_type]||r.venue_type||'餐厅',
+      r.cuisine_name||'',
+      r.rating||'',
+      r.rating_label||'',
+      rtePlain(r.summary||''),
+      (r.awards||[]).join('、'),
+      (r.tags||[]).join('、'),
+      r.remind_city||'',
+      VIS[r.visibility]||(r.is_private?'私密':'公开'),
+      r.created_at?r.created_at.slice(0,10):'',
+    ]);
+
+    // Sheet 2: dishes
+    const dishHeaders=['菜名','所属餐厅','城市','评分','评价标签','感受','创建时间'];
+    const restMap={};(rests||[]).forEach(r=>restMap[r.id]=r);
+    const dishRows=(dishes||[]).map(d=>{
+      const r=restMap[d.restaurant_id]||{};
+      return[d.name||'',r.name||'',r.city||'',d.rating||'',d.rating_label||'',d.note||'',d.created_at?d.created_at.slice(0,10):''];
+    });
+
+    // Sheet 3: discoveries
+    const discHeaders=['名称','类型','菜系','关联餐厅','描述','可见范围','创建时间'];
+    const discRows=(discs||[]).map(d=>[
+      d.name||'',
+      d.type==='discovery'?'发现':'灵感',
+      d.cuisine_name||'',
+      d.restaurant_name||'',
+      rtePlain(d.note||''),
+      VIS[d.visibility]||(d.is_private?'私密':'公开'),
+      d.created_at?d.created_at.slice(0,10):'',
+    ]);
+
+    // Build Excel XML
+    const wb=buildXlsx([
+      {name:'餐厅记录',headers:restHeaders,rows:restRows},
+      {name:'菜品记录',headers:dishHeaders,rows:dishRows},
+      {name:'发现与灵感',headers:discHeaders,rows:discRows},
+    ]);
+
+    // Download
+    const blob=new Blob([wb],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const date=new Date().toISOString().slice(0,10);
+    a.href=url;a.download=`EatAsALocal_备份_${date}.xlsx`;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    prog.textContent=`✓ 导出成功！共 ${(rests||[]).length} 家餐厅、${(dishes||[]).length} 道菜品、${(discs||[]).length} 条发现`;
+    prog.style.color='var(--teal)';
+  }catch(err){
+    console.error(err);
+    prog.textContent='导出失败，请重试';
+    prog.style.color='var(--coral)';
+  }
+  btn.disabled=false;btn.innerHTML='<span>⬇</span><span>导出全部数据</span>';
+}
+
+function buildXlsx(sheets){
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const cellId=(c,r)=>String.fromCharCode(65+c)+String(r+1);
+  const sheetXml=(headers,rows)=>{
+    let xml='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>';
+    // header row
+    xml+=`<row r="1">`;
+    headers.forEach((h,c)=>{xml+=`<c r="${cellId(c,0)}" t="inlineStr"><is><t>${esc(h)}</t></is></c>`;});
+    xml+=`</row>`;
+    rows.forEach((row,ri)=>{
+      xml+=`<row r="${ri+2}">`;
+      row.forEach((val,c)=>{
+        const v=val==null?'':val;
+        if(typeof v==='number'||(!isNaN(v)&&v!=='')){
+          xml+=`<c r="${cellId(c,ri+1)}"><v>${esc(v)}</v></c>`;
+        }else{
+          xml+=`<c r="${cellId(c,ri+1)}" t="inlineStr"><is><t>${esc(v)}</t></is></c>`;
+        }
+      });
+      xml+=`</row>`;
+    });
+    xml+='</sheetData></worksheet>';
+    return xml;
+  };
+
+  // Build XLSX (ZIP format) manually using base64 trick for simple cases
+  // We'll use a different approach: generate CSV-compatible Excel with UTF-8 BOM as fallback
+  // Actually build proper XLSX using JSZip-compatible pure JS
+  const files={};
+  const rels=[];
+  const sheetNames=[];
+
+  sheets.forEach((s,i)=>{
+    const sxml=sheetXml(s.headers,s.rows);
+    files[`xl/worksheets/sheet${i+1}.xml`]=sxml;
+    rels.push(`<Relationship Id="rId${i+2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`);
+    sheetNames.push(s.name);
+  });
+
+  const wbXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheetNames.map((n,i)=>`<sheet name="${esc(n)}" sheetId="${i+1}" r:id="rId${i+2}"/>`).join('')}</sheets></workbook>`;
+  const wbRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>${rels.join('')}</Relationships>`;
+  const contentTypes=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>${sheetNames.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+  const rootRels=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`;
+
+  files['[Content_Types].xml']=contentTypes;
+  files['_rels/.rels']=rootRels;
+  files['xl/workbook.xml']=wbXml;
+  files['xl/_rels/workbook.xml.rels']=wbRels;
+  files['xl/sharedStrings.xml']='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"></sst>';
+
+  // Pack into ZIP
+  return zipFiles(files);
+}
+
+function zipFiles(files){
+  // Pure JS ZIP builder (store-only, no compression)
+  const enc=new TextEncoder();
+  const parts=[];
+  const centralDir=[];
+  let offset=0;
+
+  for(const[name,content]of Object.entries(files)){
+    const nameBytes=enc.encode(name);
+    const dataBytes=enc.encode(content);
+    const crc=crc32(dataBytes);
+    const localHeader=makeLocalHeader(nameBytes,dataBytes,crc);
+    centralDir.push(makeCentralDir(nameBytes,dataBytes,crc,offset));
+    parts.push(localHeader,dataBytes);
+    offset+=localHeader.length+dataBytes.length;
+  }
+
+  const cdBytes=concat(centralDir);
+  const eocd=makeEOCD(centralDir.length,cdBytes.length,offset);
+  return concat([...parts,cdBytes,eocd]);
+}
+
+function makeLocalHeader(name,data,crc){
+  const buf=new Uint8Array(30+name.length);
+  const v=new DataView(buf.buffer);
+  v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(6,0,true);
+  v.setUint16(8,0,true);v.setUint16(10,0,true);v.setUint16(12,0,true);
+  v.setUint32(14,crc>>>0,true);v.setUint32(18,data.length,true);v.setUint32(22,data.length,true);
+  v.setUint16(26,name.length,true);v.setUint16(28,0,true);
+  buf.set(name,30);return buf;
+}
+function makeCentralDir(name,data,crc,offset){
+  const buf=new Uint8Array(46+name.length);
+  const v=new DataView(buf.buffer);
+  v.setUint32(0,0x02014b50,true);v.setUint16(4,20,true);v.setUint16(6,20,true);v.setUint16(8,0,true);
+  v.setUint16(10,0,true);v.setUint16(12,0,true);v.setUint16(14,0,true);
+  v.setUint32(16,crc>>>0,true);v.setUint32(20,data.length,true);v.setUint32(24,data.length,true);
+  v.setUint16(28,name.length,true);v.setUint16(30,0,true);v.setUint16(32,0,true);
+  v.setUint16(34,0,true);v.setUint16(36,0,true);v.setUint32(38,0,true);v.setUint32(42,offset,true);
+  buf.set(name,46);return buf;
+}
+function makeEOCD(count,cdSize,cdOffset){
+  const buf=new Uint8Array(22);const v=new DataView(buf.buffer);
+  v.setUint32(0,0x06054b50,true);v.setUint16(4,0,true);v.setUint16(6,0,true);
+  v.setUint16(8,count,true);v.setUint16(10,count,true);
+  v.setUint32(12,cdSize,true);v.setUint32(16,cdOffset,true);v.setUint16(20,0,true);
+  return buf;
+}
+function concat(arrays){
+  const total=arrays.reduce((s,a)=>s+a.length,0);
+  const out=new Uint8Array(total);let i=0;
+  for(const a of arrays){out.set(a,i);i+=a.length;}
+  return out;
+}
+function crc32(data){
+  let crc=0xFFFFFFFF;
+  if(!crc32.table){
+    crc32.table=new Uint32Array(256);
+    for(let i=0;i<256;i++){let c=i;for(let j=0;j<8;j++)c=c&1?(0xEDB88320^(c>>>1)):c>>>1;crc32.table[i]=c;
+    }
+  }
+  for(let i=0;i<data.length;i++)crc=crc32.table[(crc^data[i])&0xFF]^(crc>>>8);
+  return(crc^0xFFFFFFFF)>>>0;
+}
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   const openSheet=document.querySelector('.sheet-wrap.open');
