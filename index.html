@@ -355,7 +355,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div class="nav">
     <button class="nav-btn active" onclick="switchTab('mine')">我的</button>
     <button class="nav-btn" onclick="switchTab('square')">广场</button>
-    <button class="nav-btn" onclick="switchTab('friends')">好友</button>
+    <button class="nav-btn" onclick="switchTab('friends')" id="friendNavBtn" style="position:relative">好友<span id="friendBadge" style="display:none;position:absolute;top:6px;right:4px;background:var(--coral);color:white;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;line-height:1.4;min-width:16px;text-align:center"></span></button>
     <button class="nav-btn" onclick="switchTab('map')">地图</button>
     <button class="nav-btn" onclick="switchTab('stats')">统计</button>
   </div>
@@ -859,7 +859,9 @@ async function loadAll(){
     myFriends=fs.filter(f=>f.status==='accepted');
     pendingIn=fs.filter(f=>f.friend_id===currentUser.id&&f.status==='pending');
     pendingOut=fs.filter(f=>f.user_id===currentUser.id&&f.status==='pending');
-    buildUserFilter();buildCityFilter();renderAll();
+    buildUserFilter();buildCityFilter();
+    updateFriendBadge();
+    renderAll();
   }catch(e){showToast('加载失败，请刷新')}
 }
 
@@ -869,7 +871,7 @@ function switchTab(tab){
   document.querySelectorAll('.nav-btn').forEach((b,i)=>b.classList.toggle('active',['mine','square','friends','map','stats'][i]===tab));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(tab).classList.add('active');
-  if(tab==='friends')renderFriends();
+  if(tab==='friends'){renderFriends();}
 }
 function handleFab(){if(restFilter==='disc')openDiscSheet();else openRestSheet();}
 
@@ -1074,6 +1076,29 @@ function renderTagChips(){
 
 // ── Images ──
 let currentImages=[];  // array of {url, uploading}
+// ── Image compression ──
+function compressImage(file,maxPx=1200,quality=0.82){
+  return new Promise((resolve)=>{
+    const img=new Image();
+    const url=URL.createObjectURL(file);
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      let{width:w,height:h}=img;
+      if(w>maxPx||h>maxPx){
+        if(w>=h){h=Math.round(h*maxPx/w);w=maxPx;}
+        else{w=Math.round(w*maxPx/h);h=maxPx;}
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=w;canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>resolve(blob),'image/jpeg',quality);
+    };
+    img.onerror=()=>resolve(file); // fallback to original
+    img.src=url;
+  });
+}
+
 async function handleImgUpload(e){
   const files=[...e.target.files].slice(0,4-currentImages.filter(x=>x.url).length);
   if(!files.length)return;
@@ -1082,17 +1107,21 @@ async function handleImgUpload(e){
     currentImages.push({url:null,uploading:true});
     renderImgPreviews();
     try{
-      const ext=file.name.split('.').pop().toLowerCase().replace('jpg','jpeg');
-      const path=`${currentUser.id}/${Date.now()}.${ext}`;
+      // 压缩图片
+      const compressed=await compressImage(file);
+      const sizeBefore=Math.round(file.size/1024);
+      const sizeAfter=Math.round(compressed.size/1024);
+      console.log(`图片压缩: ${sizeBefore}KB → ${sizeAfter}KB`);
+      const path=`${currentUser.id}/${Date.now()}.jpg`;
       const res=await fetch(`${SB}/storage/v1/object/food-images/${path}`,{
         method:'POST',
         headers:{
           'apikey':KEY,
           'Authorization':'Bearer '+KEY,
-          'Content-Type':file.type||'image/jpeg',
+          'Content-Type':'image/jpeg',
           'x-upsert':'true'
         },
-        body:file
+        body:compressed
       });
       if(!res.ok){
         const errText=await res.text();
@@ -1696,7 +1725,15 @@ function filterByRemind(city){
   renderMine();
 }
 
-function renderAll(){renderMine();renderSquare();renderMap();renderStats()}
+function updateFriendBadge(){
+  const badge=document.getElementById('friendBadge');
+  if(!badge)return;
+  const n=pendingIn.length;
+  if(n>0){badge.style.display='inline-block';badge.textContent=n>9?'9+':String(n);}
+  else{badge.style.display='none';}
+}
+
+function renderAll(){renderMine();renderSquare();renderMap();renderStats();updateFriendBadge();}
 
 // ── Friends ──
 async function searchUser(){
@@ -1732,11 +1769,11 @@ async function sendFriendReq(fid){
   catch(e){showToast('发送失败')}
 }
 async function acceptFriend(fid){
-  try{await sbPatch('friendships',fid,{status:'accepted'});const f=pendingIn.find(x=>x.id===fid);if(f){f.status='accepted';myFriends.push(f);pendingIn=pendingIn.filter(x=>x.id!==fid);}showToast('已添加好友');renderFriends();}
+  try{await sbPatch('friendships',fid,{status:'accepted'});const f=pendingIn.find(x=>x.id===fid);if(f){f.status='accepted';myFriends.push(f);pendingIn=pendingIn.filter(x=>x.id!==fid);}showToast('已添加好友');updateFriendBadge();renderFriends();}
   catch(e){showToast('操作失败')}
 }
 async function declineFriend(fid){
-  try{await sbDel('friendships',fid);pendingIn=pendingIn.filter(x=>x.id!==fid);showToast('已拒绝');renderFriends();}
+  try{await sbDel('friendships',fid);pendingIn=pendingIn.filter(x=>x.id!==fid);showToast('已拒绝');updateFriendBadge();renderFriends();}
   catch(e){showToast('操作失败')}
 }
 async function removeFriend(fid){
