@@ -1881,9 +1881,8 @@ function renderSquare(){
     });
 
     // Sort groups: by latest record in group
-    const groups=[...grouped.values()].sort((a,b)=>
-      Math.max(...b.map(x=>x.created_at||''))
-        .localeCompare(Math.max(...a.map(x=>x.created_at||''))));
+    const latestTs=arr=>arr.reduce((best,x)=>(x.created_at||'')>best?(x.created_at||''):best,'');
+    const groups=[...grouped.values()].sort((a,b)=>latestTs(b).localeCompare(latestTs(a)));
 
     groups.forEach(group=>{
       html+=sqGroupedRestCardHTML(group,friendIds);
