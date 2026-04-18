@@ -348,6 +348,9 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <div class="h-right">
         <div class="user-pill"><div class="user-avatar" id="userAvatar"></div><span id="userDisplayName" style="cursor:pointer" onclick="openSettings()" title="点击修改昵称"></span></div>
         <div style="display:flex;gap:10px;align-items:center">
+          <button onclick="openNotifications()" style="position:relative;background:none;border:none;cursor:pointer;padding:4px;font-size:20px;color:var(--tm);line-height:1" title="通知">
+            🔔<span id="notifBadge" style="display:none;position:absolute;top:0;right:0;background:var(--coral);color:white;border-radius:10px;font-size:9px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center;line-height:1.4"></span>
+          </button>
           <button class="logout-btn" onclick="openSettings()" style="color:var(--teal)">⚙ 设置</button>
           <button class="logout-btn" onclick="doLogout()">退出登录</button>
         </div>
@@ -470,6 +473,18 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       </button>
       <div id="exportProgress" style="display:none;margin-top:10px;font-size:13px;color:var(--tm)"></div>
     </div>
+  </div>
+</div>
+
+<!-- Notification Panel -->
+<div id="notifPanel" style="display:none;position:fixed;inset:0;z-index:150;background:rgba(28,26,22,.45)" onclick="if(event.target===this)closeNotifications()">
+  <div style="position:absolute;top:0;right:0;width:min(380px,100vw);height:100%;background:var(--cream);display:flex;flex-direction:column;box-shadow:-8px 0 32px rgba(28,26,22,.12)">
+    <div style="padding:16px 18px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="font-family:var(--serif);font-size:18px;font-weight:700;flex:1">通知</div>
+      <button onclick="markAllRead()" style="font-size:12px;color:var(--teal);background:none;border:none;cursor:pointer;font-family:inherit;padding:4px 8px">全部已读</button>
+      <button onclick="closeNotifications()" style="width:30px;height:30px;border-radius:50%;background:var(--cream-d);border:none;cursor:pointer;font-size:16px;color:var(--tm)">×</button>
+    </div>
+    <div id="notifList" style="flex:1;overflow-y:auto;padding:8px 0"></div>
   </div>
 </div>
 
@@ -883,7 +898,8 @@ const AWARDS=['米其林一星','米其林二星','米其林三星','米其林�
 
 let currentUser=null;
 let myRests=[],myDishes=[],myDiscs=[];
-let myVisits=[],myComments=[]; // visits diary, friend comments
+let myVisits=[],myComments=[];
+let myNotifs=[]; // notifications
 let allRests=[],allDiscs=[];
 let myFriends=[],pendingIn=[],pendingOut=[];
 let restFilter='all',currentTab='mine',currentRestId=null,saving=false;
@@ -1035,13 +1051,14 @@ async function loadAll(){
       sbGet(`friendships?or=(user_id.eq.${currentUser.id},friend_id.eq.${currentUser.id})`),
       sbGet(`visits?user_id=eq.${currentUser.id}&order=visited_date.desc`),
       sbGet(`restaurant_comments?order=created_at.desc&limit=500`),
+      sbGet(`notifications?user_id=eq.${currentUser.id}&order=created_at.desc&limit=50`),
     ]);
     myRests=res[0]||[];myDishes=res[1]||[];myDiscs=res[2]||[];
     allRests=res[3]||[];allDiscs=res[4]||[];
     const fs=res[5]||[];
     myVisits=res[6]||[];
     myComments=res[7]||[];
-    // Deduplicate friends - A→B and B→A should count as one
+    myNotifs=res[8]||[];
     const acceptedRaw=fs.filter(f=>f.status==='accepted');
     const seenPairs=new Set();
     myFriends=acceptedRaw.filter(f=>{
@@ -1053,6 +1070,7 @@ async function loadAll(){
     pendingOut=fs.filter(f=>f.user_id===currentUser.id&&f.status==='pending');
     buildUserFilter();buildCityFilter();
     updateFriendBadge();
+    updateNotifBadge();
     renderAll();
   }catch(e){showToast('加载失败，请刷新')}
 }
@@ -1115,9 +1133,21 @@ function buildCuisineSelect(id){
   document.getElementById(id).innerHTML=h;
 }
 function buildRestSelect(){
+  // Use myRests, fallback to allRests filtered by current user if myRests is empty
+  const rests=myRests.length>0 ? myRests : (currentUser ? allRests.filter(r=>r.user_id===currentUser.id) : []);
   let h='<option value="">— 不关联餐厅 —</option>';
-  myRests.forEach(r=>{h+=`<option value="${r.id}|${r.name}">${r.name}${r.city?' ('+r.city+')':''} ${r.status==='wishlist'?'📌':''}</option>`});
-  document.getElementById('diRest').innerHTML=h;
+  // Sort: visited first, then wishlist, then by name
+  const sorted=[...rests].sort((a,b)=>{
+    if(a.status===b.status)return a.name.localeCompare(b.name,'zh');
+    return a.status==='visited'?-1:1;
+  });
+  sorted.forEach(r=>{
+    // Store as "id§name" using § as separator (unlikely in restaurant names)
+    const safeName=(r.name||'').replace(/\|/g,'／'); // replace any | in name
+    h+=`<option value="${r.id}|${safeName}">${r.status==='visited'?'✓':'📌'} ${r.name}${r.city?' ('+r.city+')':''}</option>`;
+  });
+  const sel=document.getElementById('diRest');
+  if(sel)sel.innerHTML=h;
   // reset dish selector
   const dw=document.getElementById('diDishWrap');
   if(dw)dw.style.display='none';
@@ -1128,11 +1158,14 @@ function onDiscRestChange(){
   const dw=document.getElementById('diDishWrap');
   const ds=document.getElementById('diDish');
   if(!rv||!dw||!ds){if(dw)dw.style.display='none';return}
-  const rid=parseInt(rv.split('|')[0]);
+  // Safe parse: id is first segment, rest is name (in case name has | chars)
+  const pipeIdx=rv.indexOf('|');
+  const rid=pipeIdx>-1?parseInt(rv.slice(0,pipeIdx)):parseInt(rv);
+  if(!rid){dw.style.display='none';return}
   const dishes=myDishes.filter(d=>d.restaurant_id===rid);
   if(!dishes.length){dw.style.display='none';return}
   ds.innerHTML='<option value="">— 不关联具体菜品 —</option>'+
-    dishes.map(d=>`<option value="${d.id}|${d.name}">${d.name}${d.rating?' '+d.rating.toFixed(1)+'★':''}</option>`).join('');
+    dishes.map(d=>`<option value="${d.id}|${d.name}">${d.name}${d.rating?' '+parseFloat(d.rating).toFixed(1)+'★':''}</option>`).join('');
   dw.style.display='block';
 }
 function buildUserFilter(){
@@ -1549,7 +1582,9 @@ async function saveDish(){
 // ── Discovery sheet ──
 function openDiscSheet(disc=null){
   editingDiscId=disc?disc.id:null;
-  buildCuisineSelect('diCuisine');buildRestSelect();
+  buildCuisineSelect('diCuisine');
+  // Build rest select fresh each time
+  buildRestSelect();
   if(disc){
     togState.discType=disc.type;
     document.getElementById('diName').value=disc.name;
@@ -1596,9 +1631,13 @@ async function saveDisc(){
   const cv=document.getElementById('diCuisine').value;
   const[cid,cname]=cv?cv.split('|'):['',''];
   const rv=document.getElementById('diRest').value;
-  const[rid,rname]=rv?rv.split('|'):['',''];
+  const rvPipe=rv?rv.indexOf('|'):-1;
+  const rid=rvPipe>-1?rv.slice(0,rvPipe):'';
+  const rname=rvPipe>-1?rv.slice(rvPipe+1):'';
   const dv=document.getElementById('diDish')?.value||'';
-  const[did,dname]=dv?dv.split('|'):['',''];
+  const dvPipe=dv?dv.indexOf('|'):-1;
+  const did=dvPipe>-1?dv.slice(0,dvPipe):'';
+  const dname=dvPipe>-1?dv.slice(dvPipe+1):'';
   const entry={name,type:togState.discType,cuisine_id:cid||null,cuisine_name:cname||null,
     restaurant_id:rid?parseInt(rid):null,restaurant_name:rname||null,
     dish_id:did?parseInt(did):null,dish_name:dname||null,
@@ -1818,69 +1857,148 @@ function renderSquare(){
     if(vis==='friends')return friendIds.has(item.user_id);
     return true;
   };
-  let items=[];
+
+  let html='';
+
+  // ── Restaurants: group by name+city ──
   if(tf!=='discoveries'){
-    let r=[...allRests].filter(canSee);
-    if(uf!=='all')r=r.filter(x=>x.username===uf);
-    // quality filter
-    if(qf==='4.5')r=r.filter(x=>x.rating>=4.5);
-    else if(qf==='4')r=r.filter(x=>x.rating>=4);
-    else if(qf==='friends_high')r=r.filter(x=>friendIds.has(x.user_id)&&x.rating>=4.5);
-    if(q)r=r.filter(x=>x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||rtePlain(x.summary||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
-    items=items.concat(r.map(x=>({...x,_k:'rest',_ts:x.created_at})));
+    let rests=[...allRests].filter(canSee);
+    if(uf!=='all')rests=rests.filter(x=>x.username===uf);
+    if(qf==='4.5')rests=rests.filter(x=>x.rating>=4.5);
+    else if(qf==='4')rests=rests.filter(x=>x.rating>=4);
+    else if(qf==='friends_high')rests=rests.filter(x=>friendIds.has(x.user_id)&&x.rating>=4.5);
+    if(q)rests=rests.filter(x=>
+      x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||
+      (x.cuisine_name||'').toLowerCase().includes(q)||rtePlain(x.summary||'').toLowerCase().includes(q)||
+      (x.display_name||x.username||'').toLowerCase().includes(q));
+
+    // Group by name+city key
+    const grouped=new Map();
+    rests.forEach(r=>{
+      const key=(r.name+'|'+(r.city||'')).toLowerCase();
+      if(!grouped.has(key))grouped.set(key,[]);
+      grouped.get(key).push(r);
+    });
+
+    // Sort groups: by latest record in group
+    const groups=[...grouped.values()].sort((a,b)=>
+      Math.max(...b.map(x=>x.created_at||''))
+        .localeCompare(Math.max(...a.map(x=>x.created_at||''))));
+
+    groups.forEach(group=>{
+      html+=sqGroupedRestCardHTML(group,friendIds);
+    });
   }
+
+  // ── Discoveries: unchanged ──
   if(tf!=='restaurants'){
-    let d=[...allDiscs].filter(canSee);
-    if(uf!=='all')d=d.filter(x=>x.username===uf);
-    if(qf==='friends_high')d=d.filter(x=>friendIds.has(x.user_id));
-    if(q)d=d.filter(x=>x.name.toLowerCase().includes(q)||rtePlain(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
-    items=items.concat(d.map(x=>({...x,_k:'disc',_ts:x.created_at})));
+    let discs=[...allDiscs].filter(canSee);
+    if(uf!=='all')discs=discs.filter(x=>x.username===uf);
+    if(qf==='friends_high')discs=discs.filter(x=>friendIds.has(x.user_id));
+    if(q)discs=discs.filter(x=>x.name.toLowerCase().includes(q)||rtePlain(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
+    discs.sort((a,b)=>b.created_at.localeCompare(a.created_at));
+    discs.forEach(d=>{html+=sqDiscCardHTML(d);});
   }
-  items.sort((a,b)=>b._ts.localeCompare(a._ts));
-  if(!items.length){
+
+  if(!html){
     list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here yet</div><p>${q||qf!=='all'?'没有找到符合条件的记录':'还没有公开内容'}</p></div>`;
     return;
   }
-  list.innerHTML=items.map(item=>item._k==='rest'?sqRestCardHTML(item):sqDiscCardHTML(item)).join('');
+  list.innerHTML=html;
 }
 
-function sqRestCardHTML(r){
-  const isOwn=r.user_id===currentUser.id;
-  const vis=r.visibility||(r.is_private?'private':'public');
-  const visBadge=vis==='friends'?'<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:#1A4A6A;font-weight:600">👥 好友</span>':'';
-  const vLabel=r.venue_type&&r.venue_type!=='restaurant'?VENUE_TYPES[r.venue_type]||'':'';
-  // own items → click to open detail; others → click to expand in place
-  // All cards open detail - own cards show edit/delete, others show comment
-  const clickAction=`openDetail(${r.id})`;
-  return`<div class="card" id="sqr_${r.id}" style="margin-bottom:7px;cursor:pointer" onclick="${clickAction}">
-    <div class="card-inner" style="padding:12px 14px">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:15px;font-weight:600">${r.name}</span>
-            <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
-            ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
-            ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
-            ${visBadge}
-          </div>
-          <div style="font-size:13px;color:var(--tm);display:flex;gap:6px;flex-wrap:wrap">
-            ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
-            ${r.awards&&r.awards.length?`<span class="award-badge">${r.awards[0]}${r.awards.length>1?' +'+(r.awards.length-1):''}</span>`:''}
-          </div>
-          ${r.tags&&r.tags.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">${r.tags.map(t=>`<span class="tag-badge">${t}</span>`).join('')}</div>`:''}
-          ${r.summary?`<div class="sq-preview" style="font-size:13px;color:var(--th);margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+function sqGroupedRestCardHTML(group, friendIds){
+  // Use the "representative" record for main info: prefer own, then highest rated
+  const own=group.find(r=>r.user_id===currentUser.id);
+  const rep=own||[...group].sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
+  const vLabel=rep.venue_type&&rep.venue_type!=='restaurant'?VENUE_TYPES[rep.venue_type]||'':'';
+
+  // Rated records for avg
+  const rated=group.filter(r=>r.rating);
+  const avgRating=rated.length?(rated.reduce((s,r)=>s+parseFloat(r.rating),0)/rated.length):0;
+
+  // Visited vs wishlist counts
+  const visitedCount=group.filter(r=>r.status==='visited').length;
+  const wishCount=group.filter(r=>r.status==='wishlist').length;
+
+  // Build reviewer avatars (max 4)
+  const reviewers=group.slice(0,4);
+  const avatarStack=`<div style="display:flex;gap:-4px;flex-direction:row">${
+    reviewers.map((r,i)=>`<div class="user-tag-dot" style="width:22px;height:22px;font-size:10px;margin-left:${i?'-6px':'0'};border:2px solid white;z-index:${4-i};position:relative;flex-shrink:0;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
+      ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>`).join('')
+  }${group.length>4?`<div style="width:22px;height:22px;font-size:9px;border-radius:50%;background:var(--cream-dd);color:var(--tm);display:flex;align-items:center;justify-content:center;margin-left:-6px;border:2px solid white;font-weight:700">+${group.length-4}</div>`:''}</div>`;
+
+  // Individual reviews (collapsed by default)
+  const reviewsHtml=group.map(r=>{
+    const isOwn=r.user_id===currentUser.id;
+    return`<div style="display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--cream-d)" onclick="event.stopPropagation();openDetail(${r.id})">
+      <div class="user-tag-dot" style="width:26px;height:26px;font-size:11px;flex-shrink:0;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
+        ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:600;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
+            ${r.display_name||r.username}</span>
+          <span class="badge ${r.status==='wishlist'?'b-wishlist':'b-visited'}" style="font-size:10px">${r.status==='wishlist'?'📌 想去':'✓ 去过'}</span>
+          ${r.rating?`<span style="color:#E8B84B;font-size:12px;font-weight:700">${parseFloat(r.rating).toFixed(1)} ★</span>`:''}
+          ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+          <span style="font-size:11px;color:var(--th);margin-left:auto">${fmtDate(r.created_at)}</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
-          ${r.rating?`<span style="color:#E8B84B;font-size:14px;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
-          <div class="user-tag" style="cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>
-          ${isOwn
-            ? `<span style="font-size:11px;color:var(--teal)">查看详情 →</span>`
-            : `<button onclick="event.stopPropagation();addToWishlist(${r.id},'${r.name.replace(/'/g,"\\'")}',${r.user_id})" style="font-size:11px;padding:4px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit" title="加入我的想去">+ 想去</button>`
-          }
+        ${r.summary?`<div style="font-size:12.5px;color:var(--th);line-height:1.55;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+      </div>
+      <span style="font-size:11px;color:var(--teal);flex-shrink:0">→</span>
+    </div>`;
+  }).join('');
+
+  const cardId=`sqg_${rep.id}`;
+  return`<div class="card" style="margin-bottom:9px">
+    <div class="card-inner" style="padding:13px 16px">
+      <!-- Header: name + key info -->
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:15px;font-weight:700">${rep.name}</span>
+            ${vLabel?`<span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
+            ${rep.awards&&rep.awards.length?`<span class="award-badge" style="font-size:10px">${rep.awards[0]}</span>`:''}
+          </div>
+          <div style="font-size:12.5px;color:var(--tm);display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+            ${rep.cuisine_name?`<span>${rep.cuisine_name}</span>`:''}
+            ${rep.city?`<span style="color:var(--th)">· ${rep.city}</span>`:''}
+          </div>
+        </div>
+        <!-- Right: avg rating -->
+        <div style="text-align:right;flex-shrink:0">
+          ${avgRating?`<div style="color:#E8B84B;font-size:18px;font-weight:700">${avgRating.toFixed(1)} ★</div>
+          <div style="font-size:11px;color:var(--th)">${rated.length}人评分</div>`:''}
         </div>
       </div>
+      <!-- Stats row -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        ${avatarStack}
+        <div style="font-size:12px;color:var(--tm);flex:1">
+          ${group.length}人记录
+          ${visitedCount?` · <span style="color:var(--teal)">✓ ${visitedCount}人去过</span>`:''}
+          ${wishCount?` · <span style="color:var(--amber)">📌 ${wishCount}人想去</span>`:''}
+        </div>
+        ${!own?`<button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" style="font-size:11px;padding:4px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit">+ 想去</button>`:''}
+      </div>
+      <!-- Reviews: collapsed by default, click to expand -->
+      <div id="${cardId}_reviews" style="display:none;border-top:1px solid var(--cream-d);margin-top:6px">
+        ${reviewsHtml}
+      </div>
+      <button onclick="toggleSqReviews('${cardId}')" style="width:100%;padding:7px;background:var(--cream);border:none;border-radius:var(--rs);font-size:12px;color:var(--tm);cursor:pointer;font-family:inherit;margin-top:4px" id="${cardId}_btn">
+        ▾ 查看 ${group.length} 条评价
+      </button>
     </div>
   </div>`;
+}
+
+function toggleSqReviews(cardId){
+  const reviews=document.getElementById(cardId+'_reviews');
+  const btn=document.getElementById(cardId+'_btn');
+  const isOpen=reviews.style.display!=='none';
+  reviews.style.display=isOpen?'none':'block';
+  const n=reviews.querySelectorAll('[style*="border-bottom"]').length;
+  btn.textContent=isOpen?`▾ 查看 ${n} 条评价`:`▴ 收起评价`;
 }
 
 function sqDiscCardHTML(d){
@@ -2145,6 +2263,11 @@ async function saveComment(){
     }else{
       const res=await sbPost('restaurant_comments',{...entry,restaurant_id:currentRestId,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name});
       if(res&&res[0])myComments.unshift(res[0]);
+      // Notify restaurant owner
+      const r=[...myRests,...allRests].find(x=>x.id===currentRestId);
+      if(r&&r.user_id!==currentUser.id){
+        createNotif(r.user_id,'comment',{rest_id:r.id,rest_name:r.name,comment_id:res&&res[0]?res[0].id:null});
+      }
       showToast('评价已发布');
     }
     closeSheet('commentSheet');
@@ -2179,6 +2302,10 @@ async function addToWishlist(sourceRestId, restName, ownerUserId){
   try{
     const res=await sbPost('restaurants',entry);
     if(res&&res[0]){myRests.unshift(res[0]);allRests.unshift(res[0]);buildCityFilter();renderAll();}
+    // Notify original owner
+    if(ownerUserId&&ownerUserId!==currentUser.id){
+      createNotif(ownerUserId,'wishlist_add',{rest_id:sourceRestId,rest_name:src.name});
+    }
     showToast(`✓ 已加入想去：${src.name}`);
   }catch(e){showToast('添加失败，请重试')}
 }
@@ -2375,13 +2502,23 @@ async function sendFriendReq(fid){
     }
     const r=await sbPost('friendships',{user_id:currentUser.id,friend_id:fid,status:'pending'});
     if(r&&r[0])pendingOut.push(r[0]);
+    // Notify the other person
+    createNotif(fid,'friend_request',{});
     showToast('好友申请已发送');
     document.getElementById('friendSearchResult').innerHTML='<div style="font-size:13px;color:var(--teal)">申请已发送</div>';
   }catch(e){showToast('发送失败')}
 }
 async function acceptFriend(fid){
-  try{await sbPatch('friendships',fid,{status:'accepted'});const f=pendingIn.find(x=>x.id===fid);if(f){f.status='accepted';myFriends.push(f);pendingIn=pendingIn.filter(x=>x.id!==fid);}showToast('已添加好友');updateFriendBadge();renderFriends();}
-  catch(e){showToast('操作失败')}
+  try{
+    await sbPatch('friendships',fid,{status:'accepted'});
+    const f=pendingIn.find(x=>x.id===fid);
+    if(f){
+      f.status='accepted';myFriends.push(f);pendingIn=pendingIn.filter(x=>x.id!==fid);
+      // Notify the person who sent the request
+      createNotif(f.user_id,'friend_accepted',{});
+    }
+    showToast('已添加好友');updateFriendBadge();renderFriends();
+  }catch(e){showToast('操作失败')}
 }
 async function declineFriend(fid){
   try{await sbDel('friendships',fid);pendingIn=pendingIn.filter(x=>x.id!==fid);showToast('已拒绝');updateFriendBadge();renderFriends();}
@@ -3030,6 +3167,97 @@ function drawShareCard(){
   ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(32,H-56,W-64,1);
   ctx.fillStyle='rgba(255,255,255,0.28)';ctx.font='13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='center';
   ctx.fillText('Eat as a Local · 我的美食探索地图',W/2,H-28);
+}
+
+// ── Notifications ──
+async function createNotif(toUserId, type, data={}){
+  if(toUserId===currentUser.id)return; // no self-notifs
+  try{
+    await sbPost('notifications',{
+      user_id:toUserId,
+      type,
+      from_user_id:currentUser.id,
+      from_display_name:currentUser.display_name||currentUser.username,
+      rest_id:data.rest_id||null,
+      rest_name:data.rest_name||null,
+      comment_id:data.comment_id||null,
+      is_read:false
+    });
+  }catch(e){console.warn('notif failed',e)}
+}
+
+function updateNotifBadge(){
+  const unread=myNotifs.filter(n=>!n.is_read).length;
+  const badge=document.getElementById('notifBadge');
+  if(!badge)return;
+  if(unread>0){badge.style.display='inline-block';badge.textContent=unread>9?'9+':String(unread);}
+  else{badge.style.display='none';}
+}
+
+function openNotifications(){
+  document.getElementById('notifPanel').style.display='block';
+  renderNotifList();
+  // Mark all as read after a short delay
+  setTimeout(markAllRead,1500);
+}
+function closeNotifications(){
+  document.getElementById('notifPanel').style.display='none';
+}
+
+function renderNotifList(){
+  const el=document.getElementById('notifList');
+  if(!el)return;
+  if(!myNotifs.length){
+    el.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--th)"><div style="font-size:32px;margin-bottom:12px">🔔</div><div style="font-size:14px">暂无通知</div></div>';
+    return;
+  }
+  const typeIcon={
+    comment:'💬',
+    friend_request:'👋',
+    friend_accepted:'🤝',
+    wishlist_add:'📌',
+  };
+  const typeText={
+    comment:(n)=>`评价了你的餐厅「${n.rest_name||''}」`,
+    friend_request:(n)=>`向你发送了好友申请`,
+    friend_accepted:(n)=>`通过了你的好友申请`,
+    wishlist_add:(n)=>`将「${n.rest_name||''}」加入了想去清单`,
+  };
+  el.innerHTML=myNotifs.map(n=>{
+    const icon=typeIcon[n.type]||'📢';
+    const text=(typeText[n.type]||((n)=>n.type))(n);
+    const unread=!n.is_read;
+    const clickFn=n.type==='comment'&&n.rest_id
+      ?`openDetail(${n.rest_id});closeNotifications()`
+      :n.type==='friend_request'||n.type==='friend_accepted'
+      ?`switchTab('friends');closeNotifications()`
+      :n.rest_id?`openDetail(${n.rest_id});closeNotifications()`:'closeNotifications()';
+    return`<div onclick="${clickFn}" style="display:flex;gap:12px;align-items:flex-start;padding:14px 18px;border-bottom:1px solid var(--cream-d);cursor:pointer;background:${unread?'rgba(42,122,92,.04)':'transparent'};transition:background .15s" onmouseenter="this.style.background='var(--cream-d)'" onmouseleave="this.style.background='${unread?'rgba(42,122,92,.04)':'transparent'}'">
+      <div style="font-size:22px;flex-shrink:0;line-height:1;margin-top:2px">${icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13.5px;color:var(--ink);line-height:1.5;margin-bottom:4px">
+          <strong>${n.from_display_name||'有人'}</strong> ${text}
+        </div>
+        <div style="font-size:12px;color:var(--th)">${fmtDate(n.created_at)}</div>
+      </div>
+      ${unread?`<div style="width:8px;height:8px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:6px"></div>`:''}
+    </div>`;
+  }).join('');
+}
+
+async function markAllRead(){
+  const unread=myNotifs.filter(n=>!n.is_read);
+  if(!unread.length)return;
+  try{
+    await fetch(`${SB}/rest/v1/notifications?user_id=eq.${currentUser.id}&is_read=eq.false`,{
+      method:'PATCH',
+      headers:{'apikey':KEY,'Authorization':'Bearer '+KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify({is_read:true})
+    });
+    myNotifs=myNotifs.map(n=>({...n,is_read:true}));
+    updateNotifBadge();
+    renderNotifList();
+  }catch(e){console.warn('mark read failed',e)}
 }
 
 // ── Init ──
