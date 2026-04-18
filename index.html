@@ -544,7 +544,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
       <div class="form-group-label">📍 基本信息</div>
       <div class="fg"><label class="fl">状态</label><div class="tog-row"><button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button><button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button></div></div>
       <div class="fr">
-        <div class="fg"><label class="fl">餐厅名称 <span style="color:var(--coral)">*</span></label><input class="fi" id="rName" placeholder="餐厅名称"/></div>
+        <div class="fg"><label class="fl">餐厅名称 <span style="color:var(--coral)">*</span></label><input class="fi" id="rName" placeholder="餐厅名称" oninput="checkDuplicateRest()" autocomplete="off"/><div id="dupHint" style="display:none;margin-top:6px;padding:10px 12px;background:var(--amber-l);border-radius:var(--rs);border-left:3px solid var(--amber);font-size:13px;color:var(--ink-2);line-height:1.6"></div></div>
         <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="上海、东京、巴黎..."/></div>
       </div>
       <div class="fg"><label class="fl">店铺类型</label>
@@ -1198,9 +1198,10 @@ function toggleAward(a,btn){if(selectedAwards.includes(a)){selectedAwards=select
 // ── Restaurant sheet ──
 function openRestSheet(rest=null){
   editingRestId=rest?rest.id:null;
-  window._editingSheetDishId=null; // clear any in-progress dish edit
-  rlState.sdLabel=''; // reset dish label in form
+  window._editingSheetDishId=null;
+  rlState.sdLabel='';
   buildCuisineSelect('rCuisine');
+  const dh=document.getElementById('dupHint');if(dh)dh.style.display='none';
   if(rest){
     togState.restStatus=rest.status;
     rlState.restLabel=rest.rating_label||'';
@@ -1884,8 +1885,23 @@ function renderSquare(){
     const latestTs=arr=>arr.reduce((best,x)=>(x.created_at||'')>best?(x.created_at||''):best,'');
     const groups=[...grouped.values()].sort((a,b)=>latestTs(b).localeCompare(latestTs(a)));
 
-    groups.forEach(group=>{
-      html+=sqGroupedRestCardHTML(group,friendIds);
+    // Build fuzzy similarity index: for each group, find other groups whose name overlaps
+    // Strip brackets and spaces for comparison
+    const stripName=name=>name.replace(/[（）()【】\s]/g,'').toLowerCase();
+    const groupKeys=[...grouped.keys()]; // "name|city"
+    const groupList=groups.map((g,i)=>({group:g,key:groupKeys[i],stripped:stripName(g[0].name)}));
+
+    groups.forEach((group,idx)=>{
+      const stripped=stripName(group[0].name);
+      const city=(group[0].city||'').toLowerCase();
+      // Find similar groups: name contains or is contained by this name, same city
+      const similar=groupList.filter((x,i)=>{
+        if(i===idx)return false;
+        const xCity=(x.group[0].city||'').toLowerCase();
+        if(xCity&&city&&xCity!==city)return false; // different city → not similar
+        return (x.stripped.includes(stripped)||stripped.includes(x.stripped))&&x.stripped!==stripped;
+      });
+      html+=sqGroupedRestCardHTML(group,friendIds,similar.map(x=>x.group[0]));
     });
   }
 
@@ -1906,7 +1922,7 @@ function renderSquare(){
   list.innerHTML=html;
 }
 
-function sqGroupedRestCardHTML(group, friendIds){
+function sqGroupedRestCardHTML(group, friendIds, similarReps=[]){
   // Use the "representative" record for main info: prefer own, then highest rated
   const own=group.find(r=>r.user_id===currentUser.id);
   const rep=own||[...group].sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
@@ -1987,6 +2003,10 @@ function sqGroupedRestCardHTML(group, friendIds){
       <button onclick="toggleSqReviews('${cardId}')" style="width:100%;padding:7px;background:var(--cream);border:none;border-radius:var(--rs);font-size:12px;color:var(--tm);cursor:pointer;font-family:inherit;margin-top:4px" id="${cardId}_btn">
         ▾ 查看 ${group.length} 条评价
       </button>
+      ${similarReps.length?`<div style="margin-top:8px;padding:8px 10px;background:var(--amber-l);border-radius:var(--rs);border-left:3px solid var(--amber)">
+        <div style="font-size:11px;color:var(--amber);font-weight:700;margin-bottom:4px">⚠ 可能是同一家？</div>
+        <div style="font-size:12px;color:var(--ink-3);line-height:1.6">广场中还有名称相近的记录：${similarReps.map(r=>`<strong>${r.name}</strong>${r.city?' ('+r.city+')':''}`).join('、')}。如果是同一家，建议统一餐厅名称。</div>
+      </div>`:''}
     </div>
   </div>`;
 }
@@ -3166,6 +3186,51 @@ function drawShareCard(){
   ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(32,H-56,W-64,1);
   ctx.fillStyle='rgba(255,255,255,0.28)';ctx.font='13px -apple-system,PingFang SC,sans-serif';ctx.textAlign='center';
   ctx.fillText('Eat as a Local · 我的美食探索地图',W/2,H-28);
+}
+
+// ── Duplicate restaurant detection ──
+let _dupTimer=null;
+function checkDuplicateRest(){
+  clearTimeout(_dupTimer);
+  const hint=document.getElementById('dupHint');
+  if(!hint)return;
+  const val=document.getElementById('rName').value.trim();
+  if(val.length<2){hint.style.display='none';return}
+  _dupTimer=setTimeout(()=>{
+    const strip=s=>s.replace(/[（）()【】\s，,。.]/g,'').toLowerCase();
+    const v=strip(val);
+    // Check myRests (own) and allRests (others) for fuzzy matches
+    const pool=[...new Map([...myRests,...allRests].map(r=>[r.id,r])).values()];
+    const matches=pool.filter(r=>{
+      if(editingRestId&&r.id===editingRestId)return false; // skip self when editing
+      const rn=strip(r.name);
+      return rn===v||(rn.length>=2&&v.length>=2&&(rn.includes(v)||v.includes(rn)));
+    });
+    if(!matches.length){hint.style.display='none';return}
+    // Exact match
+    const exact=matches.filter(r=>strip(r.name)===v);
+    // Fuzzy match only
+    const fuzzy=matches.filter(r=>strip(r.name)!==v);
+    let html='';
+    if(exact.length){
+      html+=`<div style="font-weight:700;color:var(--coral);margin-bottom:6px">⚠ 你已经记录过这家！</div>`;
+      html+=exact.map(r=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="flex:1"><strong>${r.name}</strong>${r.city?' · '+r.city:''} ${r.status==='visited'?'✓ 去过':'📌 想去'} ${r.rating?r.rating.toFixed(1)+'★':''}</span>
+        <button onclick="closeSheet('restSheet');openDetail(${r.id})" style="font-size:11px;padding:3px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">查看原记录</button>
+      </div>`).join('');
+    }
+    if(fuzzy.length){
+      html+=`<div style="font-weight:700;color:var(--amber);margin-bottom:6px;${exact.length?'margin-top:8px;padding-top:8px;border-top:1px solid var(--amber-l)':''}">🔍 名称相近，是同一家吗？</div>`;
+      html+=fuzzy.map(r=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="flex:1"><strong>${r.name}</strong>${r.city?' · '+r.city:''} ${r.status==='visited'?'✓ 去过':'📌 想去'} ${r.rating?r.rating.toFixed(1)+'★':''}</span>
+        <button onclick="document.getElementById('rName').value='${r.name.replace(/'/g,"\\'")}';checkDuplicateRest()" style="font-size:11px;padding:3px 10px;background:var(--cream-d);color:var(--tm);border:none;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">用这个名字</button>
+        <button onclick="closeSheet('restSheet');openDetail(${r.id})" style="font-size:11px;padding:3px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">查看</button>
+      </div>`).join('');
+      html+=`<div style="font-size:11px;color:var(--th);margin-top:4px">如果不是同一家，忽略此提示继续填写即可</div>`;
+    }
+    hint.innerHTML=html;
+    hint.style.display='block';
+  },400);
 }
 
 // ── Notifications ──
