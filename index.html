@@ -433,18 +433,29 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 
   <!-- Collections -->
   <div id="collections" class="section">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div>
-        <div style="font-size:14px;color:var(--tm)">创建自定义收藏单，整理想去或去过的餐厅</div>
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="filter-row" style="margin-bottom:0">
+        <button class="pill active" id="collTabMine" onclick="switchCollTab('mine',this)">我的收藏单</button>
+        <button class="pill" id="collTabPublic" onclick="switchCollTab('public',this)">好友的收藏单</button>
       </div>
-      <button onclick="openCollectionSheet()" class="btn-fetch" style="padding:8px 16px;white-space:nowrap">+ 新建收藏单</button>
+      <button onclick="openCollectionSheet()" class="btn-fetch" style="padding:8px 16px;white-space:nowrap;flex-shrink:0">+ 新建</button>
     </div>
-    <!-- Tab: mine / public -->
-    <div class="filter-row" style="margin-bottom:14px">
-      <button class="pill active" id="collTabMine" onclick="switchCollTab('mine',this)">我的收藏单</button>
-      <button class="pill" id="collTabPublic" onclick="switchCollTab('public',this)">好友的收藏单</button>
-    </div>
+    <!-- Grid of collection cards -->
     <div id="collectionsList"></div>
+  </div>
+
+  <!-- Collection Detail Page (full-screen) -->
+  <div id="collDetailPage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:55;overflow-y:auto">
+    <div style="position:sticky;top:0;background:rgba(250,248,243,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--wb);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:5">
+      <button onclick="closeCollDetail()" style="display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--teal);padding:6px 12px;border-radius:20px;background:var(--teal-l);border:none;cursor:pointer">← 返回</button>
+      <div id="collDetailName" style="flex:1;font-family:var(--serif);font-size:17px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+      <div id="collDetailActions" style="display:flex;gap:6px;flex-shrink:0"></div>
+    </div>
+    <div style="max-width:700px;margin:0 auto;padding:16px 18px">
+      <div id="collDetailMeta" style="margin-bottom:16px"></div>
+      <div id="collDetailItems"></div>
+    </div>
   </div>
 
   <!-- Friends -->
@@ -953,7 +964,7 @@ let myRests=[],myDishes=[],myDiscs=[];
 let myVisits=[],myComments=[];
 let myNotifs=[];
 let myCollections=[],myCollItems=[];
-let _collTab='mine',_editingCollId=null;
+let _collTab='mine',_editingCollId=null,_currentCollId=null;
 let allRests=[],allDiscs=[];
 let myFriends=[],pendingIn=[],pendingOut=[];
 let restFilter='all',currentTab='mine',currentRestId=null,saving=false;
@@ -1784,7 +1795,7 @@ function restCardHTML(r,showUser=false){
           ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
           ${isOwn&&r.status==='wishlist'?`<button class="checkin-btn" onclick="event.stopPropagation();quickCheckin(${r.id})">✓ 已去</button>`:''}
           <span style="font-size:11px;color:var(--th)">${fmtDate(r.created_at)}</span>
-          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<div style="display:flex;gap:5px"><button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button><button class="del-btn" onclick="event.stopPropagation();deleteRest(${r.id})" style="font-size:13px" title="删除">🗑</button></div>`}
+          ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<div style="display:flex;gap:5px;align-items:center"><button class="edit-btn" onclick="event.stopPropagation();openAddToCollSheet(${r.id},'${r.name.replace(/'/g,"\\'")}')" style="font-size:11px;padding:2px 9px" title="加入收藏单">📋</button><button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button><button class="del-btn" onclick="event.stopPropagation();deleteRest(${r.id})" style="font-size:13px" title="删除">🗑</button></div>`}
         </div>
       </div>
     </div>
@@ -3128,6 +3139,7 @@ document.addEventListener('keydown',e=>{
 window.addEventListener('popstate',()=>{
   const openSheet=document.querySelector('.sheet-wrap.open');
   if(openSheet){openSheet.classList.remove('open');stopDraftSave();return}
+  if(document.getElementById('collDetailPage').style.display==='block'){document.getElementById('collDetailPage').style.display='none';_currentCollId=null;return}
   if(document.getElementById('profilePage').style.display==='block'){document.getElementById('profilePage').style.display='none';return}
   if(document.getElementById('restDetail').classList.contains('open')){closeDetail();return}
 });
@@ -3316,61 +3328,152 @@ function switchCollTab(tab,btn){
 async function renderCollections(){
   const el=document.getElementById('collectionsList');
   if(!el)return;
-  el.innerHTML='<div style="color:var(--th);font-size:13px;padding:12px 0">加载中...</div>';
-  try{
-    if(_collTab==='mine'){
-      const mine=myCollections.filter(c=>c.user_id===currentUser.id);
-      if(!mine.length){
-        el.innerHTML='<div class="empty"><div class="empty-en">No collections</div><p>还没有收藏单，点上方「+ 新建」创建一个</p></div>';
-        return;
-      }
-      el.innerHTML=mine.map(c=>collCardHTML(c,true)).join('');
-    }else{
-      const friendIds=new Set(myFriends.map(f=>f.user_id===currentUser.id?f.friend_id:f.user_id));
-      const pub=myCollections.filter(c=>{
-        if(c.user_id===currentUser.id)return false;
-        const v=c.visibility||'public';
-        if(v==='private')return false;
-        if(v==='friends')return friendIds.has(c.user_id);
-        return true;
-      });
-      if(!pub.length){
-        el.innerHTML='<div class="empty"><div class="empty-en">Nothing yet</div><p>好友还没有公开的收藏单</p></div>';
-        return;
-      }
-      el.innerHTML=pub.map(c=>collCardHTML(c,false)).join('');
-    }
-  }catch(e){el.innerHTML='<div style="color:var(--coral);font-size:13px">加载失败</div>'}
+  let list=[];
+  if(_collTab==='mine'){
+    list=myCollections.filter(c=>c.user_id===currentUser.id);
+  }else{
+    const friendIds=new Set(myFriends.map(f=>f.user_id===currentUser.id?f.friend_id:f.user_id));
+    list=myCollections.filter(c=>{
+      if(c.user_id===currentUser.id)return false;
+      const v=c.visibility||'public';
+      if(v==='private')return false;
+      if(v==='friends')return friendIds.has(c.user_id);
+      return true;
+    });
+  }
+  if(!list.length){
+    el.innerHTML=`<div class="empty"><div class="empty-en">No collections yet</div><p>${_collTab==='mine'?'还没有收藏单，点右上角「+ 新建」':'好友还没有公开的收藏单'}</p></div>`;
+    return;
+  }
+  // 2-column grid
+  el.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">${list.map(c=>collGridCardHTML(c)).join('')}</div>`;
 }
 
-function collCardHTML(c,isOwn){
+function collGridCardHTML(c){
+  const isOwn=c.user_id===currentUser.id;
   const items=myCollItems.filter(x=>x.collection_id===c.id);
-  const rests=items.map(x=>myRests.find(r=>r.id===x.restaurant_id)||allRests.find(r=>r.id===x.restaurant_id)).filter(Boolean);
-  const visIcon={'public':'🌐','friends':'👥','private':'🔒'}[c.visibility||'public']||'🌐';
-  return`<div class="card" style="margin-bottom:10px">
-    <div class="card-inner" style="padding:14px 16px">
-      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
-            <span style="font-size:15px;font-weight:700">${c.name}</span>
-            <span style="font-size:11px;color:var(--th)">${visIcon}</span>
-            <span style="font-size:11px;color:var(--th)">${items.length}家</span>
-          </div>
-          ${c.description?`<div style="font-size:13px;color:var(--tm)">${c.description}</div>`:''}
-          ${!isOwn?`<div style="font-size:12px;color:var(--th);margin-top:3px">by ${c.display_name||c.username}</div>`:''}
-        </div>
-        ${isOwn?`<div style="display:flex;gap:6px;flex-shrink:0">
-          <button class="edit-btn" style="font-size:11px;padding:3px 9px" onclick="openCollectionSheet(${c.id})">编辑</button>
-        </div>`:''}
+  const visLabel={'public':'🌐 公开','friends':'👥 好友','private':'🔒 私密'}[c.visibility||'public']||'🌐 公开';
+
+  // Color palette based on collection name
+  const palettes=[
+    {bg:'#E8F5EE',accent:'#2A7A5C',text:'#1A5940'},
+    {bg:'#E6F1FB',accent:'#3A7FBF',text:'#1A4A6A'},
+    {bg:'#EEEDFE',accent:'#7F77DD',text:'#3C3489'},
+    {bg:'#FDF3DC',accent:'#C88A2A',text:'#7A5800'},
+    {bg:'#FAECE7',accent:'#C4523A',text:'#8B2A1A'},
+    {bg:'#F0FBF4',accent:'#2AAAB0',text:'#1A7A7E'},
+  ];
+  const p=palettes[c.name.charCodeAt(0)%palettes.length];
+
+  // Preview: first 3 restaurant names
+  const restNames=items.slice(0,3).map(x=>{
+    const r=[...myRests,...allRests].find(r=>r.id===x.restaurant_id);
+    return r?r.name:'';
+  }).filter(Boolean);
+
+  const coverHtml=`<div style="height:90px;background:${p.bg};border-radius:12px 12px 0 0;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
+    <div style="position:absolute;bottom:-8px;right:-8px;font-size:52px;opacity:.12;line-height:1">📋</div>
+    <div style="font-size:15px;font-weight:700;color:${p.text};line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${c.name}</div>
+    <div style="font-size:11px;color:${p.accent};font-weight:600">${items.length}家餐厅</div>
+  </div>`;
+
+  return`<div onclick="openCollDetail(${c.id})" style="background:white;border:1px solid var(--wb2);border-radius:12px;overflow:hidden;cursor:pointer;transition:box-shadow .2s;-webkit-tap-highlight-color:transparent" onmouseenter="this.style.boxShadow='0 4px 16px rgba(28,26,22,.1)'" onmouseleave="this.style.boxShadow=''">
+    ${coverHtml}
+    <div style="padding:10px 12px">
+      ${c.description?`<div style="font-size:12px;color:var(--tm);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px">${c.description}</div>`:''}
+      ${restNames.length?`<div style="font-size:11.5px;color:var(--th);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px">${restNames.join(' · ')}${items.length>3?' ...':''}</div>`:'<div style="font-size:11.5px;color:var(--th);margin-bottom:5px">还没有餐厅</div>'}
+      <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--th)">
+        <span>${visLabel}</span>
+        ${!isOwn?`<span>·</span><span>${c.display_name||c.username}</span>`:''}
       </div>
-      ${rests.length?`<div style="display:flex;gap:8px;flex-wrap:wrap">
-        ${rests.slice(0,6).map(r=>`<div onclick="openDetail(${r.id})" style="padding:5px 10px;background:var(--cream-d);border-radius:var(--rs);font-size:12px;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:4px">
-          <span>${r.name}</span>${r.rating?`<span style="color:#E8B84B;font-size:11px">${r.rating.toFixed(1)}★</span>`:''}
-        </div>`).join('')}
-        ${rests.length>6?`<span style="font-size:12px;color:var(--th);padding:5px 0">+${rests.length-6}</span>`:''}
-      </div>`:`<div style="font-size:13px;color:var(--th)">还没有添加餐厅</div>`}
     </div>
   </div>`;
+}
+
+function openCollDetail(collId){
+  _currentCollId=collId;
+  const c=myCollections.find(x=>x.id===collId);
+  if(!c)return;
+  const isOwn=c.user_id===currentUser.id;
+  document.getElementById('collDetailName').textContent=c.name;
+  // Actions
+  const actions=document.getElementById('collDetailActions');
+  if(isOwn){
+    actions.innerHTML=`<button class="edit-btn" style="font-size:11px;padding:3px 10px" onclick="openCollectionSheet(${c.id})">✏️ 编辑</button>`;
+  }else{actions.innerHTML='';}
+  // Meta
+  const visLabel={'public':'🌐 公开','friends':'👥 好友可见','private':'🔒 私密'}[c.visibility||'public']||'🌐 公开';
+  const items=myCollItems.filter(x=>x.collection_id===collId);
+  document.getElementById('collDetailMeta').innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      ${!isOwn?`<div style="display:flex;align-items:center;gap:6px"><div class="user-tag-dot" style="width:24px;height:24px;font-size:11px">${(c.display_name||c.username).charAt(0).toUpperCase()}</div><span style="font-size:13px;font-weight:600">${c.display_name||c.username}</span></div>`:''}
+      <span style="font-size:12px;color:var(--th)">${visLabel}</span>
+      <span style="font-size:12px;color:var(--th)">${items.length}家餐厅</span>
+    </div>
+    ${c.description?`<div style="font-size:14px;color:var(--tm);margin-top:8px;line-height:1.6">${c.description}</div>`:''}`;
+  renderCollDetailItems(collId,isOwn);
+  document.getElementById('collDetailPage').style.display='block';
+  history.pushState({page:'collDetail',collId},'','');
+}
+
+function closeCollDetail(){
+  document.getElementById('collDetailPage').style.display='none';
+  _currentCollId=null;
+  history.back();
+}
+
+function renderCollDetailItems(collId,isOwn){
+  const el=document.getElementById('collDetailItems');
+  const items=myCollItems.filter(x=>x.collection_id===collId);
+  if(!items.length){
+    el.innerHTML=`<div class="empty" style="padding:32px 0"><div class="empty-en">Empty</div><p>还没有添加餐厅</p></div>`;
+    return;
+  }
+  const rests=items.map(item=>{
+    const r=[...myRests,...allRests].find(r=>r.id===item.restaurant_id);
+    return r?{...r,_itemId:item.id}:null;
+  }).filter(Boolean);
+
+  el.innerHTML=rests.map(r=>{
+    const img=r.images&&r.images[0];
+    return`<div style="display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid var(--wb);cursor:pointer" onclick="openDetail(${r.id})">
+      <!-- Thumbnail -->
+      <div style="width:80px;height:80px;border-radius:10px;overflow:hidden;flex-shrink:0;background:var(--cream-d)">
+        ${img?`<img src="${img}" style="width:100%;height:100%;object-fit:cover">`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px">${{restaurant:'🍽',cafe:'☕',dessert:'🍰',icecream:'🍦',bakery:'🥐',bar:'🍸',teahouse:'🍵',streetfood:'🥢',market:'🛒'}[r.venue_type]||'🍽'}</div>`}
+      </div>
+      <!-- Info -->
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="font-size:15px;font-weight:700">${r.name}</span>
+          <span class="badge ${r.status==='visited'?'b-visited':'b-wishlist'}" style="font-size:10px">${r.status==='visited'?'✓ 去过':'📌 想去'}</span>
+        </div>
+        <div style="font-size:13px;color:var(--tm);margin-bottom:5px;display:flex;gap:6px;flex-wrap:wrap">
+          ${r.cuisine_name?`<span>${r.cuisine_name}</span>`:''}
+          ${r.city?`<span style="color:var(--th)">· ${r.city}</span>`:''}
+        </div>
+        ${r.summary?`<div style="font-size:12.5px;color:var(--th);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+        ${r.tags&&r.tags.length?`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px">${r.tags.slice(0,3).map(t=>`<span class="tag-badge">${t}</span>`).join('')}</div>`:''}
+      </div>
+      <!-- Rating + remove -->
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0">
+        ${r.rating?`<span style="color:#E8B84B;font-size:14px;font-weight:700">${r.rating.toFixed(1)} ★</span>`:''}
+        ${isOwn?`<button onclick="event.stopPropagation();removeFromCollById(${r._itemId})" style="font-size:11px;padding:3px 8px;background:transparent;color:var(--th);border:1px solid var(--wb2);border-radius:12px;cursor:pointer;font-family:inherit">移除</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function removeFromCollById(itemId){
+  if(!confirm('从收藏单移除这家餐厅？'))return;
+  try{
+    await sbDel('collection_items',itemId);
+    myCollItems=myCollItems.filter(x=>x.id!==itemId);
+    if(_currentCollId){
+      const c=myCollections.find(x=>x.id===_currentCollId);
+      renderCollDetailItems(_currentCollId,c&&c.user_id===currentUser.id);
+    }
+    showToast('已移除');
+  }catch(e){showToast('移除失败')}
 }
 
 function openCollectionSheet(collId=null){
@@ -3420,45 +3523,64 @@ async function deleteCollection(){
   }catch(e){showToast('删除失败')}
 }
 
-// Add restaurant to collection from detail page
 function openAddToCollSheet(restId,restName){
+  window._addToCollRestId=restId;
   const mine=myCollections.filter(c=>c.user_id===currentUser.id);
-  document.getElementById('addToCollRestName').textContent=`将「${restName}」加入收藏单`;
+  document.getElementById('addToCollRestName').innerHTML=`<span style="font-size:13px;color:var(--tm)">将</span> <strong>${restName}</strong> <span style="font-size:13px;color:var(--tm)">加入收藏单</span>`;
+  const listEl=document.getElementById('addToCollList');
   if(!mine.length){
-    document.getElementById('addToCollList').innerHTML=`<div style="text-align:center;padding:20px;color:var(--th)"><div style="margin-bottom:10px">还没有收藏单</div><button onclick="closeSheet('addToCollSheet');openCollectionSheet()" class="btn-fetch">新建收藏单</button></div>`;
+    listEl.innerHTML=`<div style="text-align:center;padding:24px 0;color:var(--th)">
+      <div style="font-size:14px;margin-bottom:12px">还没有收藏单</div>
+      <button onclick="closeSheet('addToCollSheet');openCollectionSheet()" class="btn-fetch">+ 新建收藏单</button>
+    </div>`;
   }else{
-    document.getElementById('addToCollList').innerHTML=mine.map(c=>{
-      const already=myCollItems.some(x=>x.collection_id===c.id&&x.restaurant_id===restId);
-      const n=myCollItems.filter(x=>x.collection_id===c.id).length;
-      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--cream-d)">
-        <div style="flex:1"><div style="font-size:14px;font-weight:600">${c.name}</div><div style="font-size:12px;color:var(--th)">${n}家</div></div>
-        ${already
-          ?`<button onclick="removeFromColl(${c.id},${restId})" style="font-size:12px;padding:5px 12px;background:var(--coral-l);color:var(--coral);border:1px solid rgba(196,82,58,.2);border-radius:20px;cursor:pointer;font-family:inherit">已加入 ✓</button>`
-          :`<button onclick="addToColl(${c.id},${restId},'${restName.replace(/'/g,"\\'")}',this)" style="font-size:12px;padding:5px 12px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-family:inherit">+ 加入</button>`
-        }
-      </div>`;
-    }).join('');
+    listEl.innerHTML=`<div style="margin-bottom:8px">
+      ${mine.map(c=>{
+        const already=myCollItems.some(x=>x.collection_id===c.id&&x.restaurant_id===restId);
+        const n=myCollItems.filter(x=>x.collection_id===c.id).length;
+        const palettes=[{bg:'#E8F5EE',text:'#1A5940'},{bg:'#E6F1FB',text:'#1A4A6A'},{bg:'#EEEDFE',text:'#3C3489'},{bg:'#FDF3DC',text:'#7A5800'},{bg:'#FAECE7',text:'#8B2A1A'},{bg:'#F0FBF4',text:'#1A7A7E'}];
+        const p=palettes[c.name.charCodeAt(0)%palettes.length];
+        return`<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cream-d)">
+          <div style="width:40px;height:40px;border-radius:8px;background:${p.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <span style="font-size:16px;font-weight:700;color:${p.text}">${c.name.charAt(0)}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+            <div style="font-size:12px;color:var(--th)">${n}家餐厅</div>
+          </div>
+          ${already
+            ?`<button onclick="removeFromCollByRestId(${c.id},${restId})" style="font-size:12px;padding:6px 12px;background:var(--cream-d);color:var(--tm);border:none;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">✓ 已收藏</button>`
+            :`<button onclick="addToColl(${c.id},${restId},'${c.name.replace(/'/g,"\\'")}',this)" style="font-size:12px;padding:6px 14px;background:var(--teal);color:white;border:none;border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">收藏</button>`
+          }
+        </div>`;
+      }).join('')}
+    </div>
+    <button onclick="closeSheet('addToCollSheet');openCollectionSheet()" style="width:100%;padding:10px;background:transparent;border:1px dashed var(--wb2);border-radius:var(--rs);font-size:13px;color:var(--tm);cursor:pointer;font-family:inherit">+ 新建收藏单</button>`;
   }
   document.getElementById('addToCollSheet').classList.add('open');
 }
 
-async function addToColl(collId,restId,restName,btn){
-  try{
-    const res=await sbPost('collection_items',{collection_id:collId,restaurant_id:restId});
-    if(res&&res[0])myCollItems.push(res[0]);
-    if(btn){btn.textContent='已加入 ✓';btn.style.background='var(--coral-l)';btn.style.color='var(--coral)';btn.onclick=null;}
-    showToast(`已加入「${restName}」`);
-  }catch(e){showToast('添加失败')}
-}
-
-async function removeFromColl(collId,restId){
+async function removeFromCollByRestId(collId,restId){
   const item=myCollItems.find(x=>x.collection_id===collId&&x.restaurant_id===restId);
   if(!item)return;
   try{
     await sbDel('collection_items',item.id);
     myCollItems=myCollItems.filter(x=>x.id!==item.id);
-    openAddToCollSheet(restId,document.getElementById('addToCollRestName').textContent.replace('将「','').replace('」加入收藏单',''));
-  }catch(e){showToast('移除失败')}
+    const restName=([...myRests,...allRests].find(r=>r.id===restId)||{}).name||'';
+    openAddToCollSheet(restId,restName);
+    showToast('已从收藏单移除');
+  }catch(e){showToast('操作失败')}
+}
+
+async function addToColl(collId,restId,collName,btn){
+  if(btn){btn.disabled=true;btn.textContent='...';}
+  try{
+    const res=await sbPost('collection_items',{collection_id:collId,restaurant_id:restId});
+    if(res&&res[0])myCollItems.push(res[0]);
+    const restName=([...myRests,...allRests].find(r=>r.id===restId)||{}).name||'';
+    openAddToCollSheet(restId,restName);
+    showToast(`✓ 已收藏到「${collName}」`);
+  }catch(e){showToast('添加失败');if(btn){btn.disabled=false;btn.textContent='收藏';}}
 }
 
 // ── Notifications ──
