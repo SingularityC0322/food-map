@@ -114,6 +114,8 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 .award-chip{padding:6px 13px;border:1.5px solid var(--wb2);border-radius:20px;background:white;font-size:13px;cursor:pointer;font-family:inherit;color:var(--tm);transition:all .15s}
 .award-chip.on{border-color:var(--gold);background:var(--gold-l);color:#7A6010;font-weight:600}
 .priv-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-top:1px solid var(--wb);margin-top:4px}
+.form-group-card{background:var(--cream);border:1px solid var(--wb2);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.form-group-label{font-size:11px;font-weight:700;color:var(--tm);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--wb)}
 .priv-row-label{font-size:14px;color:var(--tm)}
 .priv-row-sub{font-size:12px;color:var(--th);margin-top:2px}
 .tog-switch{width:40px;height:22px;border-radius:11px;background:var(--cream-d);border:1px solid var(--wb2);position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
@@ -515,83 +517,107 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-top"><div class="sheet-title" id="restSheetTitle">添加餐厅</div><button class="sheet-close-btn" onclick="closeSheet('restSheet')">×</button></div>
-    <div class="fg"><label class="fl">状态</label><div class="tog-row"><button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button><button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button></div></div>
-    <div class="fr">
-      <div class="fg"><label class="fl">餐厅名称</label><input class="fi" id="rName" placeholder="餐厅名"/></div>
-      <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="东京、台北、上海..."/></div>
-    </div>
-    <div class="fg"><label class="fl">店铺类型</label>
-      <div class="tog-row" id="venueTypeRow">
-        <button class="tog c-teal on" onclick="selVenueType(this,'restaurant')">🍽 餐厅</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'dessert')">🍰 甜品店</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'icecream')">🍦 冰激凌</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市集/美食市场</button>
-        <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
+
+    <!-- ① 基本信息 -->
+    <div class="form-group-card">
+      <div class="form-group-label">📍 基本信息</div>
+      <div class="fg"><label class="fl">状态</label><div class="tog-row"><button class="tog c-blue on" onclick="selTog(this,'restStatus','wishlist')">📌 想去</button><button class="tog c-teal" onclick="selTog(this,'restStatus','visited')">✓ 去过</button></div></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">餐厅名称 <span style="color:var(--coral)">*</span></label><input class="fi" id="rName" placeholder="餐厅名称"/></div>
+        <div class="fg"><label class="fl">城市</label><input class="fi" id="rCity" placeholder="上海、东京、巴黎..."/></div>
       </div>
-    </div>
-    <div class="fg"><label class="fl">菜系（可选）</label><select class="fi" id="rCuisine"></select></div>
-    <div class="fg"><label class="fl">整体评分（可选）</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
-    <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
-    <div class="fg"><label class="fl">总结（可选）</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色、氛围..."></div></div></div>
-    <div class="fg"><label class="fl">荣誉认证（可多选）</label><div class="award-row" id="awardRow"></div></div>
-    <!-- Tags -->
-    <div class="fg">
-      <label class="fl">自定义标签</label>
-      <div class="tag-input-wrap">
-        <div class="tag-chips" id="tagChips"></div>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <input class="fi" id="tagInput" placeholder="输入标签回车添加，如：约会、性价比高..." style="font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"/>
-          <button onclick="addTag()" class="btn-fetch" style="padding:8px 14px">添加</button>
+      <div class="fg"><label class="fl">店铺类型</label>
+        <div class="tog-row" id="venueTypeRow">
+          <button class="tog c-teal on" onclick="selVenueType(this,'restaurant')">🍽 餐厅</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'dessert')">🍰 甜品店</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'icecream')">🍦 冰激凌</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'cafe')">☕ 咖啡馆</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'bakery')">🥐 面包烘焙</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 美食市集</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
         </div>
-        <div style="font-size:12px;color:var(--th);margin-top:5px">常用：<span class="tag-preset" onclick="addTagVal('约会')">约会</span> <span class="tag-preset" onclick="addTagVal('朋友聚')">朋友聚</span> <span class="tag-preset" onclick="addTagVal('一个人')">一个人</span> <span class="tag-preset" onclick="addTagVal('性价比')">性价比</span> <span class="tag-preset" onclick="addTagVal('环境好')">环境好</span> <span class="tag-preset" onclick="addTagVal('适合拍照')">适合拍照</span></div>
+      </div>
+      <div class="fg"><label class="fl">菜系</label><select class="fi" id="rCuisine"></select></div>
+    </div>
+
+    <!-- ② 评分评价 -->
+    <div class="form-group-card">
+      <div class="form-group-label">⭐ 评分 & 评价</div>
+      <div class="fg"><label class="fl">整体评分</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
+      <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
+      <div class="fg"><label class="fl">荣誉认证 <span style="font-weight:400;font-size:11px;color:var(--th)">可多选</span></label><div class="award-row" id="awardRow"></div></div>
+    </div>
+
+    <!-- ③ 详细描述 -->
+    <div class="form-group-card">
+      <div class="form-group-label">✍️ 详细描述</div>
+      <div class="fg"><label class="fl">总结感受</label><div class="rte-wrap"><div class="rte-toolbar" onmousedown="return false"><button onclick="rf('bold')" title="加粗"><b>B</b></button><button onclick="rf('italic')" title="斜体"><i>I</i></button><button onclick="rf('underline')" title="下划线"><u>U</u></button><button onclick="rf('strikeThrough')" title="删除线"><s>S</s></button><span class="rte-sep"></span><button onclick="rf('fontSize','1')" title="小字">小</button><button onclick="rf('fontSize','3')" title="正常">中</button><button onclick="rf('fontSize','5')" title="大字">大</button><span class="rte-sep"></span><button onclick="rfColor(this,'rSummary')" title="文字颜色" class="rte-color-btn">A</button><span class="rte-sep"></span><button onclick="rf('removeFormat')" title="清除格式">✕</button></div><div class="rte-body fi" id="rSummary" contenteditable="true" data-placeholder="整体感受、特色菜、氛围..."></div></div></div>
+      <div class="fg">
+        <label class="fl">自定义标签 <span style="font-weight:400;font-size:11px;color:var(--th)">最多10个</span></label>
+        <div class="tag-input-wrap">
+          <div class="tag-chips" id="tagChips"></div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input class="fi" id="tagInput" placeholder="输入后回车添加..." style="font-size:13px" onkeydown="if(event.key==='Enter'){event.preventDefault();addTag()}"/>
+            <button onclick="addTag()" class="btn-fetch" style="padding:8px 14px">添加</button>
+          </div>
+          <div style="font-size:12px;color:var(--th);margin-top:5px">快速添加：<span class="tag-preset" onclick="addTagVal('约会')">约会</span> <span class="tag-preset" onclick="addTagVal('朋友聚')">朋友聚</span> <span class="tag-preset" onclick="addTagVal('一个人')">一个人</span> <span class="tag-preset" onclick="addTagVal('性价比')">性价比</span> <span class="tag-preset" onclick="addTagVal('环境好')">环境好</span> <span class="tag-preset" onclick="addTagVal('适合拍照')">适合拍照</span></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">图片 <span style="font-weight:400;font-size:11px;color:var(--th)">最多4张，自动压缩</span></label>
+        <div id="imgPreviewRow" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
+        <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px dashed var(--wb2);border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--tm);transition:all .15s" id="imgUploadLabel">
+          <span>📷</span><span>点击上传图片</span>
+          <input type="file" id="imgUpload" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)"/>
+        </label>
       </div>
     </div>
-    <!-- Remind city (wishlist only) -->
-    <div class="fg" id="remindCityFg">
-      <label class="fl">去哪个城市时提醒我</label>
-      <input class="fi" id="remindCity" placeholder="填城市名，下次浏览时会提醒（可选）" style="font-size:14px"/>
-    </div>
-    <!-- Image upload -->
-    <div class="fg">
-      <label class="fl">图片（可选）</label>
-      <div id="imgPreviewRow" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"></div>
-      <label style="display:flex;align-items:center;gap:8px;padding:10px 14px;border:1px dashed var(--wb2);border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--tm);transition:all .15s" id="imgUploadLabel">
-        <span>📷</span><span>上传图片（最多4张）</span>
-        <input type="file" id="imgUpload" accept="image/*" multiple style="display:none" onchange="handleImgUpload(event)"/>
-      </label>
-    </div>
-    <!-- Dish section always visible -->
-    <div style="border-top:1px solid var(--wb);margin:4px 0 14px;padding-top:14px">
-      <div class="fl" style="margin-bottom:8px">菜品 / 单品记录 <span id="sheetDishCount" style="font-weight:400;text-transform:none;font-size:12px;color:var(--th)"></span></div>
+
+    <!-- ④ 菜品记录 -->
+    <div class="form-group-card">
+      <div class="form-group-label">🍜 菜品 / 单品记录 <span id="sheetDishCount" style="font-weight:400;font-size:11px;color:var(--th)"></span></div>
       <div id="sheetDishList"></div>
       <div style="background:var(--cream-d);border-radius:var(--rs);padding:12px;margin-top:6px">
         <div class="fr" style="margin-bottom:8px">
           <input class="fi" id="sdName" placeholder="菜名 / 单品名" style="font-size:14px"/>
           <input class="fi" id="sdNote" placeholder="感受（可选）" style="font-size:14px"/>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <div class="stars" id="sdStars" style="font-size:18px"></div>
           <span class="star-val" id="sdStarVal" style="font-size:13px">—</span>
           <div class="star-adj"><button onclick="adjStar('sd',-0.1)">−</button><button onclick="adjStar('sd',0.1)">+</button></div>
-          <button onclick="saveSheetDish()" style="margin-left:auto;padding:7px 16px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:inherit">+ 添加</button>
+          <div class="rl-row" style="margin:0 0 0 auto;gap:4px">
+            <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','必试')">必试</button>
+            <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','值得一吃')">值得一吃</button>
+            <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','一般')">一般</button>
+          </div>
+          <button onclick="saveSheetDish()" style="padding:7px 14px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" id="sdAddBtn">+ 添加</button>
         </div>
       </div>
     </div>
-    <div class="priv-row">
-      <div><div class="priv-row-label">可见范围</div><div class="priv-row-sub">决定谁能在广场看到这条记录</div></div>
-      <div class="tog-row" id="restVisRow" style="flex-shrink:0">
-        <button class="tog c-teal on" onclick="selVisibility('rest','public',this)">🌐 公开</button>
-        <button class="tog c-blue" onclick="selVisibility('rest','friends',this)">👥 好友</button>
-        <button class="tog c-teal" onclick="selVisibility('rest','private',this)">🔒 私密</button>
+
+    <!-- ⑤ 设置 -->
+    <div class="form-group-card">
+      <div class="form-group-label">⚙️ 设置</div>
+      <div class="fg" id="remindCityFg">
+        <label class="fl">去某城市时提醒我</label>
+        <input class="fi" id="remindCity" placeholder="填城市名，登录时顶部会出现提醒（可选）" style="font-size:14px"/>
+      </div>
+      <div class="priv-row" style="border:none;padding:0;margin-top:4px">
+        <div><div class="priv-row-label">可见范围</div><div class="priv-row-sub">决定谁能在广场看到这条记录</div></div>
+        <div class="tog-row" id="restVisRow" style="flex-shrink:0">
+          <button class="tog c-teal on" onclick="selVisibility('rest','public',this)">🌐 公开</button>
+          <button class="tog c-blue" onclick="selVisibility('rest','friends',this)">👥 好友</button>
+          <button class="tog c-teal" onclick="selVisibility('rest','private',this)">🔒 私密</button>
+        </div>
       </div>
     </div>
+
     <button class="btn-p" id="restSaveBtn" onclick="saveRest()">保存</button>
-    <button class="btn-s" onclick="closeSheet('restSheet')">完成</button>
+    <button class="btn-s" onclick="closeSheet('restSheet')">取消</button>
     <div id="restSheetDeleteRow" style="display:none;margin-top:8px">
       <button onclick="if(editingRestId){deleteRest(editingRestId);closeSheet('restSheet')}" style="width:100%;padding:11px;background:transparent;color:var(--coral);border:1px solid var(--coral-l);border-radius:var(--rs);font-size:14px;cursor:pointer;font-family:inherit">🗑 删除这家餐厅</button>
     </div>
@@ -602,12 +628,12 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 <div class="sheet-wrap" id="dishSheet" onclick="if(event.target===this)closeSheet('dishSheet')">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="sheet-top"><div class="sheet-title">添加一道菜</div><button class="sheet-close-btn" onclick="closeSheet('dishSheet')">×</button></div>
-    <div class="fg"><label class="fl">菜名</label><input class="fi" id="dName" placeholder="比如：黑松露炒饭"/></div>
+    <div class="sheet-top"><div class="sheet-title" id="dishSheetTitle">添加一道菜</div><button class="sheet-close-btn" onclick="closeSheet('dishSheet')">×</button></div>
+    <div class="fg"><label class="fl">菜名 <span style="color:var(--coral)">*</span></label><input class="fi" id="dName" placeholder="比如：黑松露炒饭"/></div>
     <div class="fg"><label class="fl">评分</label><div class="star-row"><div class="stars" id="dishStars"></div><span class="star-val" id="dishStarVal">—</span><div class="star-adj"><button onclick="adjStar('dish',-0.1)">−</button><button onclick="adjStar('dish',0.1)">+</button></div></div></div>
     <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'dishLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button></div></div>
     <div class="fg"><label class="fl">感受（可选）</label><textarea class="fi" id="dNote" placeholder="一句话描述味道..."></textarea></div>
-    <button class="btn-p" onclick="saveDish()">保存</button>
+    <button class="btn-p" id="dishSaveBtn" onclick="saveDish()">保存</button>
     <button class="btn-s" onclick="closeSheet('dishSheet')">取消</button>
   </div>
 </div>
@@ -841,7 +867,7 @@ let myVisits=[],myComments=[]; // visits diary, friend comments
 let allRests=[],allDiscs=[];
 let myFriends=[],pendingIn=[],pendingOut=[];
 let restFilter='all',currentTab='mine',currentRestId=null,saving=false;
-let editingRestId=null,editingDiscId=null;
+let editingRestId=null,editingDiscId=null,editingDishId=null,editingVisitId=null;
 let selectedAwards=[];
 let groupByCity=false;
 let cityFilter='all';
@@ -855,7 +881,7 @@ function selVenueType(btn,val){
   document.querySelectorAll('#venueTypeRow .tog').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
 }
-const rlState={restLabel:'',dishLabel:'',visitLabel:'',commentLabel:''};
+const rlState={restLabel:'',dishLabel:'',visitLabel:'',commentLabel:'',sdLabel:''};
 const starState={rest:0,dish:0,sd:0,visit:0,comment:0};
 const visState={rest:'public',disc:'public'};
 
@@ -1102,6 +1128,8 @@ function toggleAward(a,btn){if(selectedAwards.includes(a)){selectedAwards=select
 // ── Restaurant sheet ──
 function openRestSheet(rest=null){
   editingRestId=rest?rest.id:null;
+  window._editingSheetDishId=null; // clear any in-progress dish edit
+  rlState.sdLabel=''; // reset dish label in form
   buildCuisineSelect('rCuisine');
   if(rest){
     togState.restStatus=rest.status;
@@ -1353,14 +1381,55 @@ function renderSheetDishes(restId){
   const cnt=document.getElementById('sheetDishCount');
   if(cnt)cnt.textContent=dishes.length?`（${dishes.length}道）`:'';
   document.getElementById('sheetDishList').innerHTML=dishes.length?dishes.map(d=>`
-    <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--wb);font-size:13px">
-      <span style="flex:1;font-weight:600">${d.name}</span>
-      <span style="color:var(--th);font-size:12px">${d.rating?d.rating.toFixed(1)+' ★':''} ${d.rating_label||''}</span>
-      ${d.note?`<span style="color:var(--th);font-size:12px">${d.note}</span>`:''}
-      <button class="del-btn" style="font-size:14px" onclick="deleteSheetDish(${d.id})">×</button>
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--wb);font-size:13px">
+      <div style="flex:1;min-width:0">
+        <span style="font-weight:600">${d.name}</span>
+        ${d.note?`<span style="color:var(--th);font-size:12px;margin-left:6px">${d.note}</span>`:''}
+      </div>
+      <span style="color:var(--th);font-size:12px;flex-shrink:0">${d.rating?d.rating.toFixed(1)+' ★':''} ${d.rating_label||''}</span>
+      <button class="edit-btn" style="font-size:11px;padding:3px 8px;flex-shrink:0" onclick="editSheetDish(${d.id})">编辑</button>
+      <button class="del-btn" style="font-size:14px;flex-shrink:0" onclick="deleteSheetDish(${d.id})">×</button>
     </div>`).join(''):'<div style="font-size:13px;color:var(--th);padding:4px 0 8px">在下方添加菜品 ↓</div>';
 }
+
+function editSheetDish(id){
+  const d=myDishes.find(x=>x.id===id);
+  if(!d)return;
+  window._editingSheetDishId=id;
+  document.getElementById('sdName').value=d.name;
+  document.getElementById('sdNote').value=d.note||'';
+  starState.sd=d.rating||0;
+  rlState.sdLabel=d.rating_label||'';
+  buildStars('sdStars','sdStarVal','sd');
+  document.getElementById('sdStarVal').textContent=d.rating?parseFloat(d.rating).toFixed(1):'—';
+  document.querySelectorAll('#restSheet .rl[onclick*="sdLabel"]').forEach(b=>{
+    b.classList.toggle('on',b.textContent===d.rating_label);
+  });
+  const btn=document.getElementById('sdAddBtn');
+  if(btn)btn.textContent='✓ 保存修改';
+  document.getElementById('sdName').scrollIntoView({behavior:'smooth',block:'center'});
+  document.getElementById('sdName').focus();
+}
 async function saveSheetDish(){
+  // If editing existing dish
+  if(window._editingSheetDishId){
+    const name=document.getElementById('sdName').value.trim();
+    if(!name){showToast('请填写菜名');return}
+    const entry={name,rating:starState.sd||null,rating_label:rlState.sdLabel||null,note:document.getElementById('sdNote').value.trim()||null};
+    try{
+      const res=await sbPatch('dishes',window._editingSheetDishId,entry);
+      const idx=myDishes.findIndex(d=>d.id===window._editingSheetDishId);
+      if(idx>-1&&res&&res[0])myDishes[idx]={...myDishes[idx],...res[0]};
+      window._editingSheetDishId=null;
+      const btn=document.getElementById('sdAddBtn');if(btn)btn.textContent='+ 添加';document.getElementById('sdNote').value='';
+      starState.sd=0;rlState.sdLabel='';
+      buildStars('sdStars','sdStarVal','sd');
+      document.getElementById('sdStarVal').textContent='—';
+      document.querySelectorAll('#restSheet .rl[onclick*="sdLabel"]').forEach(b=>b.classList.remove('on'));
+      renderSheetDishes(editingRestId);showToast('已修改');
+    }catch(e){showToast('修改失败')}
+    return;
+  }
   // If restaurant not saved yet, save it first
   if(!editingRestId){
     const name=document.getElementById('rName').value.trim();
@@ -1383,14 +1452,17 @@ async function saveSheetDish(){
   }
   const name=document.getElementById('sdName').value.trim();
   if(!name){showToast('请填写菜名');return}
-  const entry={restaurant_id:editingRestId,user_id:currentUser.id,name,rating:starState.sd||null,rating_label:null,note:document.getElementById('sdNote').value.trim()||null};
+  const entry={restaurant_id:editingRestId,user_id:currentUser.id,name,rating:starState.sd||null,rating_label:rlState.sdLabel||null,note:document.getElementById('sdNote').value.trim()||null};
   try{
     const res=await sbPost('dishes',entry);
     if(res&&res[0])myDishes.push(res[0]);
     document.getElementById('sdName').value='';
     document.getElementById('sdNote').value='';
-    starState.sd=0;buildStars('sdStars','sdStarVal','sd');
+    starState.sd=0;rlState.sdLabel='';
+    buildStars('sdStars','sdStarVal','sd');
     document.getElementById('sdStarVal').textContent='—';
+    document.querySelectorAll('#restSheet .rl[onclick*="sdLabel"]').forEach(b=>b.classList.remove('on'));
+    const btn=document.getElementById('sdAddBtn');if(btn)btn.textContent='+ 添加';
     renderSheetDishes(editingRestId);
     showToast('已添加');
   }catch(e){showToast('添加失败')}
@@ -1401,11 +1473,18 @@ async function deleteSheetDish(id){
 }
 
 // ── Dish sheet ──
-function openDishSheet(){
-  rlState.dishLabel='';starState.dish=0;
-  document.getElementById('dName').value='';document.getElementById('dNote').value='';
-  document.getElementById('dishStarVal').textContent='—';
-  document.querySelectorAll('#dishSheet .rl').forEach(b=>b.classList.remove('on'));
+function openDishSheet(dish=null){
+  editingDishId=dish?dish.id:null;
+  rlState.dishLabel=dish?dish.rating_label||'':'';
+  starState.dish=dish?dish.rating||0:0;
+  document.getElementById('dName').value=dish?dish.name:'';
+  document.getElementById('dNote').value=dish?dish.note||'':'';
+  document.getElementById('dishStarVal').textContent=dish&&dish.rating?dish.rating.toFixed(1):'—';
+  document.getElementById('dishSheetTitle').textContent=dish?'编辑菜品':'添加一道菜';
+  document.getElementById('dishSaveBtn').textContent=dish?'保存修改':'保存';
+  document.querySelectorAll('#dishSheet .rl').forEach(b=>{
+    b.classList.toggle('on',dish&&b.textContent===dish.rating_label);
+  });
   buildStars('dishStars','dishStarVal','dish');
   document.getElementById('dishSheet').classList.add('open');
 }
@@ -1413,10 +1492,21 @@ async function saveDish(){
   if(saving||!currentRestId)return;
   const name=document.getElementById('dName').value.trim();
   if(!name){showToast('请填写菜名');return}
-  const entry={restaurant_id:currentRestId,user_id:currentUser.id,name,rating:starState.dish||null,rating_label:rlState.dishLabel||null,note:document.getElementById('dNote').value.trim()||null};
+  const entry={name,rating:starState.dish||null,rating_label:rlState.dishLabel||null,note:document.getElementById('dNote').value.trim()||null};
   saving=true;
-  try{const res=await sbPost('dishes',entry);if(res&&res[0])myDishes.push(res[0]);closeSheet('dishSheet');renderDetail(currentRestId);showToast('已添加')}
-  catch(e){showToast('保存失败')}
+  try{
+    if(editingDishId){
+      const res=await sbPatch('dishes',editingDishId,entry);
+      const idx=myDishes.findIndex(d=>d.id===editingDishId);
+      if(idx>-1&&res&&res[0])myDishes[idx]={...myDishes[idx],...res[0]};
+      showToast('修改已保存');
+    }else{
+      const res=await sbPost('dishes',{...entry,restaurant_id:currentRestId,user_id:currentUser.id});
+      if(res&&res[0])myDishes.push(res[0]);
+      showToast('已添加');
+    }
+    closeSheet('dishSheet');renderDetail(currentRestId);
+  }catch(e){showToast('保存失败')}
   saving=false;
 }
 
@@ -1848,7 +1938,10 @@ function renderDetail(id){
   document.getElementById('dishRows').innerHTML=dl.length?dl.map(d=>`
     <div class="dish-row"><div class="dish-dot"></div>
       <div class="dish-body"><div class="dish-name">${d.name}</div>${d.note?`<div class="dish-note">${d.note}</div>`:''}<div class="dish-rating">${d.rating?d.rating.toFixed(1)+' ★ ':''}${d.rating_label||''}</div></div>
-      ${own?`<button class="del-btn" onclick="deleteDish(${d.id})">×</button>`:''}
+      ${own?`<div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="edit-btn" style="font-size:11px;padding:3px 8px" onclick="openDishSheet(${JSON.stringify(d).replace(/"/g,'&quot;')})">编辑</button>
+        <button class="del-btn" onclick="deleteDish(${d.id})">×</button>
+      </div>`:''}
     </div>`).join(''):'<div style="color:var(--th);font-size:14px;padding:8px 0">暂无菜品记录</div>';
   // Render visits
   renderVisits(id,own);
@@ -1866,41 +1959,58 @@ function renderDetail(id){
 function renderVisits(restId,own){
   const el=document.getElementById('visitRows');
   if(!el)return;
-  const visits=myVisits.filter(v=>v.restaurant_id===restId).sort((a,b)=>b.visited_date?.localeCompare(a.visited_date||'')||0);
+  const visits=myVisits.filter(v=>v.restaurant_id===restId).sort((a,b)=>(b.visited_date||'').localeCompare(a.visited_date||'')||0);
   if(!visits.length){el.innerHTML='<div style="color:var(--th);font-size:14px;padding:8px 0">还没有探访日记，点上方按钮记录这次体验</div>';return}
   el.innerHTML=visits.map(v=>`
     <div style="border:1px solid var(--wb);border-radius:var(--rs);padding:13px 15px;margin-bottom:10px;background:white">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <span style="font-size:13px;font-weight:600;color:var(--text)">${v.visited_date||fmtDate(v.created_at)}</span>
         ${v.rating?`<span style="color:#E8B84B;font-weight:700;font-size:14px">${parseFloat(v.rating).toFixed(1)} ★</span>`:''}
         ${v.rating_label?`<span class="badge b-visited" style="font-size:10px">${v.rating_label}</span>`:''}
-        ${own?`<button class="del-btn" style="margin-left:auto" onclick="deleteVisit(${v.id})">×</button>`:''}
+        ${own?`<div style="display:flex;gap:4px;margin-left:auto">
+          <button class="edit-btn" style="font-size:11px;padding:3px 8px" onclick="openVisitSheet(${v.id})">编辑</button>
+          <button class="del-btn" onclick="deleteVisit(${v.id})">×</button>
+        </div>`:''}
       </div>
       ${v.summary?`<div style="font-size:13.5px;color:var(--tm);line-height:1.7">${v.summary}</div>`:''}
     </div>`).join('');
 }
-function openVisitSheet(){
-  rlState.visitLabel='';starState.visit=0;
-  rteSet('visitSummary','');
-  document.getElementById('visitDate').value=new Date().toISOString().slice(0,10);
-  document.getElementById('visitStarVal').textContent='—';
-  document.querySelectorAll('#visitSheet .rl').forEach(b=>b.classList.remove('on'));
+function openVisitSheet(visitId=null){
+  const v=visitId?myVisits.find(x=>x.id===visitId):null;
+  editingVisitId=v?v.id:null;
+  rlState.visitLabel=v?v.rating_label||'':'';
+  starState.visit=v?v.rating||0:0;
+  rteSet('visitSummary',v?v.summary||'':'');
+  document.getElementById('visitDate').value=v?v.visited_date||'':new Date().toISOString().slice(0,10);
+  document.getElementById('visitStarVal').textContent=v&&v.rating?parseFloat(v.rating).toFixed(1):'—';
+  document.getElementById('visitSheetTitle').textContent=v?'编辑探访日记':'记录这次探访';
+  document.querySelectorAll('#visitSheet .rl').forEach(b=>{
+    b.classList.toggle('on',v&&b.textContent===v.rating_label);
+  });
   buildStars('visitStars','visitStarVal','visit');
   document.getElementById('visitSheet').classList.add('open');
 }
 async function saveVisit(){
   if(!currentRestId)return;
-  const entry={restaurant_id:currentRestId,user_id:currentUser.id,
+  const entry={
     visited_date:document.getElementById('visitDate').value||null,
     rating:starState.visit||null,
     rating_label:rlState.visitLabel||null,
-    summary:rteGet('visitSummary')||null};
+    summary:rteGet('visitSummary')||null
+  };
   try{
-    const res=await sbPost('visits',entry);
-    if(res&&res[0])myVisits.unshift(res[0]);
+    if(editingVisitId){
+      const res=await sbPatch('visits',editingVisitId,entry);
+      const idx=myVisits.findIndex(v=>v.id===editingVisitId);
+      if(idx>-1&&res&&res[0])myVisits[idx]={...myVisits[idx],...res[0]};
+      showToast('日记已更新');
+    }else{
+      const res=await sbPost('visits',{...entry,restaurant_id:currentRestId,user_id:currentUser.id});
+      if(res&&res[0])myVisits.unshift(res[0]);
+      showToast('日记已保存');
+    }
     closeSheet('visitSheet');
     renderVisits(currentRestId,true);
-    showToast('日记已保存');
   }catch(e){showToast('保存失败')}
 }
 async function deleteVisit(id){
@@ -1919,44 +2029,58 @@ function renderComments(restId,own){
   if(!el)return;
   const comments=myComments.filter(c=>c.restaurant_id===restId);
   if(!comments.length){el.innerHTML='<div style="color:var(--th);font-size:14px;padding:8px 0">暂无好友评价</div>';return}
-  // avg rating from comments
   const rated=comments.filter(c=>c.rating);
   const avg=rated.length?(rated.reduce((s,c)=>s+parseFloat(c.rating),0)/rated.length).toFixed(1):'';
   el.innerHTML=(avg?`<div style="font-size:13px;color:var(--th);margin-bottom:10px">好友平均评分：<span style="color:#E8B84B;font-weight:700">${avg} ★</span>（${rated.length}人评价）</div>`:'')
     +comments.map(c=>`
-    <div style="border-left:3px solid var(--teal-l);padding:10px 14px;margin-bottom:10px;background:white;border-radius:0 var(--rs) var(--rs) 0;border:1px solid var(--wb);border-left:3px solid var(--teal)">
+    <div style="border:1px solid var(--wb);border-left:3px solid var(--teal);padding:10px 14px;margin-bottom:10px;background:white;border-radius:0 var(--rs) var(--rs) 0">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <div class="user-tag-dot" style="width:22px;height:22px;font-size:10px">${(c.display_name||c.username||'?').charAt(0).toUpperCase()}</div>
         <span style="font-size:13px;font-weight:600">${c.display_name||c.username}</span>
         ${c.rating?`<span style="color:#E8B84B;font-size:13px;font-weight:700">${parseFloat(c.rating).toFixed(1)} ★</span>`:''}
         ${c.rating_label?`<span class="badge b-visited" style="font-size:10px">${c.rating_label}</span>`:''}
         <span style="font-size:11px;color:var(--th);margin-left:auto">${fmtDate(c.created_at)}</span>
-        ${c.user_id===currentUser.id?`<button class="del-btn" onclick="deleteComment(${c.id})">×</button>`:''}
+        ${c.user_id===currentUser.id?`<div style="display:flex;gap:4px">
+          <button class="edit-btn" style="font-size:11px;padding:3px 8px" onclick="openCommentSheet(${c.id})">编辑</button>
+          <button class="del-btn" onclick="deleteComment(${c.id})">×</button>
+        </div>`:''}
       </div>
       ${c.comment?`<div style="font-size:13.5px;color:var(--tm);line-height:1.7">${c.comment}</div>`:''}
     </div>`).join('');
 }
-function openCommentSheet(){
-  rlState.commentLabel='';starState.comment=0;
-  document.getElementById('commentText').value='';
-  document.getElementById('commentStarVal').textContent='—';
-  document.querySelectorAll('#commentSheet .rl').forEach(b=>b.classList.remove('on'));
+function openCommentSheet(commentId=null){
+  const c=commentId?myComments.find(x=>x.id===commentId):null;
+  window._editingCommentId=c?c.id:null;
+  rlState.commentLabel=c?c.rating_label||'':'';
+  starState.comment=c?c.rating||0:0;
+  document.getElementById('commentText').value=c?c.comment||'':'';
+  document.getElementById('commentStarVal').textContent=c&&c.rating?parseFloat(c.rating).toFixed(1):'—';
+  document.querySelectorAll('#commentSheet .rl').forEach(b=>{
+    b.classList.toggle('on',c&&b.textContent===c.rating_label);
+  });
+  // Update sheet title and button
+  const sheet=document.getElementById('commentSheet');
+  sheet.querySelector('.sheet-title').textContent=c?'编辑评价':'写评价';
+  sheet.querySelector('.btn-p').textContent=c?'保存修改':'发布评价';
   buildStars('commentStars','commentStarVal','comment');
-  document.getElementById('commentSheet').classList.add('open');
+  sheet.classList.add('open');
 }
 async function saveComment(){
   if(!currentRestId)return;
-  const entry={restaurant_id:currentRestId,user_id:currentUser.id,
-    username:currentUser.username,display_name:currentUser.display_name,
-    rating:starState.comment||null,
-    rating_label:rlState.commentLabel||null,
-    comment:document.getElementById('commentText').value.trim()||null};
+  const entry={rating:starState.comment||null,rating_label:rlState.commentLabel||null,comment:document.getElementById('commentText').value.trim()||null};
   try{
-    const res=await sbPost('restaurant_comments',entry);
-    if(res&&res[0])myComments.unshift(res[0]);
+    if(window._editingCommentId){
+      const res=await sbPatch('restaurant_comments',window._editingCommentId,entry);
+      const idx=myComments.findIndex(c=>c.id===window._editingCommentId);
+      if(idx>-1&&res&&res[0])myComments[idx]={...myComments[idx],...res[0]};
+      showToast('评价已更新');
+    }else{
+      const res=await sbPost('restaurant_comments',{...entry,restaurant_id:currentRestId,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name});
+      if(res&&res[0])myComments.unshift(res[0]);
+      showToast('评价已发布');
+    }
     closeSheet('commentSheet');
-    renderComments(currentRestId,false);
-    showToast('评价已发布');
+    renderComments(currentRestId,myRests.some(r=>r.id===currentRestId));
   }catch(e){showToast('发布失败')}
 }
 async function deleteComment(id){
