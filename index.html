@@ -205,7 +205,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 .bar-cnt{font-size:12px;color:var(--th);width:22px;text-align:right;flex-shrink:0}
 
 /* Detail */
-.detail-wrap{display:none;position:fixed;inset:0;background:var(--cream);z-index:50;overflow-y:auto}
+.detail-wrap{display:none;position:fixed;inset:0;background:var(--cream);z-index:60;overflow-y:auto}
 .detail-wrap.open{display:block}
 .detail-header{padding:10px 14px;border-bottom:1px solid var(--wb);display:flex;align-items:center;gap:8px;position:sticky;top:0;background:var(--cream);z-index:5}
 .back-btn{background:none;border:none;font-size:22px;cursor:pointer;color:var(--tm);padding:2px 6px}
@@ -446,7 +446,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   </div>
 
   <!-- Collection Detail Page (full-screen) -->
-  <div id="collDetailPage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:55;overflow-y:auto">
+  <div id="collDetailPage" style="display:none;position:fixed;inset:0;background:var(--cream);z-index:52;overflow-y:auto">
     <div style="position:sticky;top:0;background:rgba(250,248,243,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--wb);padding:10px 14px;display:flex;align-items:center;gap:10px;z-index:5">
       <button onclick="closeCollDetail()" style="display:flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:var(--teal);padding:6px 12px;border-radius:20px;background:var(--teal-l);border:none;cursor:pointer">← 返回</button>
       <div id="collDetailName" style="flex:1;font-family:var(--serif);font-size:17px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
@@ -3435,7 +3435,7 @@ function renderCollDetailItems(collId,isOwn){
   }).filter(Boolean);
 
   el.innerHTML=rests.map(r=>{
-    return`<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openDetailFromColl(${r.id},${c.id})">
+    return`<div class="card" style="margin-bottom:8px;cursor:pointer" onclick="openDetailFromColl(${r.id},${collId})">
       <div class="card-inner" style="padding:13px 15px">
         <div style="display:flex;align-items:flex-start;gap:10px">
           <div style="flex:1;min-width:0">
