@@ -917,7 +917,8 @@ async function sbDel(table,id){const r=await fetch(`${SB}/rest/v1/${table}?id=eq
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function closeSheet(id){
   document.getElementById(id).classList.remove('open');
-  if(id==='restSheet')stopDraftSave();
+  if(id==='restSheet'){stopDraftSave();clearDraft();}
+  if(id==='discSheet'){stopDiscDraft();localStorage.removeItem('disc_draft');}
 }
 
 // ── Auth ──
@@ -1209,18 +1210,17 @@ async function saveRest(){
       myRests=myRests.map(r=>r.id===editingRestId?{...r,...upd}:r);
       allRests=allRests.map(r=>r.id===editingRestId?{...r,...upd}:r);
       showToast('已更新');
+      clearDraft();
       closeSheet('restSheet');buildCityFilter();renderAll();
     }else{
       const full={...entry,user_id:currentUser.id,username:currentUser.username,display_name:currentUser.display_name};
       const res=await sbPost('restaurants',full);
       if(res&&res[0]){
         myRests.unshift(res[0]);allRests.unshift(res[0]);
-        editingRestId=res[0].id;
         clearDraft();
-        document.getElementById('restSaveBtn').textContent='保存修改';
-        document.getElementById('restSheetTitle').textContent='编辑餐厅';
-        renderSheetDishes(res[0].id);
+        stopDraftSave();
         showToast('已保存 ✓');
+        closeSheet('restSheet');
         buildCityFilter();renderAll();
       }
     }
