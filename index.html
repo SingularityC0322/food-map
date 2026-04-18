@@ -1106,8 +1106,6 @@ async function loadAll(){
       sbGet(`visits?user_id=eq.${currentUser.id}&order=visited_date.desc`),
       sbGet(`restaurant_comments?order=created_at.desc&limit=500`),
       sbGet(`notifications?user_id=eq.${currentUser.id}&order=created_at.desc&limit=50`),
-      sbGet(`collections?order=created_at.desc&limit=200`),
-      sbGet(`collection_items?order=created_at.asc&limit=2000`),
     ]);
     myRests=res[0]||[];myDishes=res[1]||[];myDiscs=res[2]||[];
     allRests=res[3]||[];allDiscs=res[4]||[];
@@ -1115,8 +1113,6 @@ async function loadAll(){
     myVisits=res[6]||[];
     myComments=res[7]||[];
     myNotifs=res[8]||[];
-    myCollections=res[9]||[];
-    myCollItems=res[10]||[];
     const acceptedRaw=fs.filter(f=>f.status==='accepted');
     const seenPairs=new Set();
     myFriends=acceptedRaw.filter(f=>{
@@ -1130,7 +1126,21 @@ async function loadAll(){
     updateFriendBadge();
     updateNotifBadge();
     renderAll();
-  }catch(e){showToast('加载失败，请刷新')}
+  }catch(e){console.error('loadAll error',e);showToast('加载失败，请刷新')}
+
+  // Load collections separately (new tables, may not exist yet)
+  try{
+    const[colls,collItems]=await Promise.all([
+      sbGet(`collections?order=created_at.desc&limit=200`),
+      sbGet(`collection_items?order=created_at.asc&limit=2000`),
+    ]);
+    myCollections=colls||[];
+    myCollItems=collItems||[];
+    if(currentTab==='collections')renderCollections();
+  }catch(e){
+    myCollections=[];myCollItems=[];
+    console.warn('Collections tables not ready yet, run SQL first');
+  }
 }
 
 // ── Tab ──
@@ -1141,7 +1151,6 @@ function switchTab(tab){
   document.getElementById(tab).classList.add('active');
   if(tab==='friends'){renderFriends();}
   if(tab==='collections'){renderCollections();}
-}
 }
 function handleFab(){if(restFilter==='disc')openDiscSheet();else openRestSheet();}
 
