@@ -1483,15 +1483,17 @@ function showImgFull(url){
   document.body.appendChild(d);
 }
 
-// ── Quick checkin ──
-async function quickCheckin(id){
-  if(!confirm('标记为「已去过」？'))return;
-  try{
-    await sbPatch('restaurants',id,{status:'visited'});
-    myRests=myRests.map(r=>r.id===id?{...r,status:'visited'}:r);
-    allRests=allRests.map(r=>r.id===id?{...r,status:'visited'}:r);
-    renderAll();showToast('✓ 已标记为去过');
-  }catch(e){showToast('操作失败')}
+// ── Quick checkin → opens edit sheet pre-filled as visited ──
+function quickCheckin(id){
+  const r=myRests.find(x=>x.id===id);
+  if(!r)return;
+  // Open edit sheet with status flipped to visited
+  openRestSheet({...r,status:'visited'});
+  // Switch the status toggle to visited
+  setTimeout(()=>{
+    const visitedBtn=[...document.querySelectorAll('#restSheet .tog')].find(b=>b.textContent.includes('去过'));
+    if(visitedBtn){visitedBtn.click();}
+  },50);
 }
 
 // ── Remind city check ──
@@ -1793,7 +1795,7 @@ function restCardHTML(r,showUser=false){
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0">
           ${r.rating?`<span style="color:#E8B84B;font-size:15px;font-weight:700">${r.rating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></span>`:''}
-          ${isOwn&&r.status==='wishlist'?`<button class="checkin-btn" onclick="event.stopPropagation();quickCheckin(${r.id})">✓ 已去</button>`:''}
+          ${isOwn&&r.status==='wishlist'?`<button class="checkin-btn" onclick="event.stopPropagation();quickCheckin(${r.id})" style="background:var(--cream-d);color:var(--tm);border-color:var(--wb2)">去过了 →</button>`:''}
           <span style="font-size:11px;color:var(--th)">${fmtDate(r.created_at)}</span>
           ${showUser?`<div class="user-tag"><div class="user-tag-dot">${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>${r.display_name||r.username}</div>`:`<div style="display:flex;gap:5px;align-items:center"><button class="edit-btn" onclick="event.stopPropagation();openAddToCollSheet(${r.id},'${r.name.replace(/'/g,"\\'")}')" style="font-size:11px;padding:3px 10px" title="加入收藏单">📋 收藏</button><button class="edit-btn" onclick="event.stopPropagation();editRest(${r.id})" style="font-size:11px;padding:2px 9px">编辑</button><button class="del-btn" onclick="event.stopPropagation();deleteRest(${r.id})" style="font-size:13px" title="删除">🗑</button></div>`}
         </div>
@@ -2074,7 +2076,10 @@ function sqGroupedRestCardHTML(group, friendIds, similarReps=[]){
           ${visitedCount?` · <span style="color:var(--teal)">✓ ${visitedCount}人去过</span>`:''}
           ${wishCount?` · <span style="color:var(--amber)">📌 ${wishCount}人想去</span>`:''}
         </div>
-        ${!own?`<button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" style="font-size:11px;padding:4px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit">+ 想去</button>`:''}
+        ${!own?`<div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" style="font-size:11px;padding:5px 11px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit">+ 想去</button>
+          <button onclick="event.stopPropagation();addAsVisited(${rep.id},${rep.user_id})" style="font-size:11px;padding:5px 11px;background:var(--amber-l);color:#7A5800;border:1px solid rgba(200,138,42,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit">+ 已去</button>
+        </div>`:''}
       </div>
       <!-- Reviews: collapsed by default, click to expand -->
       <div id="${cardId}_reviews" style="display:none;border-top:1px solid var(--cream-d);margin-top:6px">
@@ -2410,6 +2415,35 @@ async function addToWishlist(sourceRestId, restName, ownerUserId){
     }
     showToast(`✓ 已加入想去：${src.name}`);
   }catch(e){showToast('添加失败，请重试')}
+}
+
+// ── Add as visited (copy from others, open edit sheet) ──
+async function addAsVisited(sourceRestId, ownerUserId){
+  const src=[...allRests].find(r=>r.id===sourceRestId);
+  if(!src){showToast('找不到餐厅信息');return}
+  if(myRests.some(r=>r.name===src.name&&r.status==='visited')){showToast('你已经记录过去过这家了');return}
+  // Check if already have a wishlist entry → upgrade it
+  const existing=myRests.find(r=>r.name===src.name&&r.status==='wishlist');
+  // Pre-fill the rest sheet with source data, status=visited
+  const prefilled={
+    id:existing?existing.id:null,
+    name:src.name,city:src.city||null,venue_type:src.venue_type||'restaurant',
+    cuisine_id:src.cuisine_id||null,cuisine_name:src.cuisine_name||null,
+    status:'visited',
+    rating:src.rating||null,rating_label:src.rating_label||null,
+    summary:src.summary||null,
+    is_private:false,visibility:'public',
+    awards:src.awards||null,tags:src.tags||null,
+    images:null,remind_city:null,
+  };
+  openRestSheet(prefilled);
+  // Switch to visited
+  setTimeout(()=>{
+    const visitedBtn=[...document.querySelectorAll('#restSheet .tog')].find(b=>b.textContent.includes('去过'));
+    if(visitedBtn)visitedBtn.click();
+    // Show a note
+    showToast('已填入对方的评分和信息，可直接修改后保存');
+  },80);
 }
 
 // ── Map ──
