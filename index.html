@@ -2,8 +2,18 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Eat as a Local</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2A7A5C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="觅食">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+</style>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -3933,6 +3943,14 @@ async function init(){
   if(saved){try{setUser(JSON.parse(saved))}catch(e){sessionStorage.removeItem('fu_user')}}
 }
 init();
+// ── PWA Service Worker ──
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(r=>console.log('SW registered'))
+      .catch(e=>console.log('SW failed',e));
+  });
+}
 </script>
 </body>
 </html>
