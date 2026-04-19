@@ -435,7 +435,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <option value="bar">🍸 酒吧</option>
         <option value="teahouse">🍵 茶馆</option>
         <option value="streetfood">🥢 街头小吃</option>
-        <option value="market">🛒 美食市集</option>
+        <option value="market">🛒 市场/市集</option>
         <option value="other">其他</option>
       </select>
       <select class="sq-select" id="sqCuisineFilter" onchange="renderSquare()">
@@ -609,7 +609,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
           <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
           <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
           <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-          <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 美食市集</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市场/市集</button>
           <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
         </div>
       </div>
@@ -664,7 +664,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
           <div class="star-adj"><button onclick="adjStar('sd',-0.1)">−</button><button onclick="adjStar('sd',0.1)">+</button></div>
           <div class="rl-row" style="margin:0 0 0 auto;gap:4px">
             <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','必试')">必试</button>
-            <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','值得一吃')">值得一试</button>
+            <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','值得一试')">值得一试</button>
             <button class="rl" style="padding:4px 8px;font-size:11px" onclick="selRl(this,'sdLabel','一般')">一般</button>
           </div>
           <button onclick="saveSheetDish()" style="padding:7px 14px;background:var(--teal);color:white;border:none;border-radius:var(--rs);font-size:13px;cursor:pointer;font-family:inherit;flex-shrink:0" id="sdAddBtn">+ 添加</button>
@@ -829,7 +829,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="fg"><label class="fl">评价标签</label>
       <div class="rl-row">
         <button class="rl" onclick="selRl(this,'visitLabel','必试')">必试</button>
-        <button class="rl" onclick="selRl(this,'visitLabel','值得一吃')">值得一吃</button>
+        <button class="rl" onclick="selRl(this,'visitLabel','值得一试')">值得一试</button>
         <button class="rl" onclick="selRl(this,'visitLabel','一般')">一般</button>
         <button class="rl" onclick="selRl(this,'visitLabel','不推荐')">不推荐</button>
       </div>
@@ -866,7 +866,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="fg"><label class="fl">评价标签</label>
       <div class="rl-row">
         <button class="rl" onclick="selRl(this,'commentLabel','必试')">必试</button>
-        <button class="rl" onclick="selRl(this,'commentLabel','值得一吃')">值得一吃</button>
+        <button class="rl" onclick="selRl(this,'commentLabel','值得一试')">值得一试</button>
         <button class="rl" onclick="selRl(this,'commentLabel','一般')">一般</button>
         <button class="rl" onclick="selRl(this,'commentLabel','不推荐')">不推荐</button>
       </div>
