@@ -1031,6 +1031,52 @@ function fmtDate(s){if(!s)return'';const d=new Date(s);return`${d.getFullYear()}
 
 // ── Rich text editor ──
 function rf(cmd,val){document.execCommand(cmd,false,val||null)}
+
+// ── Intercept paste on all rich text areas: strip formatting, keep plain text ──
+document.addEventListener('paste',(e)=>{
+  const target=e.target;
+  if(!target.classList.contains('rte-body'))return;
+  e.preventDefault();
+
+  // Get plain text from clipboard
+  let text='';
+  if(e.clipboardData){
+    text=e.clipboardData.getData('text/plain');
+  }
+  if(!text)return;
+
+  // Clean: normalize line endings, remove null chars and other garbage
+  text=text
+    .replace(/\r\n/g,'\n')
+    .replace(/\r/g,'\n')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g,'') // strip control chars
+    .replace(/[^\S\n]+/g,' ') // normalize whitespace (not newlines)
+    .trim();
+
+  // Insert at cursor position
+  const sel=window.getSelection();
+  if(!sel||!sel.rangeCount){
+    // Fallback: append
+    target.innerText+=(target.innerText?'\n':'')+text;
+    return;
+  }
+  const range=sel.getRangeAt(0);
+  range.deleteContents();
+
+  // Split by newline and insert as text nodes with <br>
+  const lines=text.split('\n');
+  const frag=document.createDocumentFragment();
+  lines.forEach((line,i)=>{
+    if(i>0)frag.appendChild(document.createElement('br'));
+    if(line)frag.appendChild(document.createTextNode(line));
+  });
+  range.insertNode(frag);
+
+  // Move cursor to end of inserted content
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}, true); // capture phase so we get it before browser default
 function rfColor(btn,editorId){
   const input=document.createElement('input');input.type='color';input.value='#C4523A';
   input.onchange=()=>{document.getElementById(editorId).focus();document.execCommand('foreColor',false,input.value)};
@@ -1049,7 +1095,12 @@ async function sbDel(table,id){const r=await fetch(`${SB}/rest/v1/${table}?id=eq
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function closeSheet(id){
   document.getElementById(id).classList.remove('open');
-  if(id==='restSheet'){stopDraftSave();clearDraft();window._pendingWishlistNotif=null;}
+  if(id==='restSheet'){
+    stopDraftSave();
+    // Don't clear draft on cancel - keep it so user can recover
+    // Draft is only cleared on successful save
+    window._pendingWishlistNotif=null;
+  }
   if(id==='discSheet'){stopDiscDraft();localStorage.removeItem('disc_draft');}
 }
 
@@ -1328,27 +1379,49 @@ function openRestSheet(rest=null){
   if(cuisineFg)cuisineFg.style.display='';
   const dh=document.getElementById('dupHint');if(dh)dh.style.display='none';
   if(rest){
-    togState.restStatus=rest.status;
-    rlState.restLabel=rest.rating_label||'';
-    starState.rest=rest.rating||0;
-    venueType=rest.venue_type||'restaurant';
-    document.getElementById('rName').value=rest.name;
-    document.getElementById('rCity').value=rest.city||'';
-    rteSet('rSummary',rest.summary||'');
-    document.getElementById('restStarVal').textContent=rest.rating?rest.rating.toFixed(1):'—';
+    // Check if there's a newer unsaved draft for this record
+    const editDraftKey=rest.id?`rest_draft_edit_${rest.id}`:'';
+    const editDraft=editDraftKey?JSON.parse(localStorage.getItem(editDraftKey)||'null'):null;
+    const hasEditDraft=editDraft&&(Date.now()-(editDraft._ts||0)<86400000)&&(editDraft.summary||editDraft.name);
+
+    if(hasEditDraft){
+      // Restore from draft (user had unsaved changes)
+      togState.restStatus=editDraft.status||rest.status;
+      rlState.restLabel=editDraft.rl||'';
+      starState.rest=editDraft.rating||0;
+      venueType=editDraft.venue||rest.venue_type||'restaurant';
+      document.getElementById('rName').value=editDraft.name||rest.name;
+      document.getElementById('rCity').value=editDraft.city||rest.city||'';
+      rteSet('rSummary',editDraft.summary||'');
+      document.getElementById('restStarVal').textContent=editDraft.rating?parseFloat(editDraft.rating).toFixed(1):'—';
+      document.getElementById('remindCity').value=editDraft.remindCity||rest.remind_city||'';
+      selectedAwards=editDraft.awards||rest.awards||[];
+      currentTags=editDraft.tags||rest.tags||[];
+      visState.rest=editDraft.visibility||rest.visibility||'public';
+      currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
+      showToast('📝 已恢复未保存的编辑内容');
+    }else{
+      togState.restStatus=rest.status;
+      rlState.restLabel=rest.rating_label||'';
+      starState.rest=rest.rating||0;
+      venueType=rest.venue_type||'restaurant';
+      document.getElementById('rName').value=rest.name;
+      document.getElementById('rCity').value=rest.city||'';
+      rteSet('rSummary',rest.summary||'');
+      document.getElementById('restStarVal').textContent=rest.rating?rest.rating.toFixed(1):'—';
+      document.getElementById('remindCity').value=rest.remind_city||'';
+      visState.rest=rest.visibility||(rest.is_private?'private':'public');
+      selectedAwards=rest.awards?[...rest.awards]:[];
+      currentTags=rest.tags?[...rest.tags]:[];
+      currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
+    }
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
-    document.querySelectorAll('#restSheet .tog').forEach(b=>{if((rest.status==='wishlist'&&b.textContent.includes('想去'))||(rest.status==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
+    document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
     document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
-    document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rest.rating_label));
+    document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
     if(rest.cuisine_id){const sel=document.getElementById('rCuisine');[...sel.options].forEach(o=>{if(o.value===`${rest.cuisine_id}|${rest.cuisine_name}`)o.selected=true})}
-    visState.rest=rest.visibility||( rest.is_private?'private':'public');
-    selectedAwards=rest.awards?[...rest.awards]:[];
-    currentTags=rest.tags?[...rest.tags]:[];
-    currentImages=rest.images?rest.images.map(u=>({url:u,uploading:false})):[];
-    document.getElementById('remindCity').value=rest.remind_city||'';
     renderTagChips();renderImgPreviews();
     renderSheetDishes(rest.id);
-    // Also save draft when editing, so content isn't lost on crash
     startDraftSave();
   }else{
     const draft=JSON.parse(localStorage.getItem('rest_draft')||'null');
@@ -1571,27 +1644,37 @@ function startDraftSave(){
   stopDraftSave();
   _draftTimer=setInterval(()=>{
     try{
+      const nameEl=document.getElementById('rName');
+      const cityEl=document.getElementById('rCity');
+      const remindEl=document.getElementById('remindCity');
+      const summaryEl=document.getElementById('rSummary');
+      // Only save if sheet is open and has content
+      if(!nameEl||!document.getElementById('restSheet').classList.contains('open'))return;
       const draft={
         _ts:Date.now(),
         editingId:editingRestId||null,
-        name:document.getElementById('rName').value,
-        city:document.getElementById('rCity').value,
-        status:togState.restStatus,
-        venue:venueType,
-        rl:rlState.restLabel,
-        rating:starState.rest,
-        summary:rteGet('rSummary'),
-        remindCity:document.getElementById('remindCity').value,
-        awards:[...selectedAwards],
-        tags:[...currentTags],
-        visibility:visState.rest,
+        name:nameEl.value||'',
+        city:cityEl?cityEl.value:'',
+        status:togState.restStatus||'wishlist',
+        venue:venueType||'restaurant',
+        rl:rlState.restLabel||'',
+        rating:starState.rest||0,
+        summary:summaryEl?summaryEl.innerHTML.trim():'',
+        remindCity:remindEl?remindEl.value:'',
+        awards:[...(selectedAwards||[])],
+        tags:[...(currentTags||[])],
+        visibility:visState.rest||'public',
       };
-      localStorage.setItem('rest_draft',JSON.stringify(draft));
-    }catch(e){}
+      const key=editingRestId?`rest_draft_edit_${editingRestId}`:'rest_draft';
+      localStorage.setItem(key,JSON.stringify(draft));
+    }catch(e){console.warn('draft save failed',e)}
   },1500);
 }
 function stopDraftSave(){if(_draftTimer){clearInterval(_draftTimer);_draftTimer=null}}
-function clearDraft(){localStorage.removeItem('rest_draft')}
+function clearDraft(){
+  localStorage.removeItem('rest_draft');
+  if(editingRestId)localStorage.removeItem(`rest_draft_edit_${editingRestId}`);
+}
 
 // ── Inline dish in restSheet ──
 function renderSheetDishes(restId){
@@ -3277,12 +3360,12 @@ function crc32(data){
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   const openSheet=document.querySelector('.sheet-wrap.open');
-  if(openSheet){openSheet.classList.remove('open');stopDraftSave();return}
+  if(openSheet){closeSheet(openSheet.id);return}
   if(document.getElementById('restDetail').classList.contains('open')){closeDetail();return}
 });
 window.addEventListener('popstate',()=>{
   const openSheet=document.querySelector('.sheet-wrap.open');
-  if(openSheet){openSheet.classList.remove('open');stopDraftSave();return}
+  if(openSheet){closeSheet(openSheet.id);return}
   if(document.getElementById('collDetailPage').style.display==='block'){document.getElementById('collDetailPage').style.display='none';_currentCollId=null;return}
   if(document.getElementById('profilePage').style.display==='block'){document.getElementById('profilePage').style.display='none';return}
   if(document.getElementById('restDetail').classList.contains('open')){closeDetail();return}
