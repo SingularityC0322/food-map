@@ -435,7 +435,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
         <option value="bar">🍸 酒吧</option>
         <option value="teahouse">🍵 茶馆</option>
         <option value="streetfood">🥢 街头小吃</option>
-        <option value="market">🛒 市场/市集</option>
+        <option value="market">🛒 美食市集</option>
         <option value="other">其他</option>
       </select>
       <select class="sq-select" id="sqCuisineFilter" onchange="renderSquare()">
@@ -609,7 +609,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
           <button class="tog c-teal" onclick="selVenueType(this,'bar')">🍸 酒吧</button>
           <button class="tog c-teal" onclick="selVenueType(this,'teahouse')">🍵 茶馆</button>
           <button class="tog c-teal" onclick="selVenueType(this,'streetfood')">🥢 街头小吃</button>
-          <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 市场/市集</button>
+          <button class="tog c-teal" onclick="selVenueType(this,'market')">🛒 美食市集</button>
           <button class="tog c-teal" onclick="selVenueType(this,'other')">其他</button>
         </div>
       </div>
@@ -620,7 +620,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="form-group-card">
       <div class="form-group-label">⭐ 评分 & 评价</div>
       <div class="fg"><label class="fl">整体评分</label><div class="star-row"><div class="stars" id="restStars"></div><span class="star-val" id="restStarVal">—</span><div class="star-adj"><button onclick="adjStar('rest',-0.1)">−</button><button onclick="adjStar('rest',0.1)">+</button></div></div></div>
-      <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
+      <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'restLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'restLabel','值得一试')">值得一试</button><button class="rl" onclick="selRl(this,'restLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'restLabel','不推荐')">不推荐</button></div></div>
       <div class="fg"><label class="fl">荣誉认证 <span style="font-weight:400;font-size:11px;color:var(--th)">可多选</span></label><div class="award-row" id="awardRow"></div></div>
     </div>
 
@@ -704,7 +704,7 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
     <div class="sheet-top"><div class="sheet-title" id="dishSheetTitle">添加一道菜</div><button class="sheet-close-btn" onclick="closeSheet('dishSheet')">×</button></div>
     <div class="fg"><label class="fl">菜名 <span style="color:var(--coral)">*</span></label><input class="fi" id="dName" placeholder="比如：黑松露炒饭"/></div>
     <div class="fg"><label class="fl">评分</label><div class="star-row"><div class="stars" id="dishStars"></div><span class="star-val" id="dishStarVal">—</span><div class="star-adj"><button onclick="adjStar('dish',-0.1)">−</button><button onclick="adjStar('dish',0.1)">+</button></div></div></div>
-    <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'dishLabel','值得一吃')">值得一吃</button><button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button></div></div>
+    <div class="fg"><label class="fl">评价标签</label><div class="rl-row"><button class="rl" onclick="selRl(this,'dishLabel','必试')">必试</button><button class="rl" onclick="selRl(this,'dishLabel','值得一试')">值得一试</button><button class="rl" onclick="selRl(this,'dishLabel','一般')">一般</button><button class="rl" onclick="selRl(this,'dishLabel','不推荐')">不推荐</button></div></div>
     <div class="fg"><label class="fl">感受（可选）</label><textarea class="fi" id="dNote" placeholder="一句话描述味道..."></textarea></div>
     <button class="btn-p" id="dishSaveBtn" onclick="saveDish()">保存</button>
     <button class="btn-s" onclick="closeSheet('dishSheet')">取消</button>
@@ -2648,8 +2648,8 @@ function renderStats(){
   </div>`:'';
 
   // Label distribution
-  const labels=['必试','值得一吃','一般','不推荐'];
-  const labelColors={'必试':'var(--teal)','值得一吃':'var(--blue)','一般':'var(--th)','不推荐':'var(--coral)'};
+  const labels=['必试','值得一试','一般','不推荐'];
+  const labelColors={'必试':'var(--teal)','值得一试':'var(--blue)','一般':'var(--th)','不推荐':'var(--coral)'};
   const labelCounts={};
   visited.forEach(r=>{if(r.rating_label)labelCounts[r.rating_label]=(labelCounts[r.rating_label]||0)+1;});
   const labelHtml=Object.keys(labelCounts).length?`<div class="chart-sec" style="margin-top:14px">
