@@ -1006,6 +1006,13 @@ function selVenueType(btn,val){
   venueType=val;
   document.querySelectorAll('#venueTypeRow .tog').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
+  // 只有餐厅类型才有菜系，其他类型隐藏菜系字段
+  const cuisineFg=document.querySelector('#restSheet .fg select#rCuisine')?.closest('.fg');
+  if(cuisineFg){
+    const showCuisine=(val==='restaurant'||val==='other');
+    cuisineFg.style.display=showCuisine?'':'none';
+    if(!showCuisine)document.getElementById('rCuisine').value='';
+  }
 }
 const rlState={restLabel:'',dishLabel:'',visitLabel:'',commentLabel:'',sdLabel:''};
 const starState={rest:0,dish:0,sd:0,visit:0,comment:0};
@@ -1317,6 +1324,9 @@ function openRestSheet(rest=null){
   window._editingSheetDishId=null;
   rlState.sdLabel='';
   buildCuisineSelect('rCuisine');
+  // Reset cuisine field visibility (default venue=restaurant → show cuisine)
+  const cuisineFg=document.querySelector('#restSheet .fg select#rCuisine')?.closest('.fg');
+  if(cuisineFg)cuisineFg.style.display='';
   const dh=document.getElementById('dupHint');if(dh)dh.style.display='none';
   if(rest){
     togState.restStatus=rest.status;
@@ -2077,6 +2087,94 @@ function renderSquare(){
     return;
   }
   list.innerHTML=html;
+}
+
+function sqRestCardHTML(group, friendIds, similarReps=[]){
+  const own=group.find(r=>r.user_id===currentUser.id);
+  const rep=own||[...group].sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
+  const vLabel=rep.venue_type&&rep.venue_type!=='restaurant'?VENUE_TYPES[rep.venue_type]||'':'';
+  const rated=group.filter(r=>r.rating);
+  const avgRating=rated.length?(rated.reduce((s,r)=>s+parseFloat(r.rating),0)/rated.length):0;
+
+  // Preview top 2 reviews inline
+  const preview=group.slice(0,2).map(r=>`
+    <div style="display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--cream-d);cursor:pointer" onclick="event.stopPropagation();openDetail(${r.id})">
+      <div class="user-tag-dot" style="width:22px;height:22px;font-size:10px;flex-shrink:0;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
+        ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap">
+          <span style="font-size:12px;font-weight:600">${r.display_name||r.username}</span>
+          ${r.rating?`<span style="color:#E8B84B;font-size:12px;font-weight:700">${parseFloat(r.rating).toFixed(1)}★</span>`:''}
+          ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+          <span style="font-size:11px;color:var(--th);margin-left:auto">${fmtDate(r.created_at)}</span>
+        </div>
+        ${r.summary?`<div style="font-size:12.5px;color:var(--th);line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+      </div>
+      <span style="font-size:11px;color:var(--teal);flex-shrink:0;align-self:center">→</span>
+    </div>`).join('');
+
+  // Remaining reviews collapsible
+  const rest=group.slice(2);
+  const cardId=`sqg_${rep.id}`;
+  const moreHtml=rest.length?`
+    <div id="${cardId}_more" style="display:none">${rest.map(r=>`
+      <div style="display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--cream-d);cursor:pointer" onclick="event.stopPropagation();openDetail(${r.id})">
+        <div class="user-tag-dot" style="width:22px;height:22px;font-size:10px;flex-shrink:0">
+          ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:2px;flex-wrap:wrap">
+            <span style="font-size:12px;font-weight:600">${r.display_name||r.username}</span>
+            ${r.rating?`<span style="color:#E8B84B;font-size:12px;font-weight:700">${parseFloat(r.rating).toFixed(1)}★</span>`:''}
+            ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
+          </div>
+          ${r.summary?`<div style="font-size:12.5px;color:var(--th);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rtePlain(r.summary)}</div>`:''}
+        </div>
+        <span style="font-size:11px;color:var(--teal);flex-shrink:0;align-self:center">→</span>
+      </div>`).join('')}
+    </div>
+    <button onclick="event.stopPropagation();toggleSqMore('${cardId}')" id="${cardId}_moreBtn"
+      style="width:100%;padding:6px;background:transparent;border:none;border-top:1px solid var(--cream-d);font-size:12px;color:var(--th);cursor:pointer;font-family:inherit;text-align:center;margin-top:4px">
+      ▾ 还有 ${rest.length} 条评价
+    </button>`:'';
+
+  return`<div class="card" style="margin-bottom:10px">
+    <div class="card-inner" style="padding:13px 16px">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+            <span style="font-size:15px;font-weight:700">${rep.name}</span>
+            ${vLabel?`<span style="font-size:10px;padding:2px 7px;border-radius:10px;background:var(--purple-l);color:#3C3489;font-weight:600">${vLabel}</span>`:''}
+            ${rep.awards&&rep.awards.length?`<span class="award-badge" style="font-size:10px">${rep.awards[0]}${rep.awards.length>1?' +'+(rep.awards.length-1):''}</span>`:''}
+          </div>
+          <div style="font-size:12.5px;color:var(--tm);display:flex;gap:5px;flex-wrap:wrap">
+            ${rep.cuisine_name?`<span>${rep.cuisine_name}</span>`:''}
+            ${rep.city?`<span style="color:var(--th)">· ${rep.city}</span>`:''}
+          </div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          ${avgRating?`<div style="color:#E8B84B;font-size:17px;font-weight:700;line-height:1.1">${avgRating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)"> ★</span></div>
+          <div style="font-size:11px;color:var(--th)">${rated.length}人评分</div>`:''}
+        </div>
+      </div>
+      ${!own?`<div style="display:flex;gap:6px;margin-bottom:8px">
+        <button onclick="addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" class="sq-action-btn">+ 想去</button>
+        <button onclick="addAsVisited(${rep.id},${rep.user_id})" class="sq-action-btn amber">+ 已去</button>
+      </div>`:''}
+      ${preview}
+      ${moreHtml}
+      ${similarReps.length?`<div style="margin-top:8px;padding:7px 10px;background:var(--amber-l);border-radius:var(--rs);font-size:11px;color:#7A5800">⚠ 可能是同一家：${similarReps.map(r=>`<strong>${r.name}</strong>${r.city?' ('+r.city+')':''}`).join('、')}</div>`:''}
+    </div>
+  </div>`;
+}
+
+function toggleSqMore(cardId){
+  const more=document.getElementById(cardId+'_more');
+  const btn=document.getElementById(cardId+'_moreBtn');
+  if(!more)return;
+  const open=more.style.display!=='none';
+  more.style.display=open?'none':'block';
+  const n=more.querySelectorAll('[style*="border-top"]').length;
+  btn.textContent=open?`▾ 还有 ${n} 条评价`:'▴ 收起';
 }
 
 function sqDiscCardHTML(d){
