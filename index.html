@@ -168,16 +168,6 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
 .pill:active{transform:scale(.97)}
 .sq-filter{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
 .sq-select{padding:7px 12px;border:1px solid var(--wb2);border-radius:var(--rs);font-size:13px;font-family:inherit;color:var(--text);background:white;outline:none;cursor:pointer}
-.sq-pill{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;border:1.5px solid var(--wb2);background:white;color:var(--tm);cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .15s;flex-shrink:0}
-.sq-pill.active{background:var(--teal);color:white;border-color:var(--teal);font-weight:600}
-.sq-pill:hover:not(.active){background:var(--cream-d);border-color:var(--cream-dd)}
-.sq-divider{width:1px;background:var(--wb2);flex-shrink:0;margin:4px 2px}
-.sq-city-section{margin-bottom:20px}
-.sq-city-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--cream-d)}
-.sq-city-name{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--text)}
-.sq-city-count{font-size:12px;color:var(--th);background:var(--cream-d);padding:2px 8px;border-radius:10px}
-.sq-compact-card{background:white;border:1px solid var(--wb2);border-radius:12px;padding:12px 14px;margin-bottom:8px;transition:box-shadow .15s}
-.sq-compact-card:hover{box-shadow:0 2px 12px rgba(28,26,22,.08)}
 .sq-action-btn{font-size:11px;padding:4px 10px;background:var(--teal-l);color:var(--teal-d);border:1px solid rgba(42,122,92,.2);border-radius:20px;cursor:pointer;font-weight:600;white-space:nowrap;font-family:inherit}
 .sq-action-btn.amber{background:var(--amber-l);color:#7A5800;border-color:rgba(200,138,42,.2)}
 
@@ -420,54 +410,48 @@ textarea.fi{resize:none;min-height:80px;line-height:1.6}
   </div>
 
   <!-- Square -->
-  <div id="square" class="section" style="padding-top:0">
-    <!-- Search -->
-    <div class="search-bar" style="margin-bottom:10px">
+  <div id="square" class="section">
+    <div class="search-bar">
       <span class="search-icon">🔍</span>
-      <input type="text" id="sqSearch" placeholder="搜索餐厅名、菜系、用户..." oninput="renderSquare()"/>
+      <input type="text" id="sqSearch" placeholder="搜索餐厅名、菜系、城市..." oninput="renderSquare()"/>
       <button class="search-clear" id="sqSearchClear" onclick="clearSearch('sq')">×</button>
     </div>
-
-    <!-- Filter bar: scrollable pills -->
-    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -18px;padding-left:18px;padding-right:18px" id="sqFilterBar">
-      <!-- Content type -->
-      <div class="sq-pill-group">
-        <button class="sq-pill active" data-filter="type" data-val="all" onclick="setSqFilter('type','all',this)">全部</button>
-        <button class="sq-pill" data-filter="type" data-val="restaurants" onclick="setSqFilter('type','restaurants',this)">✓ 餐厅</button>
-        <button class="sq-pill" data-filter="type" data-val="discoveries" onclick="setSqFilter('type','discoveries',this)">💡 发现</button>
-      </div>
-      <div class="sq-divider"></div>
-      <!-- Venue type -->
-      <button class="sq-pill" data-filter="venue" data-val="cafe" onclick="setSqFilter('venue','cafe',this)">☕ 咖啡</button>
-      <button class="sq-pill" data-filter="venue" data-val="dessert" onclick="setSqFilter('venue','dessert',this)">🍰 甜品</button>
-      <button class="sq-pill" data-filter="venue" data-val="bakery" onclick="setSqFilter('venue','bakery',this)">🥐 烘焙</button>
-      <button class="sq-pill" data-filter="venue" data-val="bar" onclick="setSqFilter('venue','bar',this)">🍸 酒吧</button>
-      <button class="sq-pill" data-filter="venue" data-val="icecream" onclick="setSqFilter('venue','icecream',this)">🍦 冰淇淋</button>
-      <button class="sq-pill" data-filter="venue" data-val="streetfood" onclick="setSqFilter('venue','streetfood',this)">🥢 街头小吃</button>
-      <div class="sq-divider"></div>
-      <!-- Rating -->
-      <button class="sq-pill" data-filter="rating" data-val="4.5" onclick="setSqFilter('rating','4.5',this)">⭐ 4.5+</button>
-      <button class="sq-pill" data-filter="rating" data-val="4" onclick="setSqFilter('rating','4',this)">⭐ 4+</button>
-      <button class="sq-pill" data-filter="rating" data-val="friends_high" onclick="setSqFilter('rating','friends_high',this)">好友精选</button>
-    </div>
-
-    <!-- Active filter row: city + person + cuisine dropdowns -->
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
-      <select class="sq-select" id="sqCityFilter" onchange="renderSquare()" style="font-size:12px;padding:5px 10px">
+    <div class="sq-filter" style="flex-wrap:wrap;gap:6px;margin-bottom:4px">
+      <select class="sq-select" id="sqTypeFilter" onchange="renderSquare()">
+        <option value="all">全部内容</option>
+        <option value="restaurants">✓ 去过的餐厅</option>
+        <option value="discoveries">💡 发现 & 灵感</option>
+      </select>
+      <select class="sq-select" id="sqCityFilter" onchange="renderSquare()">
         <option value="all">所有城市</option>
       </select>
-      <select class="sq-select" id="sqCuisineFilter" onchange="renderSquare()" style="font-size:12px;padding:5px 10px">
+      <select class="sq-select" id="sqVenueFilter" onchange="onSqVenueChange()">
+        <option value="all">所有类型</option>
+        <option value="restaurant">🍽 餐厅</option>
+        <option value="cafe">☕ 咖啡馆</option>
+        <option value="dessert">🍰 甜品店</option>
+        <option value="icecream">🍦 冰激凌</option>
+        <option value="bakery">🥐 面包烘焙</option>
+        <option value="bar">🍸 酒吧</option>
+        <option value="teahouse">🍵 茶馆</option>
+        <option value="streetfood">🥢 街头小吃</option>
+        <option value="market">🛒 美食市集</option>
+        <option value="other">其他</option>
+      </select>
+      <select class="sq-select" id="sqCuisineFilter" onchange="renderSquare()">
         <option value="all">所有菜系</option>
       </select>
-      <select class="sq-select" id="sqUserFilter" onchange="renderSquare()" style="font-size:12px;padding:5px 10px">
+      <select class="sq-select" id="sqRatingFilter" onchange="renderSquare()">
+        <option value="all">所有评分</option>
+        <option value="4.5">4.5分以上</option>
+        <option value="4">4分以上</option>
+        <option value="friends">好友精选(4.5+)</option>
+      </select>
+      <select class="sq-select" id="sqUserFilter" onchange="renderSquare()">
         <option value="all">所有人</option>
       </select>
-      <button id="sqResetBtn" onclick="resetSqFilters()" style="display:none;font-size:12px;padding:5px 12px;background:var(--coral-l);color:var(--coral);border:1px solid rgba(196,82,58,.2);border-radius:20px;cursor:pointer;font-family:inherit;white-space:nowrap">✕ 清除筛选</button>
     </div>
-
-    <!-- Results count -->
-    <div id="sqResultCount" style="font-size:12px;color:var(--th);margin-bottom:10px"></div>
-
+    <div id="sqResultCount" style="font-size:12px;color:var(--th);margin-bottom:8px;min-height:16px"></div>
     <div id="squareList"></div>
   </div>
 
@@ -1203,6 +1187,7 @@ function switchTab(tab){
   document.getElementById(tab).classList.add('active');
   if(tab==='friends'){renderFriends();}
   if(tab==='collections'){renderCollections();}
+  if(tab==='square'){onSqVenueChange();}
 }
 function handleFab(){if(restFilter==='disc')openDiscSheet();else openRestSheet();}
 
@@ -1289,48 +1274,6 @@ function onDiscRestChange(){
     dishes.map(d=>`<option value="${d.id}|${d.name}">${d.name}${d.rating?' '+parseFloat(d.rating).toFixed(1)+'★':''}</option>`).join('');
   dw.style.display='block';
 }
-function setSqFilter(key,val,btn){
-  // Toggle: clicking active pill resets to 'all'
-  if(sqFilters[key]===val&&val!=='all'){
-    sqFilters[key]='all';
-    // Reset all pills for this filter group
-    document.querySelectorAll(`.sq-pill[data-filter="${key}"]`).forEach(b=>b.classList.toggle('active',b.dataset.val==='all'));
-  }else{
-    sqFilters[key]=val;
-    document.querySelectorAll(`.sq-pill[data-filter="${key}"]`).forEach(b=>b.classList.toggle('active',b===btn||(val==='all'&&b.dataset.val==='all')));
-    // If venue/rating selected, clear type to 'all'
-    if((key==='venue'||key==='rating')&&val!=='all'){
-      sqFilters.type='all';
-      document.querySelectorAll('.sq-pill[data-filter="type"]').forEach(b=>b.classList.toggle('active',b.dataset.val==='all'));
-    }
-  }
-  updateSqResetBtn();
-  renderSquare();
-}
-
-function resetSqFilters(){
-  sqFilters.type='all';sqFilters.venue='all';sqFilters.rating='all';
-  document.querySelectorAll('.sq-pill').forEach(b=>b.classList.toggle('active',b.dataset.val==='all'));
-  document.getElementById('sqCityFilter').value='all';
-  document.getElementById('sqCuisineFilter').value='all';
-  document.getElementById('sqUserFilter').value='all';
-  document.getElementById('sqSearch').value='';
-  document.getElementById('sqSearchClear').style.display='none';
-  updateSqResetBtn();
-  renderSquare();
-}
-
-function updateSqResetBtn(){
-  const btn=document.getElementById('sqResetBtn');
-  if(!btn)return;
-  const hasFilter=sqFilters.type!=='all'||sqFilters.venue!=='all'||sqFilters.rating!=='all'
-    ||(document.getElementById('sqCityFilter')?.value||'all')!=='all'
-    ||(document.getElementById('sqCuisineFilter')?.value||'all')!=='all'
-    ||(document.getElementById('sqUserFilter')?.value||'all')!=='all'
-    ||getSearch('sq');
-  btn.style.display=hasFilter?'inline-block':'none';
-}
-
 function buildUserFilter(){
   const users=[...new Map(allRests.concat(allDiscs).map(x=>[x.username,{u:x.username,d:x.display_name||x.username}])).values()];
   document.getElementById('sqUserFilter').innerHTML='<option value="all">所有人</option>'+users.map(u=>`<option value="${u.u}">${u.d}</option>`).join('');
@@ -2024,19 +1967,31 @@ function renderMine(){
   }
 }
 
+// ── Square venue filter controls cuisine visibility ──
+function onSqVenueChange(){
+  const v=document.getElementById('sqVenueFilter').value;
+  const cf=document.getElementById('sqCuisineFilter');
+  // Only restaurants have meaningful cuisine categories
+  const showCuisine=(v==='all'||v==='restaurant');
+  if(cf){
+    cf.style.display=showCuisine?'':'none';
+    if(!showCuisine)cf.value='all'; // reset cuisine when hidden
+  }
+  renderSquare();
+}
+
 // ── Render Square ──
 function renderSquare(){
-  const tf=sqFilters.type;
-  const vf=sqFilters.venue;
-  const rf=sqFilters.rating;
-  const uf=document.getElementById('sqUserFilter')?.value||'all';
+  const tf=document.getElementById('sqTypeFilter').value;
+  const uf=document.getElementById('sqUserFilter').value;
   const cityF=document.getElementById('sqCityFilter')?.value||'all';
   const cuisineF=document.getElementById('sqCuisineFilter')?.value||'all';
+  const venueF=document.getElementById('sqVenueFilter')?.value||'all';
+  const ratingF=document.getElementById('sqRatingFilter')?.value||'all';
   const q=getSearch('sq');
   const list=document.getElementById('squareList');
   const countEl=document.getElementById('sqResultCount');
   const friendIds=new Set(myFriends.map(f=>f.user_id===currentUser.id?f.friend_id:f.user_id));
-  updateSqResetBtn();
 
   const canSee=(item)=>{
     if(item.user_id===currentUser.id)return true;
@@ -2046,197 +2001,82 @@ function renderSquare(){
     return true;
   };
 
-  let html='';
-  let totalGroups=0,totalDiscs=0;
+  let restHtml='',discHtml='';
+  let totalRest=0,totalDisc=0;
 
-  // ── Restaurants: group by city → then by name ──
+  // ── Restaurants ──
   if(tf!=='discoveries'){
     let rests=[...allRests].filter(canSee).filter(x=>x.status==='visited');
     if(uf!=='all')rests=rests.filter(x=>x.username===uf);
     if(cityF!=='all')rests=rests.filter(x=>(x.city||'').trim()===cityF);
     if(cuisineF!=='all')rests=rests.filter(x=>x.cuisine_name===cuisineF);
-    if(vf!=='all')rests=rests.filter(x=>x.venue_type===vf);
-    if(rf==='4.5')rests=rests.filter(x=>x.rating>=4.5);
-    else if(rf==='4')rests=rests.filter(x=>x.rating>=4);
-    else if(rf==='friends_high')rests=rests.filter(x=>friendIds.has(x.user_id)&&x.rating>=4.5);
+    if(venueF!=='all')rests=rests.filter(x=>(x.venue_type||'restaurant')===venueF);
+    if(ratingF==='4.5')rests=rests.filter(x=>x.rating>=4.5);
+    else if(ratingF==='4')rests=rests.filter(x=>x.rating>=4);
+    else if(ratingF==='friends')rests=rests.filter(x=>friendIds.has(x.user_id)&&x.rating>=4.5);
     if(q)rests=rests.filter(x=>
       x.name.toLowerCase().includes(q)||(x.city||'').toLowerCase().includes(q)||
       (x.cuisine_name||'').toLowerCase().includes(q)||rtePlain(x.summary||'').toLowerCase().includes(q)||
       (x.display_name||x.username||'').toLowerCase().includes(q)||(x.tags||[]).some(t=>t.toLowerCase().includes(q)));
 
     // Group by name+city
-    const byNameCity=new Map();
+    const grouped=new Map();
     rests.forEach(r=>{
       const key=(r.name+'|'+(r.city||'')).toLowerCase();
-      if(!byNameCity.has(key))byNameCity.set(key,[]);
-      byNameCity.get(key).push(r);
+      if(!grouped.has(key))grouped.set(key,[]);
+      grouped.get(key).push(r);
     });
+
+    // Sort groups: by avg rating desc, then latest
     const latestTs=arr=>arr.reduce((best,x)=>(x.created_at||'')>best?(x.created_at||''):best,'');
-
-    // Group further by city
-    const byCity=new Map();
-    [...byNameCity.values()].forEach(group=>{
-      const city=group[0].city||'';
-      if(!byCity.has(city))byCity.set(city,[]);
-      byCity.get(city).push(group);
+    const groups=[...grouped.values()].sort((a,b)=>{
+      const aR=a.filter(x=>x.rating),bR=b.filter(x=>x.rating);
+      const aAvg=aR.length?aR.reduce((s,x)=>s+x.rating,0)/aR.length:0;
+      const bAvg=bR.length?bR.reduce((s,x)=>s+x.rating,0)/bR.length:0;
+      return bAvg-aAvg||latestTs(b).localeCompare(latestTs(a));
     });
+    totalRest=groups.length;
 
-    // Sort cities by latest activity
-    const sortedCities=[...byCity.entries()].sort((a,b)=>{
-      const aLast=Math.max(...a[1].map(g=>latestTs(g)));
-      const bLast=Math.max(...b[1].map(g=>latestTs(g)));
-      return bLast.localeCompare(aLast);
-    });
-
-    // Fuzzy similarity across all groups
-    const allGroups=[...byNameCity.values()];
+    // Fuzzy similarity
     const stripName=n=>n.replace(/[（）()【】\s]/g,'').toLowerCase();
-    const groupList=allGroups.map(g=>({group:g,stripped:stripName(g[0].name)}));
+    const groupList=groups.map(g=>({group:g,stripped:stripName(g[0].name)}));
 
-    totalGroups=[...byNameCity.values()].length;
-
-    if(sortedCities.length){
-      sortedCities.forEach(([city,groups])=>{
-        // Sort groups within city by avg rating desc, then latest
-        groups.sort((a,b)=>{
-          const aRated=a.filter(r=>r.rating);
-          const bRated=b.filter(r=>r.rating);
-          const aAvg=aRated.length?aRated.reduce((s,r)=>s+r.rating,0)/aRated.length:0;
-          const bAvg=bRated.length?bRated.reduce((s,r)=>s+r.rating,0)/bRated.length:0;
-          return bAvg-aAvg||latestTs(b).localeCompare(latestTs(a));
-        });
-
-        const cityLabel=city||'未填写城市';
-        const totalInCity=groups.length;
-        html+=`<div class="sq-city-section">
-          <div class="sq-city-header">
-            <span class="sq-city-name">${cityLabel}</span>
-            <span class="sq-city-count">${totalInCity}家</span>
-          </div>
-          <div class="sq-grid">
-            ${groups.map(group=>{
-              // Find similar groups for fuzzy hint
-              const stripped=stripName(group[0].name);
-              const groupCity=(group[0].city||'').toLowerCase();
-              const similar=groupList.filter(x=>{
-                if(x.group===group)return false;
-                const xCity=(x.group[0].city||'').toLowerCase();
-                if(xCity&&groupCity&&xCity!==groupCity)return false;
-                return (x.stripped.includes(stripped)||stripped.includes(x.stripped))&&x.stripped!==stripped;
-              });
-              return sqCompactCardHTML(group,friendIds,similar.map(x=>x.group[0]));
-            }).join('')}
-          </div>
-        </div>`;
+    restHtml=groups.map((group,idx)=>{
+      const stripped=stripName(group[0].name);
+      const city=(group[0].city||'').toLowerCase();
+      const similar=groupList.filter((x,i)=>{
+        if(i===idx)return false;
+        const xCity=(x.group[0].city||'').toLowerCase();
+        if(xCity&&city&&xCity!==city)return false;
+        return (x.stripped.includes(stripped)||stripped.includes(x.stripped))&&x.stripped!==stripped;
       });
-    }
+      return sqRestCardHTML(group,friendIds,similar.map(x=>x.group[0]));
+    }).join('');
   }
 
-  // ── Discoveries: grid-style ──
-  if(tf!=='restaurants'&&vf==='all'){
+  // ── Discoveries ──
+  if(tf!=='restaurants'){
     let discs=[...allDiscs].filter(canSee);
     if(uf!=='all')discs=discs.filter(x=>x.username===uf);
     if(cuisineF!=='all')discs=discs.filter(x=>x.cuisine_name===cuisineF);
-    if(rf==='friends_high')discs=discs.filter(x=>friendIds.has(x.user_id));
+    if(ratingF==='friends')discs=discs.filter(x=>friendIds.has(x.user_id));
     if(q)discs=discs.filter(x=>x.name.toLowerCase().includes(q)||rtePlain(x.note||'').toLowerCase().includes(q)||(x.cuisine_name||'').toLowerCase().includes(q)||(x.display_name||x.username||'').toLowerCase().includes(q));
     discs.sort((a,b)=>b.created_at.localeCompare(a.created_at));
-    totalDiscs=discs.length;
-    if(discs.length){
-      html+=`<div class="sq-city-section">
-        <div class="sq-city-header"><span class="sq-city-name">💡 发现 & 灵感</span><span class="sq-city-count">${discs.length}条</span></div>
-        ${discs.map(d=>sqDiscCardHTML(d)).join('')}
-      </div>`;
-    }
+    totalDisc=discs.length;
+    discHtml=discs.map(d=>sqDiscCardHTML(d)).join('');
   }
 
-  if(countEl){
-    const parts=[];
-    if(tf!=='discoveries'&&totalGroups>0)parts.push(`${totalGroups}家餐厅`);
-    if(tf!=='restaurants'&&vf==='all'&&totalDiscs>0)parts.push(`${totalDiscs}条发现`);
-    countEl.textContent=parts.join(' · ');
-  }
+  const parts=[];
+  if(totalRest)parts.push(`${totalRest}家餐厅`);
+  if(totalDisc)parts.push(`${totalDisc}条发现`);
+  if(countEl)countEl.textContent=parts.join(' · ');
 
+  const html=restHtml+discHtml;
   if(!html){
-    list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here</div><p>${q||tf!=='all'||vf!=='all'||rf!=='all'||cityF!=='all'||cuisineF!=='all'?'没有符合条件的记录，试试清除筛选':'还没有公开内容'}</p></div>`;
+    list.innerHTML=`<div class="empty"><div class="empty-en">Nothing here</div><p>没有符合条件的内容</p></div>`;
     return;
   }
   list.innerHTML=html;
-}
-
-function sqCompactCardHTML(group, friendIds, similarReps=[]){
-  const own=group.find(r=>r.user_id===currentUser.id);
-  const rep=own||[...group].sort((a,b)=>(b.rating||0)-(a.rating||0))[0];
-  const vLabel=rep.venue_type&&rep.venue_type!=='restaurant'?VENUE_TYPES[rep.venue_type]||'':'';
-  const rated=group.filter(r=>r.rating);
-  const avgRating=rated.length?(rated.reduce((s,r)=>s+parseFloat(r.rating),0)/rated.length):0;
-  const friendIds2=friendIds; // closure
-  const cardId=`sqg_${rep.id}`;
-
-  // Avatars stacked
-  const avatars=group.slice(0,3).map((r,i)=>`<div class="user-tag-dot" style="width:18px;height:18px;font-size:9px;margin-left:${i?'-5px':'0'};border:1.5px solid white;z-index:${3-i};position:relative;flex-shrink:0;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
-    ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>`).join('');
-
-  // Mini reviews (shown when expanded)
-  const reviewsHtml=group.map(r=>`
-    <div style="display:flex;gap:8px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--cream-d);cursor:pointer" onclick="event.stopPropagation();openDetail(${r.id})">
-      <div class="user-tag-dot" style="width:22px;height:22px;font-size:10px;flex-shrink:0;cursor:pointer" onclick="event.stopPropagation();openProfile(${r.user_id},'${(r.display_name||r.username||'').replace(/'/g,"\\'")}','${(r.username||'').replace(/'/g,"\\'")}')">
-        ${(r.display_name||r.username||'?').charAt(0).toUpperCase()}</div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:2px">
-          <span style="font-size:12px;font-weight:600">${r.display_name||r.username}</span>
-          ${r.rating?`<span style="color:#E8B84B;font-size:12px;font-weight:700">${parseFloat(r.rating).toFixed(1)}★</span>`:''}
-          ${r.rating_label?`<span class="badge b-visited" style="font-size:10px">${r.rating_label}</span>`:''}
-          <span style="font-size:11px;color:var(--th);margin-left:auto">${fmtDate(r.created_at)}</span>
-        </div>
-        ${r.summary?`<div style="font-size:12px;color:var(--th);line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${rtePlain(r.summary)}</div>`:''}
-      </div>
-      <span style="font-size:11px;color:var(--teal);flex-shrink:0">→</span>
-    </div>`).join('');
-
-  return`<div class="sq-compact-card" id="${cardId}">
-    <!-- Main clickable header -->
-    <div onclick="toggleSqCompact('${cardId}')" style="cursor:pointer">
-      <div style="display:flex;align-items:flex-start;gap:8px">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px;line-height:1.3">${rep.name}</div>
-          <div style="font-size:12px;color:var(--tm);display:flex;gap:5px;align-items:center;flex-wrap:wrap">
-            ${rep.cuisine_name?`<span>${rep.cuisine_name}</span>`:''}
-            ${vLabel?`<span style="color:var(--purple)">${vLabel}</span>`:''}
-            ${rep.awards&&rep.awards.length?`<span class="award-badge" style="font-size:10px;padding:1px 6px">${rep.awards[0]}</span>`:''}
-          </div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          ${avgRating?`<div style="color:#E8B84B;font-size:15px;font-weight:700;line-height:1">${avgRating.toFixed(1)}<span style="font-size:10px;font-weight:400;color:var(--th)">★</span></div>`:''}
-          ${rated.length?`<div style="font-size:10px;color:var(--th)">${rated.length}人评分</div>`:''}
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:7px">
-        <div style="display:flex">${avatars}${group.length>3?`<div style="width:18px;height:18px;font-size:9px;border-radius:50%;background:var(--cream-dd);color:var(--tm);display:flex;align-items:center;justify-content:center;margin-left:-5px;border:1.5px solid white;font-weight:700">+${group.length-3}</div>`:''}</div>
-        <span style="font-size:11px;color:var(--th);flex:1">${group.length}人记录</span>
-        ${!own?`<button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" class="sq-action-btn">+ 想去</button>
-                <button onclick="event.stopPropagation();addAsVisited(${rep.id},${rep.user_id})" class="sq-action-btn amber">+ 已去</button>`:''}
-        <span style="font-size:11px;color:var(--th)" id="${cardId}_arrow">▾</span>
-      </div>
-    </div>
-    <!-- Expandable reviews -->
-    <div id="${cardId}_reviews" style="display:none">
-      ${reviewsHtml}
-      ${similarReps.length?`<div style="margin-top:8px;padding:7px 10px;background:var(--amber-l);border-radius:var(--rs);font-size:11px;color:var(--amber)">⚠ 可能是同一家：${similarReps.map(r=>`<strong>${r.name}</strong>`).join('、')}</div>`:''}
-    </div>
-  </div>`;
-}
-
-function toggleSqCompact(cardId){
-  const reviews=document.getElementById(cardId+'_reviews');
-  const arrow=document.getElementById(cardId+'_arrow');
-  const open=reviews.style.display!=='none';
-  reviews.style.display=open?'none':'block';
-  if(arrow)arrow.textContent=open?'▾':'▴';
-}
-
-// Keep old function for compatibility
-function sqGroupedRestCardHTML(group,friendIds,similarReps=[]){
-  return sqCompactCardHTML(group,friendIds,similarReps);
 }
 
 function sqDiscCardHTML(d){
