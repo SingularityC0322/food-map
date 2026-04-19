@@ -2136,27 +2136,53 @@ function sqRestCardHTML(group, friendIds, similarReps=[]){
       ▾ 还有 ${rest.length} 条评价
     </button>`:'';
 
-  // Compact meta: all on one line
-  const metaParts=[];
-  if(rep.city)metaParts.push(`<span>${rep.city}</span>`);
-  if(rep.cuisine_name)metaParts.push(`<span>${rep.cuisine_name}</span>`);
-  if(vLabel)metaParts.push(`<span style="color:var(--purple)">${vLabel}</span>`);
-  if(rep.awards&&rep.awards.length)metaParts.push(`<span class="award-badge" style="font-size:10px;padding:1px 6px">${rep.awards[0]}${rep.awards.length>1?' +'+(rep.awards.length-1):''}</span>`);
-  if(!own)metaParts.push(
-    `<button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" class="sq-action-btn" style="padding:2px 8px;font-size:11px">+ 想去</button>`,
-    `<button onclick="event.stopPropagation();addAsVisited(${rep.id},${rep.user_id})" class="sq-action-btn amber" style="padding:2px 8px;font-size:11px">+ 已去</button>`
-  );
+  // ── Cuisine: pick most common across group, normalize similar names ──
+  const isRest=!rep.venue_type||rep.venue_type==='restaurant';
+  let cuisineDisplay='';
+  if(isRest){
+    // Count cuisine names in group, pick most common
+    const cc={};
+    group.forEach(r=>{if(r.cuisine_name)cc[r.cuisine_name]=(cc[r.cuisine_name]||0)+1;});
+    const sorted=Object.entries(cc).sort((a,b)=>b[1]-a[1]);
+    if(sorted.length){
+      cuisineDisplay=sorted[0][0];
+      // If there are different cuisines, show a hint
+      if(sorted.length>1)cuisineDisplay+=` <span style="font-size:10px;color:var(--th);font-weight:400">(有${sorted.length}种说法)</span>`;
+    }
+  }
+
+  // ── Info line: name · city · type/cuisine ──
+  // type label: if restaurant show cuisine; if other type show type name
+  const typeInfo=isRest
+    ? (cuisineDisplay?`餐厅 · ${cuisineDisplay}`:'餐厅')
+    : (vLabel||'');
+
+  const awards=rep.awards&&rep.awards.length
+    ?`<span class="award-badge" style="font-size:10px;padding:1px 6px">${rep.awards[0]}${rep.awards.length>1?' +'+(rep.awards.length-1):''}</span>`
+    :'';
 
   return`<div class="card" style="margin-bottom:9px">
     <div class="card-inner" style="padding:12px 15px">
-      <!-- Header: name + rating on same line -->
-      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:5px">
-        <span style="font-size:15px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${rep.name}</span>
-        ${avgRating?`<span style="color:#E8B84B;font-size:14px;font-weight:700;flex-shrink:0">${avgRating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)">★ ${rated.length>1?rated.length+'人':''}</span></span>`:''}
-      </div>
-      <!-- All meta on one compact line -->
-      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--tm)">
-        ${metaParts.join('<span style="color:var(--cream-dd)">·</span>')}
+      <!-- Header row: left=name+meta, right=rating+buttons -->
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <div style="flex:1;min-width:0">
+          <!-- Name -->
+          <div style="font-size:15px;font-weight:700;margin-bottom:3px;line-height:1.3">${rep.name}</div>
+          <!-- Single info line: city · type/cuisine · awards -->
+          <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;font-size:12px;color:var(--tm)">
+            ${rep.city?`<span>${rep.city}</span><span style="color:var(--cream-dd)">·</span>`:''}
+            ${typeInfo?`<span>${typeInfo}</span>`:''}
+            ${awards}
+          </div>
+        </div>
+        <!-- Right: rating + action buttons -->
+        <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          ${avgRating?`<div style="color:#E8B84B;font-size:15px;font-weight:700;line-height:1.1">${avgRating.toFixed(1)}<span style="font-size:11px;font-weight:400;color:var(--th)">★${rated.length>1?' '+rated.length+'人':''}</span></div>`:''}
+          ${!own?`<div style="display:flex;gap:4px;margin-top:2px">
+            <button onclick="event.stopPropagation();addToWishlist(${rep.id},'${rep.name.replace(/'/g,"\\'")}',${rep.user_id})" class="sq-action-btn" style="padding:3px 8px;font-size:11px">+ 想去</button>
+            <button onclick="event.stopPropagation();addAsVisited(${rep.id},${rep.user_id})" class="sq-action-btn amber" style="padding:3px 8px;font-size:11px">+ 已去</button>
+          </div>`:''}
+        </div>
       </div>
       <!-- Reviews -->
       ${preview}
