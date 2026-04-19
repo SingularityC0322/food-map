@@ -1348,9 +1348,12 @@ function openRestSheet(rest=null){
     document.getElementById('remindCity').value=rest.remind_city||'';
     renderTagChips();renderImgPreviews();
     renderSheetDishes(rest.id);
+    // Also save draft when editing, so content isn't lost on crash
+    startDraftSave();
   }else{
     const draft=JSON.parse(localStorage.getItem('rest_draft')||'null');
-    const hasDraft=draft&&(draft.name||draft.summary);
+    // Only restore draft if it's recent (within 24h) and has content
+    const hasDraft=draft&&(draft.name||draft.summary)&&(Date.now()-(draft._ts||0)<86400000);
     if(hasDraft){
       togState.restStatus=draft.status||'wishlist';
       venueType=draft.venue||'restaurant';
@@ -1360,20 +1363,24 @@ function openRestSheet(rest=null){
       document.getElementById('rCity').value=draft.city||'';
       rteSet('rSummary',draft.summary||'');
       document.getElementById('restStarVal').textContent=draft.rating?parseFloat(draft.rating).toFixed(1):'—';
-      showToast('📝 已恢复上次草稿');
+      document.getElementById('remindCity').value=draft.remindCity||'';
+      if(draft.awards){selectedAwards=[...draft.awards];}
+      if(draft.tags){currentTags=[...draft.tags];}
+      if(draft.visibility){visState.rest=draft.visibility;}
+      showToast('📝 已恢复上次未保存的草稿');
     }else{
       togState.restStatus='wishlist';venueType='restaurant';rlState.restLabel='';starState.rest=0;
       document.getElementById('rName').value='';document.getElementById('rCity').value='';
       rteSet('rSummary','');
       document.getElementById('restStarVal').textContent='—';
+      document.getElementById('remindCity').value='';
+      visState.rest='public';selectedAwards=[];currentTags=[];
     }
+    currentImages=[];
     document.querySelectorAll('#restSheet .tog').forEach(b=>b.classList.remove('on'));
     document.querySelectorAll('#restSheet .tog').forEach(b=>{if((togState.restStatus==='wishlist'&&b.textContent.includes('想去'))||(togState.restStatus==='visited'&&b.textContent.includes('去过')))b.classList.add('on')});
     document.querySelectorAll('#venueTypeRow .tog').forEach(b=>{const m=b.getAttribute('onclick')||'';b.classList.toggle('on',m.includes("'"+venueType+"'"))});
     document.querySelectorAll('#restSheet .rl').forEach(b=>b.classList.toggle('on',b.textContent===rlState.restLabel));
-    visState.rest='public';selectedAwards=[];
-    currentTags=[];currentImages=[];
-    document.getElementById('remindCity').value='';
     document.getElementById('sheetDishList').innerHTML='';
     document.getElementById('sheetDishCount').textContent='';
     renderTagChips();renderImgPreviews();
@@ -1563,16 +1570,24 @@ let _draftTimer=null;
 function startDraftSave(){
   stopDraftSave();
   _draftTimer=setInterval(()=>{
-    localStorage.setItem('rest_draft',JSON.stringify({
-      name:document.getElementById('rName').value,
-      city:document.getElementById('rCity').value,
-      status:togState.restStatus,
-      venue:venueType,
-      rl:rlState.restLabel,
-      rating:starState.rest,
-      summary:rteGet('rSummary'),
-      //notes removed,
-    }));
+    try{
+      const draft={
+        _ts:Date.now(),
+        editingId:editingRestId||null,
+        name:document.getElementById('rName').value,
+        city:document.getElementById('rCity').value,
+        status:togState.restStatus,
+        venue:venueType,
+        rl:rlState.restLabel,
+        rating:starState.rest,
+        summary:rteGet('rSummary'),
+        remindCity:document.getElementById('remindCity').value,
+        awards:[...selectedAwards],
+        tags:[...currentTags],
+        visibility:visState.rest,
+      };
+      localStorage.setItem('rest_draft',JSON.stringify(draft));
+    }catch(e){}
   },1500);
 }
 function stopDraftSave(){if(_draftTimer){clearInterval(_draftTimer);_draftTimer=null}}
@@ -3812,6 +3827,20 @@ async function markAllRead(){
     renderNotifList();
   }catch(e){console.warn('mark read failed',e)}
 }
+
+// ── Warn before closing with unsaved content ──
+window.addEventListener('beforeunload',(e)=>{
+  const sheetOpen=document.querySelector('.sheet-wrap.open');
+  if(sheetOpen&&sheetOpen.id==='restSheet'){
+    const name=document.getElementById('rName')?.value||'';
+    const summary=rteGet('rSummary')||'';
+    if(name||summary){
+      e.preventDefault();
+      e.returnValue='你有未保存的记录，确定要离开吗？';
+      return e.returnValue;
+    }
+  }
+});
 
 // ── Init ──
 async function init(){
